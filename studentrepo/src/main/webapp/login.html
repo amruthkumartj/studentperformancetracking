@@ -124,14 +124,10 @@
     }
 
     .login-card {
-      max-width: 420px;
+      max-width: 500px; /* INCREASED WIDTH HERE */
       width: 100%;
       padding: 2rem 2.5rem 3rem;
       border-radius: 1rem;
-      /* Remove fixed positioning for desktop, use flexbox/margin for centering */
-      /* right: -450px; */ /* Removed */
-      /* bottom: -50px; */ /* Removed */
-      /* position: relative; */ /* Removed for default flow */
       background-color: rgba(255, 255, 255, 0.92);
       padding: 20px;
       border-radius: 10px;
@@ -252,19 +248,17 @@
 
     @media (max-width: 992px) { /* Adjust for tablets and smaller (Materialize default breakpoint) */
         html, body {
-            /* On smaller screens, allow content to flow naturally and center it */
             justify-content: flex-start; /* Reset vertical alignment for scrollable content */
             padding: 20px; /* Add some padding around the edges */
         }
 
         .login-card {
-            /* Remove fixed desktop positioning for mobile */
             position: static; /* Let it flow naturally */
             right: auto;
             bottom: auto;
             transform: none; /* Ensure no transforms interfering */
             margin: 20px auto; /* Center horizontally with auto margins */
-            max-width: 90%; /* Allow it to take more width on smaller screens */
+            max-width: 90%; /* Allows it to be 90% of screen width on smaller screens */
             padding: 1.5rem; /* Adjust padding if desired */
         }
 
@@ -279,8 +273,6 @@
             text-align: center; /* If it contains text, center it */
         }
 
-        /* Adjustments for the avatar and circles might be needed for very small screens
-           if their fixed sizes cause overflow or look too big/small */
         .genericavatar {
             height: 120px; /* Smaller avatar on mobile */
             width: 120px;
