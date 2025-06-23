@@ -3,13 +3,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Faculty Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <title>Faculty Dashboard</title>
 
-    <!-- Boxicons for icons -->
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 	<link rel="stylesheet" href="<%= request.getContextPath() %>/css/sidebar.css" />
 
@@ -237,9 +235,9 @@
         <button id="resetFiltersBtn" style="height: 40px; margin-bottom: 1px;">Reset Filters</button>
     </div>
     
-    <div style="overflow-x: auto; border-radius: 20px; max-width: 100%;"> 
-   <table id="studentsTable"  style="width: 100%; border-collapse: collapse; border-radius: 20px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-    <thead>
+    <div class="table-responsive">
+    <table id="studentsTable">
+     <thead>
         <tr >
             <th data-sort-col="0" data-sort-dir="asc" >
                 Student ID &nbsp;&nbsp;<span style="position: relative; right: -165px;" class="fa-solid fa-sort sort-icon"></span>
