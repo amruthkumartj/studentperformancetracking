@@ -6,7 +6,7 @@
          version="4.0">
 
     <welcome-file-list>
-        <welcome-file>login.html</welcome-file>
+        <welcome-file>facultyDashboard.jsp</welcome-file>
     </welcome-file-list>
 
     </web-app>
