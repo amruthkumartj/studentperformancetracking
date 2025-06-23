@@ -1,0 +1,883 @@
+ @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+:root {
+  --body-color: #E4E9F7;
+  --sidebar-color: #FFF;
+  --primary-color: #1707c4;
+  --primary-color-light: #F6F5FF;
+  --toggle-color: #DDD;
+  --text-color: #383838;
+  --tran-03: all 0.3s ease;
+  --tran-04: all 0.3s ease;
+  --tran-05: all 0.5s ease;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--body-color);
+  transition: var(--tran-05);
+}
+
+::selection {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+body.dark {
+  --body-color: #18191a;
+  --sidebar-color: #242526;
+  --primary-color: #3a3b3c;
+  --primary-color-light: #3a3b3c;
+  --toggle-color: #fff;
+  --text-color: #ccc;
+}
+
+nav.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 250px;
+  padding: 10px 14px;
+  background: var(--sidebar-color);
+  transition: var(--tran-05);
+  z-index: 100;
+}
+
+nav.sidebar.close {
+  width: 88px;
+}
+
+nav.sidebar li {
+  height: 50px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+nav.sidebar li.has-dropdown {
+  height: auto !important;
+}
+
+nav.sidebar .icon {
+  min-width: 60px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  border-radius: 6px;
+  color: #000;
+}
+
+nav.sidebar .text {
+  font-size: 17px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: var(--tran-03);
+}
+
+nav.sidebar.close .text {
+  opacity: 0;
+}
+
+nav.sidebar header {
+  position: relative;
+}
+
+header .image-text {
+  display: flex;
+  align-items: center;
+}
+
+header .logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+header .image img {
+  width: 40px;
+  border-radius: 6px;
+}
+
+header .toggle {
+  position: absolute;
+  top: 50%;
+  right: -35px;
+  transform: translateY(-50%) rotate(180deg);
+  height: 40px;
+  width: 40px;
+  background: var(--primary-color);
+  color: var(--sidebar-color);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  cursor: pointer;
+  transition: var(--tran-05);
+}
+
+nav.sidebar.close header .toggle {
+  transform: translateY(-50%) rotate(0deg);
+}
+
+body.dark header .toggle {
+  color: var(--text-color);
+}
+
+nav.sidebar .menu {
+  margin-top: 40px;
+}
+
+.menu-bar .menu-links,
+.bottom-content ul {
+  padding-left: 0;
+}
+
+nav.sidebar li.search-box {
+  border-radius: 6px;
+  background: var(--primary-color-light);
+  cursor: pointer;
+  transition: var(--tran-05);
+}
+
+nav.sidebar li.search-box input {
+  width: 100%;
+  border: none;
+  background: var(--primary-color-light);
+  color: var(--text-color);
+  border-radius: 6px;
+  font-size: 17px;
+  font-weight: 500;
+  outline: none;
+}
+
+nav.sidebar li a {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: var(--tran-03);
+}
+
+nav.sidebar li a:hover {
+  background: var(--primary-color);
+}
+
+nav.sidebar li a:hover .icon,
+nav.sidebar li a:hover .text {
+  color: var(--sidebar-color);
+}
+
+body.dark nav.sidebar li a:hover .icon,
+body.dark nav.sidebar li a:hover .text {
+  color: var(--text-color);
+}
+
+nav.sidebar .menu-bar {
+  height: calc(100% - 55px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow-y: auto;
+}
+
+nav.sidebar .menu-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.menu-bar .mode {
+  border-radius: 6px;
+  background: var(--primary-color-light);
+  position: relative;
+  transition: var(--tran-05);
+}
+
+.mode .sun-moon {
+  height: 50px;
+  width: 60px;
+  position: relative;
+}
+
+.sun-moon i {
+  position: absolute;
+}
+
+.sun-moon i.sun {
+  opacity: 0;
+}
+
+body.dark .sun-moon i.sun {
+  opacity: 1;
+}
+
+body.dark .sun-moon i.moon {
+  opacity: 0;
+}
+
+.toggle-switch {
+  position: absolute;
+  right: 0;
+  height: 100%;
+  min-width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.switch {
+  position: relative;
+  height: 22px;
+  width: 40px;
+  border-radius: 25px;
+  background: var(--toggle-color);
+  transition: var(--tran-05);
+}
+
+.switch::before {
+  content: '';
+  position: absolute;
+  height: 15px;
+  width: 15px;
+  border-radius: 50%;
+  top: 50%;
+  left: 5px;
+  transform: translateY(-50%);
+  background: var(--sidebar-color);
+  transition: var(--tran-04);
+}
+
+body.dark .switch::before {
+  left: 20px;
+}
+
+.home {
+  position: absolute;
+  top: 0;
+  left: 250px;
+  height: 100vh;
+  width: calc(100% - 250px);
+  background: var(--body-color);
+  transition: var(--tran-05);
+}
+
+nav.sidebar.close ~ .home {
+  left: 78px;
+  width: calc(100% - 78px);
+}
+
+.home .text {
+  font-size: 30px;
+  font-weight: 500;
+  color: var(--text-color);
+  padding: 12px 60px;
+}
+
+body.dark .home .text {
+  color: var(--sidebar-color);
+}
+
+/* Dark Mode Force-White Elements */
+body.dark nav.sidebar,
+body.dark nav.sidebar .text,
+body.dark nav.sidebar .icon,
+body.dark nav.sidebar .logo-text .profession,
+body.dark nav.sidebar .search-box input,
+body.dark .home .text,
+body.dark .mode-text,
+body.dark .sun-moon i {
+  color: #CCCCCC !important;
+}
+
+/* Dropdown Styles */
+.has-dropdown {
+  position: relative;
+  display: flex;
+  
+  flex-direction: column;
+}
+
+.has-dropdown.active .dropdown-menu {
+  display: flex;
+}
+
+.dropdown-menu {
+  display: none;
+  flex-direction: column;
+
+  margin-top: 6px;
+  gap: 6px;
+}
+
+.dropdown-menu li {
+  margin-bottom: 6px;
+}
+
+.dropdown-menu a {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-color);
+  text-decoration: none;
+}
+
+.arrow {
+  margin-left: auto;
+  transition: transform 0.3s ease;
+}
+
+.has-dropdown.active .arrow {
+  transform: rotate(180deg);
+}
+/* ─── FINAL VISUAL FIXES (paste at end) ───────────────────────────── */
+
+/* 1. Card grid responsive & even spacing */
+.dashboard-widgets{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:24px;
+    padding:24px 60px;
+}
+.card{
+    background:var(--sidebar-color);
+    color:var(--text-color);
+    padding:26px 20px;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,.05);
+    transition:transform .25s;
+}
+.card:hover{transform:translateY(-4px);}
+
+/* 2. Keep “Students” row full height on hover */
+.has-dropdown > a{
+   
+    display:flex;
+    align-items:center;
+    width:100%;
+
+}
+.has-dropdown > a:hover{
+    background:var(--primary-color);
+    color:#fff;
+}
+
+/* 3. Sub‑menu indentation, icon align, text wrap */
+.dropdown-menu{
+    padding-left:50px;      /* pushes sub‑links right */
+}
+.dropdown-menu a .icon{
+    font-size:18px;         /* smaller icon */
+    min-width:24px;
+}
+.dropdown-menu a .text{
+    white-space:normal;
+        /* allow long labels to wrap */
+    line-height:1.35;
+}
+
+/* 4. Arrow stays aligned when sidebar collapsed */
+nav.sidebar.close .has-dropdown > a{
+    justify-content:center; /* centers icon & arrow in 78‑px view */
+}
+/* Fix dropdown menu icon alignment in collapsed sidebar */
+.sidebar.close .dropdown-menu {
+    padding-left: 0px; /* remove left push when collapsed */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sidebar.close .dropdown-menu a {
+    justify-content: center; /* center icon and arrow */
+    padding: 10px 0;
+    width: 100%;
+}
+
+/* NEW — keep text visible inside the floating submenu */
+.sidebar.close .dropdown-menu a .text{
+    display:inline-block;
+    margin-left:8px;
+    color:var(--text-color);
+    white-space:normal;
+}
+
+.sidebar.close .dropdown-menu a .icon {
+    font-size: 22px; /* icon size in collapsed */
+    margin: 0;
+}
+/* ─── PATCH: collapsed-sidebar behaviour for Students dropdown ─── */
+
+/* 1️⃣  When sidebar is collapsed, show ONLY the main Students icon */
+.sidebar.close .has-dropdown > a {
+    justify-content: center;   /* center icon in 78-px bar          */
+    padding: 0;                /* remove side padding               */
+}
+
+/* 2️⃣  Hide the little chevron arrow in collapsed state            */
+.sidebar.close .dropdown-arrow {
+    display: none !important;
+}
+
+/* 3️⃣  Hide submenu icons/text until the dropdown is actually open */
+.sidebar.close .dropdown-menu {  /* collapsed & not active  */
+    display: none !important;
+}
+.sidebar.close .has-dropdown.active .dropdown-menu { /* show on click */
+    display: flex !important;
+    position: absolute;
+    left: 88px;                  /* float right of collapsed bar     */
+    top: 0;
+    background: var(--sidebar-color);
+    padding: 8px 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+/* ===== FIXED DROPDOWN POSITIONING ===== */
+        .sidebar.close .has-dropdown.active .dropdown-menu {
+            left: 88px; /* Align with expanded sidebar position */
+            top: auto; /* Remove fixed top positioning */
+            transform: translateY(-100%); /* Align vertically with parent */
+            min-width: 200px;
+        }
+
+        .sidebar.close .has-dropdown.active .dropdown-menu a {
+            justify-content: flex-start;
+            padding: 10px 15px;
+        }
+
+        .sidebar.close .has-dropdown.active .dropdown-menu .text {
+            display: inline-block !important;
+            margin-left: 10px;
+        }
+
+        .sidebar.close .has-dropdown.active .dropdown-menu .icon {
+            font-size: 20px;
+            min-width: 24px;
+            display: flex !important;
+        }
+
+        /* Ensure dropdown appears above content */
+        .has-dropdown {
+            position: static;
+        }
+
+        .dropdown-menu {
+            z-index: 200;
+        }
+/* Collapsed Sidebar - Floating Dropdown Fix */
+.sidebar.close .has-dropdown.active .dropdown-menu {
+  display: flex !important;
+  position: absolute;
+  left: 88px;
+  top: auto;
+  transform: translateY(-50%);
+  min-width: 220px;
+  background: var(--sidebar-color);
+  padding: 10px 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 200;
+}
+
+.sidebar.close .has-dropdown.active .dropdown-menu a {
+  justify-content: flex-start;
+  padding: 8px 14px;
+}
+
+.sidebar.close .has-dropdown.active .dropdown-menu .text {
+  display: inline-block !important;
+  margin-left: 10px;
+  white-space: normal;
+}
+
+.sidebar.close .has-dropdown.active .dropdown-menu .icon {
+  display: inline-flex;
+  min-width: 22px;
+  font-size: 18px;
+  align-items: center;
+  justify-content: center;
+}
+/* ✅ Show text inside floating submenu when sidebar is collapsed */
+.sidebar.close .has-dropdown.active .dropdown-menu .text {
+  opacity: 1 !important;
+  display: inline !important;
+  visibility: visible !important;
+  color: var(--text-color);
+  
+}
+.sidebar.close .has-dropdown.active .dropdown-menu a:hover .text {
+  color: var(--sidebar-color) !important; /* white in light mode */
+}
+body.dark .sidebar.close .has-dropdown.active .dropdown-menu a:hover .text {
+  color: var(--text-color) !important; /* light gray */
+}
+/* Normalize height and padding of dropdown toggle */
+
+/* === FINAL: collapsed sidebar look for "Students" row === */
+nav.sidebar.close .has-dropdown > a{
+    /* keep same size & rounded corners as other buttons */
+    height: 50px;
+    width: 100%;
+    border-radius: 6px;
+    /* centre icon + (invisible) chevron */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;                 /* small gap for future text/icon */
+    background: transparent;  /* normal background until hover   */
+}
+
+/* icon must stay visible */
+nav.sidebar.close .has-dropdown > a .icon{
+    font-size: 24px;  
+    padding-left: 7px;        /* clear, readable size            */
+    color: var(--text-color); /* same colour as other icons       */
+    min-width: 24px;
+}
+
+/* hide the text when collapsed */
+nav.sidebar.close .has-dropdown > a .text{
+    display: none;
+}
+
+/* hide chevron arrow when collapsed */
+nav.sidebar.close .dropdown-arrow{
+    display:none !important;
+}
+/* Hover effect when sidebar is collapsed */
+nav.sidebar.close .has-dropdown > a:hover {
+    background: var(--primary-color);
+    border-radius: 6px;
+}
+
+/* Ensure icon turns white on hover */
+nav.sidebar.close .has-dropdown > a:hover .icon {
+    color: var(--sidebar-color);
+}
+nav.sidebar .has-dropdown > a {
+  height: 50px;
+  padding-right: 50px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/* ╭─ DASHBOARD CARDS ────────────────────────────────────────╮ */
+
+
+.card i.icon {
+  font-size: 36px;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.card h3 {
+  font-size: 18px;
+  margin-bottom: 6px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.card p {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0;
+}
+
+body.dark .card {
+  background: var(--dark-sidebar);
+}
+
+body.dark .card h3 {
+  color: var(--dark-text);
+}
+
+body.dark .card p {
+  color: #81a4ff;
+}
+.feature-card {
+  background: #f0f0f0;
+  padding: 18px 22px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+  min-width: 160px;
+  text-align: center;
+}
+.feature-card:hover {
+  background: #dfeaff;
+  transform: scale(1.03);
+}
+
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #333;
+}
+.form-group input,
+.form-group select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  outline-color: #007bff;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #218838;
+}
+body.dark .feature-card {
+  background: #1e1e2f;
+  color: #eee;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+body.dark #addStudentCard {
+  background: #2a2a3d;
+  color: #f5f5f5;
+}
+
+body.dark input,
+body.dark select,
+body.dark label {
+  background-color: #3a3a4d;
+  color: #fff;
+  border: 1px solid #555;
+}
+
+body.dark input:focus,
+body.dark select:focus {
+  border-color: #888;
+  outline: none;
+}
+
+body.dark button {
+  background-color: #4c8bf5;
+  color: white;
+  border: none;
+}
+
+body.dark button:hover {
+  background-color: #366fdd;
+}
+/* ─── DARK MODE STYLES FOR THE FORM ───────────────────────────── */
+
+/* Default (light mode) */
+#addStudentCard {
+  background-color: white;
+  color: black;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Text fields and selects default */
+#addStudentCard input,
+#addStudentCard select {
+  background-color: white;
+  color: black;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+/* Labels default */
+#addStudentCard label {
+  color: black;
+}
+
+/* Button default */
+#addStudentCard button[type="submit"] {
+  background-color: #4c8bf5;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+/* =============================== */
+/* DARK MODE via body.dark class  */
+/* =============================== */
+
+body.dark #addStudentCard {
+  background-color: #1e1e2f !important;
+  color: #f1f1f1 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+body.dark #addStudentCard input,
+body.dark #addStudentCard select {
+  background-color: #2e2e44 !important;
+  color: #f9f9f9 !important;
+  border: 1px solid #555 !important;
+}
+
+body.dark #addStudentCard label,
+body.dark #addStudentCard h3,
+body.dark #addStudentCard h2 {
+  color: #e0e0e0 !important;
+}
+
+body.dark #addStudentCard button[type="submit"] {
+  background-color: #3a6ee8 !important;
+  color: white !important;
+}
+
+body.dark #addStudentCard button[type="submit"]:hover {
+  background-color: #2d5fcb !important;
+}
+/* Add these styles to your CSS */
+#addStudentMessage {
+    transition: all 0.3s ease;
+}
+
+.loading-message {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #0066cc;
+}
+
+.success-message {
+    color: #008000;
+    background-color: #eaffea;
+    border: 1px solid #b7efb7;
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.error-message {
+    color: #d8000c;
+    background-color: #ffebeb;
+    border: 1px solid #ffb3b3;
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.spinner {
+    border: 3px solid rgba(0, 102, 204, 0.3);
+    border-radius: 50%;
+    border-top: 3px solid #0066cc;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.form-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.form-buttons button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.form-buttons button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+}
+
+.form-buttons button[type="button"] {
+    background-color: #f0f0f0;
+    color: #333;
+}
+#dashboardSection {
+    display: block; /* Show by default */
+}
+
+#studentFeatures {
+    display: none; /* Hide by default */
+}
+#studentsTable {
+            display: table;
+            width: 95%;
+            margin-top: 30px;
+            
+            border-collapse: collapse;
+            background: var(--sidebar-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        #studentsTable th, #studentsTable td {
+            padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    color: var(--text-color); /* ADD THIS LINE */
+        }
+        
+        #studentsTable th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 500;
+        }
+        
+        #studentsTable tr:hover {
+            background-color: rgba(0,0,0,0.03);
+        }
+        /* ensure the message’s text never collapses */
+#addStudentMessage div {  
+    display: inline-block;
+    max-width: 100%;
+    word-wrap: break-word;   /* long lines wrap */
+}
+ #addStudentMessage { transition: all .2s ease; }  
+   body.dark #studentsTable {
+    background: #2a2a3d; /* A slightly different dark background for the table */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6); /* Stronger shadow in dark mode */
+}
+
+/* Ensure the text color within the table remains readable in dark mode */
+body.dark #studentsTable td {
+    color: black; 
+    background-color: #2e2e44 !important;
+  color: #f9f9f9 !important;
+  border: 1px solid #555 !important;/* A very light gray for better contrast against dark background */
+}
+
+/* Optional: Adjust header background in dark mode if needed */
+body.dark #studentsTable th {
+    background: var(--primary-color); /* This should work well if primary-color is dark enough */
+    color: #f5f5f5; /* Light color for headers */
+     border: 1px solid #555 !important;
+}
+.btn-action-edit {
+    margin-right: 10px; /* Adjust this value as needed for your desired space */
+}
