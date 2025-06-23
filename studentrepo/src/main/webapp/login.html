@@ -5,20 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Performance Tracking</title>
 
+  <!-- Google Fonts & Material Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <!-- Materialize CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" />
 
   <style>
-    /* Global Variables */
     :root {
       --primary: #4f378a;
       --secondary: #eaddff;
       --container-active: #d0c3f7;
     }
 
-    /* Base HTML/Body Styles (Desktop-first approach) */
     html, body {
       height: 100%;
       margin: 0;
@@ -26,112 +26,116 @@
       background: #fff;
       display: flex;
       flex-direction: column;
-      align-items: center; /* Center horizontally by default */
-      justify-content: center; /* Center vertically by default - changed from flex-start to center */
+      align-items: center;
+      justify-content: flex-start;
       background-image: url('https://upload.wikimedia.org/wikipedia/commons/d/d8/NHCE_Campus.jpg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* Optional: makes background stay while scrolling */
     }
-
-    /* Ensure images scale responsively */
-    img {
-        max-width: 100%;
-        height: auto; /* Maintain aspect ratio */
-    }
+   
 
     h5 { font-weight: 500; letter-spacing: .4px; }
     p.subtitle { margin: .2rem 0 2.5rem; color:#555; }
 
-    .genericavatar {
-      background-color: #eaddff;
-      height: 150px;
-      width: 150px;
-      border-radius: 40%;
-      margin: 0 auto 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
+.genericavatar {
+  background-color: #eaddff;
+  height: 150px;
+  width: 150px;
+  border-radius: 40%;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
 
-    .inneravatar {
-      position: relative;
-      height: 100px;
-      width: 100px;
-      transform: rotate(-90deg);
-    }
+.inneravatar {
+  position: relative;
+  height: 100px;
+  width: 100px;
+  
+  transform: rotate(-90deg); /* Tilt the "face" to the left */
+}
 
-    .circle {
-      position: absolute;
-      width: 50px;
-      height: 50px;
-      background-color: #4f378a;
-      border-radius: 50%;
-      top: 25px;
-    }
-    .circle2 {
-      position: absolute;
-      width: 180px;
-      height: 50px;
-      background-color: #4f378a;
-      border-radius: 50%;
-      top: 25px;
-    }
+.circle {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background-color: #4f378a;
+  border-radius: 50%;
+  top: 25px;
+}
+.circle2 {
+  position: absolute;
+  width: 180px;
+  height: 50px;
+  background-color: #4f378a;
+  border-radius: 50%;
+  top: 25px;
+  
+}
 
-    .circle-left {
-      left: -150px;
-      bottom: 15px;
-      width: 90px;
-      height: 100px;
-      background-color: #6c4ba3;
-      border-radius: 50%;
-      transform: translateX(100px)translateY(-23.5px);
-    }
+.circle-left {
+ left: -150px;          /* Move further to the left */
+  bottom: 15px;         /* Adjust vertical position if needed */
+  width: 90px;          /* Slightly bigger width */
+  height: 100px;         /* Slightly bigger height */
+  background-color: #6c4ba3; /* Optional: visible fill */
+  border-radius: 50%;
+  transform: translateX(100px)translateY(-23.5px);
+}
 
-    .circle-right {
-      right: 0;
-      background-color: #6c4ba3;
-    }
+.circle-right {
+  right: 0;
+ 
+  background-color: #6c4ba3;
+}
 
-    .state-layer {
-      height: 32px;
-      width: 83px;
-      padding: 6px 12px;
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      background-color: #ece6f9;
-      border-radius: 4px;
-      border: none;
-      cursor: pointer;
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      color: #4f378a;
-      transition: background-color 0.2s ease;
-    }
 
-    .state-layer:hover {
-      background-color: #d5c4f1;
-    }
-    .poppins-title {
-      font-family: 'Poppins', sans-serif;
-      font-weight: bold;
-    }
+.state-layer {
+  height: 32px;
+  width: 83px;
+  padding: 6px 12px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+
+  background-color: #ece6f9;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: #4f378a;
+  transition: background-color 0.2s ease;
+}
+
+.state-layer:hover {
+  background-color: #d5c4f1;
+}
+.poppins-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: bold;
+}
 
     .login-card {
-      max-width: 500px; /* INCREASED WIDTH HERE */
+      max-width: 420px;
       width: 100%;
       padding: 2rem 2.5rem 3rem;
       border-radius: 1rem;
-      background-color: rgba(255, 255, 255, 0.92);
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      right: -450px;
+      bottom: -50px;
+      position: relative;
+      background-color: rgba(255, 255, 255, 0.92); /* White with slight transparency */
+	  padding: 20px;
+  	  border-radius: 10px;
+  	  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Optional: subtle shadow */
     }
 
     .login-card .input-field input:focus + label {
@@ -190,13 +194,13 @@
     .active .selectedicon {
       opacity: 1;
     }
-    .top-left-logo {
-        position: absolute; /* Keep absolute for desktop */
-        top: 10px;
-        left: 30px;
-        height: 160px;
-        z-index: 1000;
-    }
+.top-left-logo {
+  position: absolute;
+  top: 10px;
+  left: 30px;
+  height: 160px; /* Adjust height if needed */
+  z-index: 1000;
+}
 
     .label-text, .label-text2 {
       font-size: 14px;
@@ -214,114 +218,40 @@
       cursor: pointer;
     }
     .loader {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 50px;
-      height: 50px;
-      margin: -25px 0 0 -25px;
-      border: 4px solid #ddd;
-      border-top: 4px solid #6c4ba3;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      z-index: 1000;
-    }
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  margin: -25px 0 0 -25px;
+  border: 4px solid #ddd;
+  border-top: 4px solid #6c4ba3; /* theme color */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 1000;
+}
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
-    .loading-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(255, 255, 255, 0.5);
-      backdrop-filter: blur(2px);
-      z-index: 999;
-    }
-
-    /* ********************************************* */
-    /* Media Queries for Smaller Screens (Mobile & Tablet Adjustments) */
-    /* ********************************************* */
-
-    @media (max-width: 992px) { /* Adjust for tablets and smaller (Materialize default breakpoint) */
-        html, body {
-            justify-content: flex-start; /* Reset vertical alignment for scrollable content */
-            padding: 20px; /* Add some padding around the edges */
-        }
-
-        .login-card {
-            position: static; /* Let it flow naturally */
-            right: auto;
-            bottom: auto;
-            transform: none; /* Ensure no transforms interfering */
-            margin: 20px auto; /* Center horizontally with auto margins */
-            max-width: 90%; /* Allows it to be 90% of screen width on smaller screens */
-            padding: 1.5rem; /* Adjust padding if desired */
-        }
-
-        .top-left-logo {
-            position: static; /* Remove absolute positioning on mobile */
-            margin: 10px auto; /* Center it horizontally */
-            display: block; /* Make it a block element to take its own line */
-            width: 120px; /* Adjust size for mobile */
-            height: auto;
-            left: auto;
-            top: auto;
-            text-align: center; /* If it contains text, center it */
-        }
-
-        .genericavatar {
-            height: 120px; /* Smaller avatar on mobile */
-            width: 120px;
-            margin-bottom: 1rem;
-        }
-        .inneravatar {
-            height: 80px;
-            width: 80px;
-        }
-        .circle {
-            width: 40px;
-            height: 40px;
-            top: 20px;
-        }
-        .circle2 {
-            width: 140px;
-            height: 40px;
-            top: 20px;
-        }
-        .circle-left {
-            left: -120px;
-            width: 70px;
-            height: 80px;
-            transform: translateX(85px) translateY(-19px);
-        }
-    }
-
-    @media (max-width: 600px) { /* Further adjustments for smaller phones */
-        html, body {
-            padding: 10px; /* Even less padding */
-        }
-        .login-card {
-            padding: 1rem; /* Smaller internal padding */
-            border-radius: 0; /* Optional: remove rounded corners on very small screens */
-            box-shadow: none; /* Optional: remove shadow */
-        }
-        h5 {
-            font-size: 1.3rem; /* Adjust title size */
-        }
-        p.subtitle {
-            font-size: 0.9rem; /* Adjust subtitle size */
-            margin-bottom: 1.5rem;
-        }
-    }
+/* Optional overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 999;
+}
+    
+  
   </style>
 </head>
-</head>
 <body>
- 
+  <h3 class="center-align poppins-title" style="font-size:56px;color: black;">WELCOME TO NHCE</h3>
   
 <img src="https://www.apps-newhorizonindia.in/institution/misc/nhce.png" alt="NHCE Logo" class="top-left-logo" />
 

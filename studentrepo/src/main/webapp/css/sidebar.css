@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+ @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 * {
   margin: 0;
@@ -23,8 +23,6 @@ body {
   min-height: 100vh;
   background: var(--body-color);
   transition: var(--tran-05);
-  /* Ensure body doesn't overflow horizontally on small screens if sidebar slides out */
-  overflow-x: hidden;
 }
 
 ::selection {
@@ -77,7 +75,7 @@ nav.sidebar .icon {
   justify-content: center;
   font-size: 20px;
   border-radius: 6px;
-  color: #000; /* Original color, will be overridden by dark mode rule */
+  color: #000;
 }
 
 nav.sidebar .text {
@@ -118,7 +116,7 @@ header .toggle {
   height: 40px;
   width: 40px;
   background: var(--primary-color);
-  color: var(--sidebar-color); /* Light background for the toggle, text will be white */
+  color: var(--sidebar-color);
   border-radius: 3px;
   display: flex;
   align-items: center;
@@ -133,13 +131,8 @@ nav.sidebar.close header .toggle {
 }
 
 body.dark header .toggle {
-  color: var(--text-color); /* This rule seems to conflict with the above 'color: var(--sidebar-color)' in dark mode. Let's make it more explicit. */
-  background: var(--primary-color-light); /* Better visual in dark mode */
+  color: var(--text-color);
 }
-body.dark header .toggle:hover {
-    background: var(--primary-color); /* Darker on hover */
-}
-
 
 nav.sidebar .menu {
   margin-top: 40px;
@@ -184,12 +177,12 @@ nav.sidebar li a:hover {
 
 nav.sidebar li a:hover .icon,
 nav.sidebar li a:hover .text {
-  color: var(--sidebar-color); /* This makes text/icon white on hover in light mode */
+  color: var(--sidebar-color);
 }
 
 body.dark nav.sidebar li a:hover .icon,
 body.dark nav.sidebar li a:hover .text {
-  color: var(--text-color); /* This makes text/icon light gray on hover in dark mode, matching general text color. If you want it brighter, change to white or a brighter variable. */
+  color: var(--text-color);
 }
 
 nav.sidebar .menu-bar {
@@ -275,24 +268,22 @@ body.dark .switch::before {
   position: absolute;
   top: 0;
   left: 250px;
-  min-height: 100vh; /* Changed height to min-height to allow content to extend */
+  height: 100vh;
   width: calc(100% - 250px);
   background: var(--body-color);
   transition: var(--tran-05);
-  padding: 20px; /* Add some default padding to the home section */
 }
 
 nav.sidebar.close ~ .home {
-  left: 88px; /* Adjusted to 88px as per sidebar.close width */
-  width: calc(100% - 88px); /* Adjusted to 88px */
+  left: 78px;
+  width: calc(100% - 78px);
 }
 
 .home .text {
   font-size: 30px;
   font-weight: 500;
   color: var(--text-color);
-  padding: 12px 0px; /* Adjusted padding as the home section already has padding */
-  margin-top: 60px; /* Keep this for spacing from top */
+  padding: 12px 60px;
 }
 
 body.dark .home .text {
@@ -310,16 +301,12 @@ body.dark .mode-text,
 body.dark .sun-moon i {
   color: #CCCCCC !important;
 }
-/* Ensure icons are always visible in dark mode */
-body.dark nav.sidebar .icon {
-    color: #CCCCCC;
-}
-
 
 /* Dropdown Styles */
 .has-dropdown {
   position: relative;
   display: flex;
+  
   flex-direction: column;
 }
 
@@ -330,6 +317,7 @@ body.dark nav.sidebar .icon {
 .dropdown-menu {
   display: none;
   flex-direction: column;
+
   margin-top: 6px;
   gap: 6px;
 }
@@ -347,12 +335,12 @@ body.dark nav.sidebar .icon {
   text-decoration: none;
 }
 
-.dropdown-arrow { /* Changed from .arrow to .dropdown-arrow as per HTML */
+.arrow {
   margin-left: auto;
   transition: transform 0.3s ease;
 }
 
-.has-dropdown.active .dropdown-arrow {
+.has-dropdown.active .arrow {
   transform: rotate(180deg);
 }
 /* ─── FINAL VISUAL FIXES (paste at end) ───────────────────────────── */
@@ -362,7 +350,7 @@ body.dark nav.sidebar .icon {
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
     gap:24px;
-    padding:24px 0px; /* Adjusted padding as .home already has padding */
+    padding:24px 60px;
 }
 .card{
     background:var(--sidebar-color);
@@ -376,9 +364,11 @@ body.dark nav.sidebar .icon {
 
 /* 2. Keep “Students” row full height on hover */
 .has-dropdown > a{
+   
     display:flex;
     align-items:center;
     width:100%;
+
 }
 .has-dropdown > a:hover{
     background:var(--primary-color);
@@ -394,7 +384,8 @@ body.dark nav.sidebar .icon {
     min-width:24px;
 }
 .dropdown-menu a .text{
-    white-space:normal;     /* allow long labels to wrap */
+    white-space:normal;
+        /* allow long labels to wrap */
     line-height:1.35;
 }
 
@@ -449,59 +440,50 @@ nav.sidebar.close .has-dropdown > a{
     display: flex !important;
     position: absolute;
     left: 88px;                  /* float right of collapsed bar     */
-    top: 0; /* This top:0 might cause issues, will fix below */
+    top: 0;
     background: var(--sidebar-color);
     padding: 8px 12px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,.08);
 }
 /* ===== FIXED DROPDOWN POSITIONING ===== */
-/* This block duplicates and conflicts with the one above. Merging/refining. */
-/* The previous block sets `top: 0`, this one has `transform: translateY(-100%)`.
-   Let's refine the one below and ensure it's the effective one. */
-.sidebar.close .has-dropdown.active .dropdown-menu {
-    left: 88px; /* Align with expanded sidebar position */
-    /* top: auto; /* Remove fixed top positioning, let JS handle or relative positioning */
-    /* transform: translateY(-100%); /* Align vertically with parent - this is probably problematic */
-    min-width: 200px;
-}
+        .sidebar.close .has-dropdown.active .dropdown-menu {
+            left: 88px; /* Align with expanded sidebar position */
+            top: auto; /* Remove fixed top positioning */
+            transform: translateY(-100%); /* Align vertically with parent */
+            min-width: 200px;
+        }
 
-.sidebar.close .has-dropdown.active .dropdown-menu a {
-    justify-content: flex-start;
-    padding: 10px 15px;
-}
+        .sidebar.close .has-dropdown.active .dropdown-menu a {
+            justify-content: flex-start;
+            padding: 10px 15px;
+        }
 
-.sidebar.close .has-dropdown.active .dropdown-menu .text {
-    display: inline-block !important;
-    margin-left: 10px;
-}
+        .sidebar.close .has-dropdown.active .dropdown-menu .text {
+            display: inline-block !important;
+            margin-left: 10px;
+        }
 
-.sidebar.close .has-dropdown.active .dropdown-menu .icon {
-    font-size: 20px;
-    min-width: 24px;
-    display: flex !important;
-}
+        .sidebar.close .has-dropdown.active .dropdown-menu .icon {
+            font-size: 20px;
+            min-width: 24px;
+            display: flex !important;
+        }
 
-/* Ensure dropdown appears above content */
-/* This rule needs to be stronger to override default flow */
-.has-dropdown {
-    position: relative; /* Changed from static, vital for child absolute positioning */
-}
+        /* Ensure dropdown appears above content */
+        .has-dropdown {
+            position: static;
+        }
 
-.dropdown-menu {
-    z-index: 200;
-}
-/* Collapsed Sidebar - Floating Dropdown Fix (Refined and consolidated) */
+        .dropdown-menu {
+            z-index: 200;
+        }
+/* Collapsed Sidebar - Floating Dropdown Fix */
 .sidebar.close .has-dropdown.active .dropdown-menu {
   display: flex !important;
   position: absolute;
-  left: 88px; /* Position next to the collapsed sidebar */
-  /* Re-evaluate 'top' positioning. For a menu, it often aligns to the top of its parent,
-     but for a floating menu, it might be better calculated by JS or simply at `top: 0`
-     of the available space next to the parent li, and then offset by CSS if needed.
-     Let's use `top: 50%` and `transform: translateY(-50%)` to vertically center it
-     relative to the 'Students' link in the collapsed sidebar, which is a common pattern.*/
-  top: 50%;
+  left: 88px;
+  top: auto;
   transform: translateY(-50%);
   min-width: 220px;
   background: var(--sidebar-color);
@@ -517,8 +499,7 @@ nav.sidebar.close .has-dropdown > a{
 }
 
 .sidebar.close .has-dropdown.active .dropdown-menu .text {
-  opacity: 1 !important; /* Ensure text is visible */
-  display: inline-block !important; /* Ensure it takes up space */
+  display: inline-block !important;
   margin-left: 10px;
   white-space: normal;
 }
@@ -536,6 +517,7 @@ nav.sidebar.close .has-dropdown > a{
   display: inline !important;
   visibility: visible !important;
   color: var(--text-color);
+  
 }
 .sidebar.close .has-dropdown.active .dropdown-menu a:hover .text {
   color: var(--sidebar-color) !important; /* white in light mode */
@@ -561,7 +543,7 @@ nav.sidebar.close .has-dropdown > a{
 
 /* icon must stay visible */
 nav.sidebar.close .has-dropdown > a .icon{
-    font-size: 24px;
+    font-size: 24px;  
     padding-left: 7px;        /* clear, readable size            */
     color: var(--text-color); /* same colour as other icons       */
     min-width: 24px;
@@ -588,7 +570,7 @@ nav.sidebar.close .has-dropdown > a:hover .icon {
 }
 nav.sidebar .has-dropdown > a {
   height: 50px;
-  padding-right: 50px; /* This padding might push the dropdown-arrow */
+  padding-right: 50px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -596,32 +578,32 @@ nav.sidebar .has-dropdown > a {
 /* ╭─ DASHBOARD CARDS ────────────────────────────────────────╮ */
 
 
-.card i { /* Removed .icon from here, as some icons might not have that class in your HTML */
+.card i.icon {
   font-size: 36px;
-  color: var(--primary-color); /* Changed from --primary to --primary-color */
+  color: var(--primary);
   margin-bottom: 10px;
 }
 
 .card h3 {
   font-size: 18px;
   margin-bottom: 6px;
-  color: var(--text-color); /* Changed from --text to --text-color */
+  color: var(--text);
   font-weight: 500;
 }
 
 .card p {
   font-size: 28px;
   font-weight: 600;
-  color: var(--primary-color); /* Changed from --primary to --primary-color */
+  color: var(--primary);
   margin: 0;
 }
 
 body.dark .card {
-  background: var(--sidebar-color); /* Adjusted to use sidebar-color for consistency in dark mode */
+  background: var(--dark-sidebar);
 }
 
 body.dark .card h3 {
-  color: var(--text-color); /* Adjusted to use text-color */
+  color: var(--dark-text);
 }
 
 body.dark .card p {
@@ -643,11 +625,6 @@ body.dark .card p {
   transform: scale(1.03);
 }
 
-.form-group {
-    margin-bottom: 15px; /* Add some space between form groups */
-    display: flex;
-    flex-direction: column;
-}
 .form-group label {
   font-weight: 500;
   margin-bottom: 6px;
@@ -660,7 +637,6 @@ body.dark .card p {
   border-radius: 6px;
   font-size: 1rem;
   outline-color: #007bff;
-  width: 100%; /* Make input and select fields take full width of their container */
 }
 
 button {
@@ -849,259 +825,59 @@ body.dark #addStudentCard button[type="submit"]:hover {
 
 #studentFeatures {
     display: none; /* Hide by default */
-    margin-top: 70px; /* Keep this for spacing */
-    margin-left: 0px; /* Adjusted to 0, let padding of .home handle spacing */
-    padding: 0 20px; /* Add horizontal padding from .home or specific element if needed */
 }
-#studentFeatures h2.text {
-    margin-bottom:18px;
-    font-weight: bold;
-    font-size: 30px;
-    padding: 0; /* Remove padding here, already on .home .text */
-}
-#addStudentCard {
-    max-width: 700px;
-    margin-top: 30px;
-    padding: 25px;
-    border-radius: 10px;
-    background:white;
-    box-shadow:0 4px 20px rgba(0,0,0,0.08);
-}
-#addStudentForm {
-    display:flex;
-    flex-direction:column;
-    gap:18px;
-}
-
 #studentsTable {
-    display: table; /* Changed back to table */
-    width: 100%; /* Changed to 100% to fit container */
-    margin-top: 30px;
-    border-collapse: collapse;
-    background: var(--sidebar-color);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border-radius: 20px; /* Apply border-radius to the table itself */
-    overflow: hidden; /* Important for border-radius on table */
-}
-
-#studentsTable th, #studentsTable td {
-    padding: 12px 15px;
+            display: table;
+            width: 95%;
+            margin-top: 30px;
+            
+            border-collapse: collapse;
+            background: var(--sidebar-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        #studentsTable th, #studentsTable td {
+            padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #eee;
-    color: var(--text-color);
-}
-
-#studentsTable th {
-    background: var(--primary-color);
-    color: white;
-    font-weight: 500;
-    vertical-align: middle; /* Align header content vertically */
-    position: sticky; /* Sticky header for scrollable table */
-    top: 0; /* Stick to the top */
-    z-index: 10; /* Ensure it stays above scrolling content */
-}
-
-#studentsTable tr:hover {
-    background-color: rgba(0,0,0,0.03);
-}
-/* ensure the message’s text never collapses */
-#addStudentMessage div {
+    color: var(--text-color); /* ADD THIS LINE */
+        }
+        
+        #studentsTable th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 500;
+        }
+        
+        #studentsTable tr:hover {
+            background-color: rgba(0,0,0,0.03);
+        }
+        /* ensure the message’s text never collapses */
+#addStudentMessage div {  
     display: inline-block;
     max-width: 100%;
     word-wrap: break-word;   /* long lines wrap */
 }
-#addStudentMessage { transition: all .2s ease; }
-body.dark #studentsTable {
+ #addStudentMessage { transition: all .2s ease; }  
+   body.dark #studentsTable {
     background: #2a2a3d; /* A slightly different dark background for the table */
     box-shadow: 0 4px 20px rgba(0,0,0,0.6); /* Stronger shadow in dark mode */
 }
 
 /* Ensure the text color within the table remains readable in dark mode */
 body.dark #studentsTable td {
+    color: black; 
     background-color: #2e2e44 !important;
-    color: #f9f9f9 !important; /* A very light gray for better contrast against dark background */
-    border: 1px solid #555 !important;
+  color: #f9f9f9 !important;
+  border: 1px solid #555 !important;/* A very light gray for better contrast against dark background */
 }
 
 /* Optional: Adjust header background in dark mode if needed */
 body.dark #studentsTable th {
     background: var(--primary-color); /* This should work well if primary-color is dark enough */
     color: #f5f5f5; /* Light color for headers */
-    border: 1px solid #555 !important;
+     border: 1px solid #555 !important;
 }
 .btn-action-edit {
     margin-right: 10px; /* Adjust this value as needed for your desired space */
-}
-
-/* Student Management Section - General Styling & Responsiveness */
-#studentFeatures {
-    margin-top: 70px;
-    margin-left: 0; /* Resetting original inline style */
-    padding: 0 20px; /* Consistent padding with .home */
-}
-#studentFeatures h2 {
-    /* Adjusted existing h2 in .home .text, ensure this doesn't conflict */
-    padding-left: 0;
-}
-
-.feature-card-wrap {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap; /* Allows cards to wrap on smaller screens */
-    justify-content: flex-start; /* Aligns cards to the start */
-    margin-top: 20px; /* Added some top margin for separation */
-}
-
-.feature-card {
-    flex: 1 1 auto; /* Allows cards to grow and shrink, minimum width defined earlier */
-    min-width: 160px; /* Ensure minimum width even when wrapping */
-    max-width: 200px; /* Optional: limit max width on very wide screens */
-}
-
-/* View Student Section Specific Styles */
-#viewStudentSection {
-    margin-top: 30px;
-    max-width: 100%; /* Occupy full width of .home container */
-    padding-right: 20px; /* Add some padding on the right */
-    padding-left: 20px; /* Add some padding on the left */
-}
-#viewStudentSection .form-group {
-    flex: 1;
-    min-width: 250px; /* Ensure search/filter inputs don't get too small */
-}
-
-/* Table container for overflow on small screens */
-.table-responsive {
-    overflow-x: auto; /* Enables horizontal scrolling for the table */
-    -webkit-overflow-scrolling: touch; /* Improves scrolling on touch devices */
-    border-radius: 20px; /* Apply border-radius to the container */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Apply shadow to the container */
-    background: var(--sidebar-color); /* Match background for rounded corners */
-}
-body.dark .table-responsive {
-    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-    background: #2a2a3d;
-}
-
-/* Specific styling for table headers to prevent issues with text alignment and sort icons */
-#studentsTable th {
-    padding: 12px 15px;
-    text-align: left;
-    background: var(--primary-color);
-    color: white;
-    font-weight: 500;
-    vertical-align: middle;
-    white-space: nowrap; /* Prevent header text from wrapping */
-    position: relative; /* For positioning sort icon */
-}
-
-#studentsTable th[data-sort-col] {
-    cursor: pointer;
-}
-
-#studentsTable th .sort-icon {
-    position: absolute;
-    right: 15px; /* Adjust as needed */
-    top: 50%;
-    transform: translateY(-50%);
-    color: rgba(255, 255, 255, 0.7); /* Lighter sort icon */
-}
-
-#studentsTable tbody tr:nth-child(even) {
-    background-color: var(--primary-color-light); /* Zebra striping */
-}
-body.dark #studentsTable tbody tr:nth-child(even) {
-    background-color: rgba(255, 255, 255, 0.05); /* Darker zebra striping */
-}
-body.dark #studentsTable tbody tr:nth-child(odd) {
-    background-color: #2e2e44 !important; /* Ensure odd rows are also dark */
-}
-
-/* Responsive adjustments for overall layout */
-@media (max-width: 768px) {
-    nav.sidebar {
-        width: 88px; /* Start collapsed by default on smaller screens */
-        left: -88px; /* Hide sidebar off-screen */
-    }
-    nav.sidebar.close { /* When toggle is clicked, slide it in */
-        left: 0;
-    }
-
-    .home {
-        width: 100%;
-        left: 0;
-        padding: 15px; /* Reduce padding on smaller screens */
-    }
-    nav.sidebar.close ~ .home {
-        left: 88px; /* When sidebar is open, push content */
-        width: calc(100% - 88px);
-    }
-    nav.sidebar ~ .home { /* When sidebar is closed (initial state on mobile), home takes full width */
-        left: 0;
-        width: 100%;
-    }
-
-    .home .text {
-        font-size: 26px; /* Adjust font size */
-        margin-top: 20px; /* Less top margin for h2 */
-    }
-
-    .dashboard-widgets {
-        grid-template-columns: 1fr; /* Stack cards vertically */
-        padding: 15px 0;
-    }
-
-    .feature-card-wrap {
-        flex-direction: column; /* Stack feature cards vertically */
-        align-items: stretch; /* Stretch cards to full width */
-    }
-    .feature-card {
-        max-width: 100%; /* Allow cards to take full width */
-        min-width: unset; /* Remove min-width constraint */
-    }
-
-    #studentFeatures, #viewStudentSection {
-        padding: 0 15px; /* Adjust padding */
-    }
-
-    #addStudentCard {
-        padding: 18px; /* Reduce padding */
-    }
-
-    .form-buttons {
-        flex-direction: column; /* Stack buttons vertically */
-    }
-}
-
-@media (max-width: 480px) {
-    nav.sidebar {
-        width: 100%; /* Make sidebar full width when open */
-        left: -100%; /* Hide completely */
-    }
-    nav.sidebar.close {
-        left: 0; /* Bring in when toggled */
-        width: 100%; /* Still full width */
-    }
-    nav.sidebar.close ~ .home { /* Content still pushed when sidebar open */
-        left: 0; /* No push, just overlay or adjust content */
-        width: 100%;
-    }
-    .home {
-        padding: 10px; /* Further reduce padding */
-    }
-    .home .text {
-        font-size: 22px;
-        margin-top: 15px;
-    }
-    #studentsTable th, #studentsTable td {
-        padding: 8px 10px; /* Smaller padding for table cells */
-        font-size: 14px; /* Smaller font for table content */
-    }
-    .feature-card {
-        padding: 15px 18px;
-    }
-    .form-group input, .form-group select {
-        padding: 8px;
-        font-size: 0.9rem;
-    }
 }
