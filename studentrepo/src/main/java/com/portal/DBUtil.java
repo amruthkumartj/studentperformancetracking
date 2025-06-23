@@ -24,22 +24,16 @@ public class DBUtil {
         Connection conn = null;
         try {
             // Retrieve the complete JDBC URL from Railway's environment variables
-            // Railway can provide a single variable named MYSQL_URL which contains the full connection string.
             String jdbcUrl = System.getenv("MYSQL_URL");
-            String DB_USER = System.getenv("MYSQL_USER");         // Still need user and password explicitly if not in URL
-            String DB_PASSWORD = System.getenv("MYSQL_PASSWORD"); // Railway also provides MYSQL_ROOT_PASSWORD
+            String DB_USER = System.getenv("MYSQL_USER");
+            String DB_PASSWORD = System.getenv("MYSQL_PASSWORD");
 
             // --- IMPORTANT: Validate if environment variables are set ---
-            // If MYSQL_URL is not set, we'll assume it's a local development environment
-            // Or, if it's Railway, it means the variable wasn't injected correctly.
-            if (jdbcUrl == null || DB_USER == null || DB_PASSWORD == null) {
-                System.err.println("🚫 Error: One or more Railway MySQL environment variables (MYSQL_URL, MYSQL_USER, MYSQL_PASSWORD) are not set.");
+            if (jdbcUrl == null || DB_USER == null || DB_PASSWORD == null || jdbcUrl.isEmpty()) {
+                System.err.println("🚫 Error: One or more Railway MySQL environment variables (MYSQL_URL, MYSQL_USER, MYSQL_PASSWORD) are not set or MYSQL_URL is empty.");
                 System.err.println("Ensure your application is in the same Railway project as your MySQL DB and variables are injected.");
 
                 // --- FALLBACK FOR LOCAL DEVELOPMENT ---
-                // If these environment variables are not set (e.g., when running locally in Eclipse),
-                // fall back to local hardcoded values.
-                // IMPORTANT: Change these to your LOCAL MySQL credentials!
                 String localDbHost = "localhost";
                 String localDbPort = "3306";
                 String localDbName = "stud"; // CHANGE THIS to your local database name
@@ -54,12 +48,14 @@ public class DBUtil {
                 DB_PASSWORD = localDbPassword;
 
                 System.out.println("⚠️ Falling back to Local DB Configuration. If deployed on Railway, check variable injection.");
-                // If you want to strictly fail on Railway if variables aren't there, remove this fallback.
-                // For development, it's convenient.
             } else {
-                System.out.println("Using Production DB Configuration (Railway variables)."); // For debugging
+                // --- FIX: Ensure the JDBC URL has the "jdbc:" prefix ---
+                if (!jdbcUrl.startsWith("jdbc:mysql://")) {
+                    jdbcUrl = "jdbc:" + jdbcUrl;
+                    System.out.println("Fixed MYSQL_URL by adding 'jdbc:' prefix.");
+                }
+                System.out.println("Using Production DB Configuration (Railway variables).");
             }
-
 
             System.out.println("Attempting to connect to database URL: " + jdbcUrl); // Debugging
             conn = DriverManager.getConnection(jdbcUrl, DB_USER, DB_PASSWORD);
