@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
@@ -16,39 +16,36 @@
   </properties>
 
   <dependencies>
-    <!-- Servlet API (javax, for Tomcat 9 and below) -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <version>4.0.1</version>
       <scope>provided</scope>
     </dependency>
-    
-    <dependency>
-    <groupId>com.heroku</groupId>
-    <artifactId>webapp-runner</artifactId>
-    <version>9.0.70.0</version> <scope>provided</scope>
-	</dependency>
-	
-    <dependency>
-    <groupId>com.google.code.gson</groupId>
-    <artifactId>gson</artifactId>
-    <version>2.10.1</version> <!-- Use the latest version -->
-	</dependency>
 
-    <!-- JSTL (javax version) -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>jstl</artifactId>
-      <version>1.2</version>
+        <groupId>com.heroku</groupId>
+        <artifactId>webapp-runner</artifactId>
+        <version>9.0.70.0</version>
+        <scope>provided</scope>
     </dependency>
 
-    <!-- MySQL JDBC Driver -->
-  <dependency>
-  	<groupId>mysql</groupId>
-  	<artifactId>mysql-connector-java</artifactId>
-  	<version>8.0.33</version>
-  </dependency>
+    <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.10.1</version> </dependency>
+
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>jstl</artifactId>
+        <version>1.2</version>
+    </dependency>
+
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>8.0.33</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -59,7 +56,6 @@
     </resources>
 
     <plugins>
-      <!-- Compiler Plugin -->
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.13.0</version>
@@ -68,7 +64,6 @@
         </configuration>
       </plugin>
 
-      <!-- WAR Plugin -->
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <version>3.2.3</version>
@@ -76,6 +71,29 @@
           <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
       </plugin>
-    </plugins>
+
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>3.1.2</version> <executions>
+              <execution>
+                  <phase>package</phase>
+                  <goals>
+                      <goal>copy</goal>
+                  </goals>
+                  <configuration>
+                      <artifactItems>
+                          <artifactItem>
+                              <groupId>com.heroku</groupId>
+                              <artifactId>webapp-runner</artifactId>
+                              <version>9.0.70.0</version> <destFileName>webapp-runner.jar</destFileName>
+                          </artifactItem>
+                      </artifactItems>
+                      <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                  </configuration>
+              </execution>
+          </executions>
+      </plugin>
+      </plugins>
   </build>
 </project>
