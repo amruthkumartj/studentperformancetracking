@@ -5,158 +5,180 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Performance Tracking</title>
 
-  <!-- Google Fonts & Material Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-  <!-- Materialize CSS -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" />
 
   <style>
+    /* Material Design 3 inspired colors */
     :root {
-      --primary: #4f378a;
-      --secondary: #eaddff;
-      --container-active: #d0c3f7;
+      --primary: #6750A4; /* M3 Primary */
+      --on-primary: #FFFFFF;
+      --primary-container: #EADDFF;
+      --on-primary-container: #21005D;
+      --secondary: #625B71;
+      --on-secondary: #FFFFFF;
+      --secondary-container: #E8DEF8;
+      --on-secondary-container: #1D192B;
+      --tertiary: #7D5260;
+      --on-tertiary: #FFFFFF;
+      --tertiary-container: #FFD8E4;
+      --on-tertiary-container: #31111D;
+      --error: #B3261E;
+      --on-error: #FFFFFF;
+      --error-container: #F9DEDC;
+      --on-error-container: #410E0B;
+      --background: #FFFBFE; /* M3 background */
+      --on-background: #1C1B1F;
+      --surface: #FFFBFE;
+      --on-surface: #1C1B1F;
+      --surface-variant: #E7E0EC;
+      --on-surface-variant: #49454F;
+      --outline: #79747E;
+      --shadow: #000000;
+      --inverse-surface: #313033;
+      --inverse-on-surface: #F4EFF4;
+      --inverse-primary: #D0BCFF;
+
+      /* Custom for this design */
+      --card-background: rgba(255, 255, 255, 0.95); /* Slightly less transparent */
+      --input-border-color: var(--outline);
+      --input-focus-border-color: var(--primary);
+      --input-label-color: var(--on-surface-variant);
+      --input-label-focus-color: var(--primary);
     }
 
     html, body {
       height: 100%;
       margin: 0;
       font-family: "Roboto", sans-serif;
-      background: #fff;
+      background: var(--background); /* Use M3 background color */
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
+      flex-direction: column; /* Changed to column for vertical stacking */
+      align-items: center; /* Center horizontally */
+      justify-content: center; /* Center vertically if content is short, or flex-start */
       background-image: url('https://upload.wikimedia.org/wikipedia/commons/d/d8/NHCE_Campus.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed; /* Optional: makes background stay while scrolling */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      overflow-y: auto; /* Allow scrolling if content overflows */
     }
-   
 
-    h5 { font-weight: 500; letter-spacing: .4px; }
-    p.subtitle { margin: .2rem 0 2.5rem; color:#555; }
+    h3.poppins-title {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700; /* Bolder */
+      font-size: clamp(32px, 8vw, 56px); /* Responsive font size */
+      color: var(--on-background); /* Use M3 color */
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1); /* Subtle shadow for readability */
+      margin-top: 20px; /* Add some top margin */
+      margin-bottom: 20px;
+      text-align: center; /* Ensure it's centered */
+      line-height: 1.2;
+    }
 
-.genericavatar {
-  background-color: #eaddff;
-  height: 150px;
-  width: 150px;
-  border-radius: 40%;
-  margin: 0 auto 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
+    h6.poppins-title {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      font-size: clamp(18px, 4vw, 24px); /* Responsive font size */
+      color: var(--on-surface);
+      margin-bottom: 1.5rem;
+    }
 
-.inneravatar {
-  position: relative;
-  height: 100px;
-  width: 100px;
-  
-  transform: rotate(-90deg); /* Tilt the "face" to the left */
-}
-
-.circle {
-  position: absolute;
-  width: 50px;
-  height: 50px;
-  background-color: #4f378a;
-  border-radius: 50%;
-  top: 25px;
-}
-.circle2 {
-  position: absolute;
-  width: 180px;
-  height: 50px;
-  background-color: #4f378a;
-  border-radius: 50%;
-  top: 25px;
-  
-}
-
-.circle-left {
- left: -150px;          /* Move further to the left */
-  bottom: 15px;         /* Adjust vertical position if needed */
-  width: 90px;          /* Slightly bigger width */
-  height: 100px;         /* Slightly bigger height */
-  background-color: #6c4ba3; /* Optional: visible fill */
-  border-radius: 50%;
-  transform: translateX(100px)translateY(-23.5px);
-}
-
-.circle-right {
-  right: 0;
- 
-  background-color: #6c4ba3;
-}
-
-
-.state-layer {
-  height: 32px;
-  width: 83px;
-  padding: 6px 12px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-
-  background-color: #ece6f9;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  color: #4f378a;
-  transition: background-color 0.2s ease;
-}
-
-.state-layer:hover {
-  background-color: #d5c4f1;
-}
-.poppins-title {
-  font-family: 'Poppins', sans-serif;
-  font-weight: bold;
-}
+    .top-left-logo {
+      position: absolute;
+      top: 20px; /* Slightly more padding */
+      left: 20px; /* Slightly more padding */
+      height: clamp(80px, 15vw, 160px); /* Responsive height */
+      width: auto; /* Maintain aspect ratio */
+      z-index: 1000;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow */
+      border-radius: 8px; /* Slightly rounded corners */
+    }
 
     .login-card {
       max-width: 420px;
-      width: 100%;
-      padding: 2rem 2.5rem 3rem;
-      border-radius: 1rem;
-      right: -450px;
-      bottom: -50px;
-      position: relative;
-      background-color: rgba(255, 255, 255, 0.92); /* White with slight transparency */
-	  padding: 20px;
-  	  border-radius: 10px;
-  	  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Optional: subtle shadow */
-    }
-
-    .login-card .input-field input:focus + label {
-      color: var(--primary) !important;
-    }
-
-    .login-card .input-field input:focus {
-      border-bottom: 1px solid var(--primary) !important;
-      box-shadow: 0 1px 0 0 var(--primary) !important;
-    }
-
-    .segmentedbutton {
-      position: relative;
-      height: 48px;
-      width: 100%;
-      max-width: 275px;
-      margin: 0 auto 1.5rem;
-      border: 2px solid #000;
-      border-radius: 100px;
-      background: #fff;
+      width: 90%; /* Responsive width */
+      padding: 2.5rem; /* Increased padding */
+      border-radius: 20px; /* More rounded corners (M3 style) */
+      background-color: var(--card-background);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Stronger, softer shadow */
+      margin: 40px auto; /* Center with margin, provide vertical spacing */
+      position: relative; /* Remove fixed positioning */
+      top: unset;
+      right: unset;
+      bottom: unset;
+      left: unset;
       display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Avatar styling (kept your unique design, with minor adjustments) */
+    .genericavatar {
+      background-color: var(--primary-container); /* M3-inspired light background */
+      height: 120px; /* Slightly smaller for mobile, scales */
+      width: 120px;
+      border-radius: 50%; /* Make it a perfect circle */
+      margin: 0 auto 2rem; /* More vertical space */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .inneravatar {
+      position: relative;
+      height: 80px; /* Scaled down */
+      width: 80px;
+      transform: rotate(-90deg);
+    }
+
+    .circle, .circle2 {
+      position: absolute;
+      background-color: var(--primary); /* Use primary color */
+      border-radius: 50%;
+    }
+
+    .circle {
+      width: 40px; height: 40px;
+      top: 20px; /* Scaled down */
+      left: 20px; /* Scaled down */
+    }
+
+    .circle2 {
+      width: 150px; /* Adjusted to fit the new avatar size */
+      height: 40px;
+      top: 20px; /* Scaled down */
+    }
+
+    .circle-left {
+      left: -120px;
+      bottom: 12px;
+      width: 70px;
+      height: 80px;
+      background-color: var(--primary); /* Consistent with M3 primary */
+      transform: translateX(80px) translateY(-18px);
+    }
+
+    .circle-right {
+      right: 0;
+      background-color: var(--primary);
+    }
+
+    /* Segmented Button (M3-style) */
+    .segmentedbutton {
+      height: 56px; /* Taller */
+      width: 100%;
+      max-width: 320px; /* Wider */
+      margin: 0 auto 2.5rem; /* More spacing */
+      border: 1px solid var(--outline); /* Softer border */
+      border-radius: 100px;
+      background: var(--surface); /* Match surface color */
+      display: flex;
+      overflow: hidden; /* Important for border-radius */
     }
 
     .segment-start, .segment-end {
@@ -166,27 +188,36 @@
       justify-content: center;
       cursor: pointer;
       position: relative;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      border-right: 1px solid var(--outline); /* Separator */
+    }
+    .segment-end {
+        border-right: none; /* No separator on the last segment */
     }
 
     .container, .container2 {
       height: 100%;
       width: 100%;
-      border-radius: 100px;
-      transition: background 0.2s;
+      border-radius: 100px; /* Applies to the inner element to mimic button shape */
+      transition: background 0.2s, color 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
+      font-size: 1rem; /* Base font size */
+      color: var(--on-surface-variant); /* Default text color */
+      font-weight: 500;
     }
 
     .container.active, .container2.active {
-      background: var(--container-active);
+      background: var(--primary-container); /* M3 active state */
+      color: var(--on-primary-container); /* Text color for active state */
     }
 
     .selectedicon {
-      height: 18px;
-      width: 18px;
-      margin-left: 6px;
+      height: 20px; /* Slightly larger icon */
+      width: 20px;
+      margin-left: 8px; /* More spacing */
       opacity: 0;
       transition: opacity 0.2s;
     }
@@ -194,85 +225,341 @@
     .active .selectedicon {
       opacity: 1;
     }
-.top-left-logo {
-  position: absolute;
-  top: 10px;
-  left: 30px;
-  height: 160px; /* Adjust height if needed */
-  z-index: 1000;
-}
 
     .label-text, .label-text2 {
-      font-size: 14px;
-      font-family: Roboto, sans-serif;
-      color: #1d1b20;
+      font-size: 1rem;
+      font-family: "Roboto", sans-serif;
+      color: inherit; /* Inherit color from parent (.container) */
       display: flex;
       align-items: center;
     }
 
+    /* Materialize Input Field Overrides (M3-style filled/outlined) */
+    .input-field {
+      margin-bottom: 2rem; /* More spacing between inputs */
+      position: relative; /* For label animation */
+    }
+
+    .input-field label {
+      color: var(--input-label-color) !important;
+      font-size: 1rem; /* Base label font size */
+      top: 18px !important; /* Adjust initial label position */
+      left: 48px !important; /* Adjust for icon */
+      pointer-events: none; /* Make label unclickable */
+      transition: all 0.2s ease-out;
+    }
+
+    .input-field input[type=text]:not(.browser-default),
+    .input-field input[type=password]:not(.browser-default),
+    .input-field input[type=email]:not(.browser-default) {
+      width: calc(100% - 48px); /* Account for prefix icon padding */
+      padding: 12px 16px; /* More vertical padding */
+      border: 1px solid var(--input-border-color); /* Initial border */
+      border-radius: 8px; /* Rounded corners for input fields */
+      background-color: var(--surface-variant); /* Light background for filled style */
+      box-shadow: none !important; /* Remove Materialize default shadow */
+      color: var(--on-surface);
+      box-sizing: border-box; /* Include padding/border in width */
+      font-size: 1rem;
+      height: unset; /* Let padding define height */
+      margin-bottom: 0; /* Remove default margin */
+      transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* Input focus and validation states */
+    .input-field input[type=text]:not(.browser-default):focus,
+    .input-field input[type=password]:not(.browser-default):focus,
+    .input-field input[type=email]:not(.browser-default):focus {
+      border: 2px solid var(--input-focus-border-color) !important; /* Thicker border on focus */
+      background-color: var(--surface); /* Clear background on focus */
+      box-shadow: 0 0 0 4px var(--primary-container) !important; /* Focus ring */
+    }
+
+    /* Materialize label animation fix for M3 style */
+    .input-field input[type=text]:focus + label,
+    .input-field input[type=password]:focus + label,
+    .input-field input[type=email]:focus + label,
+    .input-field input[type=text]:not(.browser-default):valid + label,
+    .input-field input[type=password]:not(.browser-default):valid + label,
+    .input-field input[type=email]:not(.browser-default):valid + label,
+    .input-field input[type=text]:not(.browser-default):focus:not([value=""]) + label,
+    .input-field input[type=password]:not(.browser-default):focus:not([value=""]) + label,
+    .input-field input[type=email]:not(.browser-default):focus:not([value=""]) + label {
+      top: 0 !important; /* Move label to top */
+      font-size: 0.75rem !important; /* Smaller font for top label */
+      color: var(--input-label-focus-color) !important;
+    }
+    
+    /* Hide label when input has value and is not focused, Materialize bug fix */
+    .input-field input[type=text]:not(.browser-default):not(:focus):not([value=""]) + label,
+    .input-field input[type=password]:not(.browser-default):not(:focus):not([value=""]) + label,
+    .input-field input[type=email]:not(.browser-default):not(:focus):not([value=""]) + label {
+        top: 0 !important;
+        font-size: 0.75rem !important;
+        color: var(--input-label-color) !important; /* Keep original color when not focused */
+    }
+
+
     .input-field .material-icons.prefix {
-      color: #4f378a;
+      color: var(--input-label-color) !important; /* Icon color */
+      font-size: 24px; /* Default icon size */
+      line-height: 48px; /* Align icon vertically */
+      position: absolute;
+      left: 8px; /* Adjust icon position */
+      top: 0;
     }
 
     .toggle-pw {
+      position: absolute;
+      right: 12px; /* Adjust position */
+      top: 50%;
+      transform: translateY(-50%); /* Vertically center */
       cursor: pointer;
+      color: var(--input-label-color) !important;
+      font-size: 20px !important; /* Adjust size */
+    }
+
+    /* M3 style button */
+    button.state-layer {
+      height: 48px; /* Taller button */
+      width: 100%; /* Full width of its container */
+      max-width: 250px; /* Max width for consistency */
+      padding: 0 24px; /* Horizontal padding */
+      margin-top: 1.5rem; /* More space above button */
+      background-color: var(--primary); /* Primary button color */
+      color: var(--on-primary); /* Text color on primary */
+      border-radius: 100px; /* Pill shape */
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+      transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+      display: flex; /* To center content */
+      justify-content: center;
+      align-items: center;
+      text-transform: uppercase; /* Material Design standard */
+    }
+
+    button.state-layer:hover {
+      background-color: var(--inverse-primary); /* Lighter hover color */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    button.state-layer:active {
+        transform: scale(0.98); /* Slight press effect */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Register link styling */
+    h6 a {
+      color: var(--primary); /* Link color */
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+    h6 a:hover {
+      color: var(--inverse-primary);
+      text-decoration: underline;
+    }
+
+    /* Registration Form Styling (non-Materialize part) */
+    #registerForm fieldset {
+      border: 1px solid var(--outline);
+      border-radius: 16px; /* Rounded corners */
+      padding: 1.5rem;
+      margin: 1.5rem 0; /* Add margin */
+      width: 100%; /* Full width within card */
+      box-sizing: border-box;
+    }
+    #registerForm legend {
+      color: var(--primary);
+      font-size: 1.2rem;
+      font-weight: 500;
+      padding: 0 10px;
+    }
+    #registerForm table {
+      width: 100%;
+      border-collapse: collapse; /* Remove table borders */
+      margin-top: 1rem;
+      background: none; /* No background for table */
+      box-shadow: none; /* No shadow */
+      border: none;
+    }
+    #registerForm table td {
+      padding: 10px 0; /* Adjust padding */
+      border: none; /* Remove default table cell borders */
+      vertical-align: middle;
+    }
+    #registerForm label {
+      color: var(--on-surface-variant);
+      font-size: 0.95rem;
+      font-weight: 400;
+      white-space: nowrap; /* Prevent label wrapping */
+    }
+    #registerForm input.control {
+      width: calc(100% - 20px); /* Adjust width */
+      padding: 10px 12px;
+      border: 1px solid var(--input-border-color);
+      border-radius: 8px;
+      background-color: var(--surface-variant);
+      color: var(--on-surface);
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    #registerForm input.control:focus {
+      border: 2px solid var(--input-focus-border-color);
+      background-color: var(--surface);
+      box-shadow: 0 0 0 4px var(--primary-container);
+      outline: none;
+    }
+
+    #registerForm button {
+      height: 40px; /* Smaller buttons for inner form */
+      padding: 0 20px;
+      border-radius: 100px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin: 5px; /* Spacing between buttons */
+    }
+    #registerBtn {
+      background-color: var(--primary);
+      color: var(--on-primary);
+      border: none;
+    }
+    #registerBtn:hover {
+      background-color: var(--inverse-primary);
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+    }
+    #registerForm button[type="reset"] {
+      background-color: var(--surface-variant);
+      color: var(--on-surface-variant);
+      border: 1px solid var(--outline);
+    }
+    #registerForm button[type="reset"]:hover {
+      background-color: var(--secondary-container);
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+    }
+    #registerForm center a {
+        color: var(--primary);
+        text-decoration: none;
+        margin-top: 1rem;
+        display: inline-block;
+        font-weight: 500;
+    }
+    #registerForm center a:hover {
+        text-decoration: underline;
+    }
+
+    /* Loader */
+    .loading-overlay {
+      background-color: rgba(255, 255, 255, 0.7); /* Slightly more opaque */
+      backdrop-filter: blur(4px); /* Stronger blur */
     }
     .loader {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 50px;
-  height: 50px;
-  margin: -25px 0 0 -25px;
-  border: 4px solid #ddd;
-  border-top: 4px solid #6c4ba3; /* theme color */
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  z-index: 1000;
-}
+      border-top: 4px solid var(--primary); /* Use primary color for loader */
+    }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      h3.poppins-title {
+        font-size: clamp(28px, 7vw, 48px);
+        margin-top: 10px;
+        margin-bottom: 15px;
+      }
 
-/* Optional overlay */
-.loading-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(2px);
-  z-index: 999;
-}
-    
-  
+      .top-left-logo {
+        top: 10px;
+        left: 10px;
+        height: clamp(60px, 12vw, 100px);
+      }
+
+      .login-card {
+        width: 95%; /* Wider on small screens */
+        padding: 1.5rem;
+        margin: 20px auto; /* Adjust vertical margin */
+        border-radius: 16px;
+      }
+
+      .genericavatar {
+        height: 100px;
+        width: 100px;
+        margin-bottom: 1.5rem;
+      }
+      .inneravatar {
+        height: 70px;
+        width: 70px;
+      }
+      .circle { width: 35px; height: 35px; top: 18px; left: 18px; }
+      .circle2 { width: 120px; height: 35px; top: 18px; }
+      .circle-left { left: -100px; bottom: 10px; width: 60px; height: 70px; transform: translateX(70px) translateY(-15px); }
+
+      .segmentedbutton {
+        height: 48px;
+        max-width: 280px;
+        margin-bottom: 2rem;
+      }
+
+      .input-field {
+        margin-bottom: 1.5rem;
+      }
+      .input-field label {
+        font-size: 0.9rem;
+        left: 48px !important;
+      }
+      .input-field input:not(.browser-default) {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+      }
+      .input-field input:focus + label,
+      .input-field input:not(.browser-default):valid + label,
+      .input-field input:not(.browser-default):focus:not([value=""]) + label,
+      .input-field input:not(.browser-default):not(:focus):not([value=""]) + label {
+        font-size: 0.65rem !important;
+      }
+      .input-field .material-icons.prefix {
+        font-size: 20px;
+        line-height: 40px;
+      }
+      .toggle-pw {
+        font-size: 18px !important;
+      }
+
+      button.state-layer {
+        height: 44px;
+        font-size: 0.95rem;
+        max-width: 220px;
+      }
+
+      h6 {
+        font-size: clamp(14px, 3.5vw, 18px);
+      }
+    }
   </style>
 </head>
 <body>
-  <h3 class="center-align poppins-title" style="font-size:56px;color: black;">WELCOME TO NHCE</h3>
+  <h3 class="center-align poppins-title">WELCOME TO NHCE</h3>
   
-<img src="https://www.apps-newhorizonindia.in/institution/misc/nhce.png" alt="NHCE Logo" class="top-left-logo" />
+  <img src="https://www.apps-newhorizonindia.in/institution/misc/nhce.png" alt="NHCE Logo" class="top-left-logo" />
 
   <div class="login-card z-depth-1">
-<div id="loadingOverlay" class="loading-overlay" style="display: none;">
-  <div class="loader"></div>
-</div>
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+      <div class="loader"></div>
+    </div>
 
-  <h6 class="center-align poppins-title">Student Performance Tracking</h6><br><br>
-<div class="genericavatar">
-  <div class="inneravatar">
-    <div class="circle2 circle-left"></div>
-    <div class="circle circle-right"></div>
-  </div>
-</div>
+    <h6 class="center-align poppins-title">Student Performance Tracking</h6><br>
+    <div class="genericavatar">
+      <div class="inneravatar">
+        <div class="circle2 circle-left"></div>
+        <div class="circle circle-right"></div>
+      </div>
+    </div>
 
-
-
-    <!-- Segmented Button -->
     <div id="segmentedbutton" class="segmentedbutton">
-      <!-- Faculty -->
       <div data-role="faculty" id="segment-start" class="segment-start">
         <div id="container" class="container active">
           <span class="label-text">Faculty</span>
@@ -280,143 +567,207 @@
         </div>
       </div>
 
-      <!-- Student -->
       <div data-role="student" id="segment-end" class="segment-end">
         <div id="container2" class="container2">
           <span class="label-text2">Student</span>
-          <img id="selectedicon2" class="selectedicon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAASCAYAAAC5DOVpAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAC/SURBVHgB7dIhDsIwFIDh994mYGpHWILlEAUmBmqKVI4TcAS4AUcgKBLUHIKQ7QgTSBLCDaaGgRSG2koTWiCo/artS748UYCmvxX4nMlvBB808vmMAJPhYBx+hZUQAM4Fwmq738TVGYJBNWi3juR5DQsY98iiRXErJmka5yZQGUk3BihCx24njIWuCfSy2XO7Po+IcPk4ZsX10nPs1lQHUmJVEAFzAcLVgcos1ePxdMg6XveMCFwXepvqYzb9tjvHg0ZvV5YLFwAAAABJRU5ErkJggg==" />
+          <img id="selectedicon2" class="selectedicon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAASCAYAAAC5DOVpAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAC/SURBVHgB7dIhDsIwFIDh994mYGpHWILlEAUmBmqKVI4TcAS4AUcgKBLUHIKQ7QgTSBLCDaaG2koTWiCo/artS748UYCmvxX4nMlvBB808vmMAJPhYBx+hZUQAM4Fwmq738TVGYJBNWi3juR5DQsY98iiRXErJmka5yZQGUk3BihCx24njIWuCfSy2XO7Po+IcPk4ZsX10nPs1lQHUmJVEAFzAcLVgcos1ePxdMg6XveMCFwXepvqYzb9tjvHg0ZvV5YLFwAAAABJRU5ErkJggg==" />
         </div>
       </div>
     </div>
   
-<div id="loginFields">
-<form name="loginForm" id="loginForm" action="LoginServlet" method="post">
-<input type="hidden" id="loginRoleInput" name="role" value="faculty" />
+    <div id="loginFields">
+      <form name="loginForm" id="loginForm" action="LoginServlet" method="post">
+        <input type="hidden" id="loginRoleInput" name="role" value="faculty" />
 
-  <!-- LOGIN FIELDS -->
-  
-    <div class="input-field">
-      <i class="material-icons prefix">person</i>
-      <input id="username" name="username" type="text" class="validate" required />
-      <label for="username">Username</label>
+        <div class="input-field">
+          <i class="material-icons prefix">person</i>
+          <input id="username" name="username" type="text" class="validate" required />
+          <label for="username">Username</label>
+        </div>
+
+        <div class="input-field">
+          <i class="material-icons prefix">lock</i>
+          <input id="password" name="password" type="password" class="validate" required />
+          <label for="password">Password</label>
+          <i class="material-icons toggle-pw" id="togglePw">visibility_off</i>
+        </div>
+
+        <center>
+          <button class="state-layer" id="loginBtn" type="submit">
+            <span id="formButtonLabel" class="label">Login</span>
+          </button><br><br>
+          <h6>Have not registered yet?<a href="#" onclick="switchToRegister()"><u>&nbsp;Register</u></a></h6>
+        </center>
+      </form>
     </div>
 
-    <div class="input-field" style="position:relative;">
-      <i class="material-icons prefix">lock</i>
-      <input id="password" name="password" type="password" class="validate" required />
-      <label for="password">Password</label>
-      <i class="material-icons toggle-pw" id="togglePw" style="position:absolute; right:0; top:0.8rem;">visibility_off</i>
-    </div>
-
-    <center>
-      <button class="state-layer" id="loginBtn" type="submit">
-        <span id="formButtonLabel" class="label">>&nbsp;&nbsp;Login</span>
-      </button><br><br>
-      <h6>Have not registered yet?<a href="#" onclick="switchToRegister()"><u>&nbsp;Register</u></a></h6>
-    </center>
-</form>
-  </div>
-<!-- REGISTER FORM -->
-<form name="registerForm" id="registerForm" action="RegisterServlet" method="post" style="display: none;">
-<input type="hidden" id="registerRoleInput" name="role" value="faculty" />
-  <fieldset style="min-height: 100px; width: 300px; margin: 0 auto;">
-    <legend>Registration Form</legend>
-    <table cellspacing="0" cellpadding="10" border="1">
-      <tr>
-        <td><label for="regUsername">USERNAME:</label></td>
-        <td><input class="control" type="text" id="regUsername" name="regUsername"></td>
-      </tr>
-      <tr>
-        <td><label for="regEmail">EMAIL:</label></td>
-        <td><input class="control" type="email" id="regEmail" name="email" placeholder="EMAIL"></td>
-      </tr>
-      <tr>
-        <td><label for="regPassword">PASSWORD:</label></td>
-        <td><input class="control" type="password" id="regPassword" name="regPassword"></td>
-      </tr>
-      <tr>
-        <td><label for="confirmPassword">CONFIRM PASSWORD:</label></td>
-        <td><input class="control" type="password" id="confirmPassword" name="confirmPassword" placeholder="CONFIRM PASSWORD"></td>
-      </tr>
-      <tr>
-        <td colspan="2" style="text-align: center;">
+    <form name="registerForm" id="registerForm" action="RegisterServlet" method="post" style="display: none;">
+      <input type="hidden" id="registerRoleInput" name="role" value="faculty" />
+      <fieldset>
+        <legend>Registration Form</legend>
+        <div class="register-input-group">
+          <label for="regUsername">USERID:</label>
+          <input class="control" type="text" id="regUsername" name="regUsername">
+        </div>
+        <div class="register-input-group">
+          <label for="regEmail">EMAIL:</label>
+          <input class="control" type="email" id="regEmail" name="email" placeholder="EMAIL">
+        </div>
+        <div class="register-input-group">
+          <label for="regPassword">PASSWORD:</label>
+          <input class="control" type="password" id="regPassword" name="regPassword">
+        </div>
+        <div class="register-input-group">
+          <label for="confirmPassword">CONFIRM PASSWORD:</label>
+          <input class="control" type="password" id="confirmPassword" name="confirmPassword" placeholder="CONFIRM PASSWORD">
+        </div>
+        <div class="register-buttons">
           <button id="registerBtn" type="submit">REGISTER</button>
           <button type="reset">CLEAR</button>
-        </td>
-      </tr>
-    </table>
-    <center><a href="#" onclick="switchToLogin()">Back to Login</a></center>
-  </fieldset>
-</form>
+        </div>
+        <center><a href="#" onclick="switchToLogin()">Back to Login</a></center>
+      </fieldset>
+    </form>
+  </div>
 
-
-  <!-- Materialize JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const pwField = document.getElementById('password');
+      const toggle = document.getElementById('togglePw');
+      if (toggle && pwField) { // Check if elements exist before adding listener
+          toggle.addEventListener('click', () => {
+            const showing = pwField.type === 'text';
+            pwField.type = showing ? 'password' : 'text';
+            toggle.textContent = showing ? 'visibility_off' : 'visibility';
+          });
+      }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const pwField = document.getElementById('password');
-    const toggle = document.getElementById('togglePw');
-    toggle.addEventListener('click', () => {
-      const showing = pwField.type === 'text';
-      pwField.type = showing ? 'password' : 'text';
-      toggle.textContent = showing ? 'visibility_off' : 'visibility';
-    });
-  });
-    const facultySegment = document.querySelector('[data-role="faculty"]');
-    const studentSegment = document.querySelector('[data-role="student"]');
-    const loginRoleInput = document.getElementById('loginRoleInput');
-    const registerRoleInput = document.getElementById('registerRoleInput');
+      const regUsernameInput = document.getElementById('regUsername');
+      const regUsernameLabel = document.querySelector('label[for="regUsername"]'); 
+      const facultySegment = document.querySelector('[data-role="faculty"]');
+      const studentSegment = document.querySelector('[data-role="student"]');
+      const loginRoleInput = document.getElementById('loginRoleInput');
+      const registerRoleInput = document.getElementById('registerRoleInput');
 
-    function setRole(role) {
-      document.getElementById('container').classList.toggle('active', role === 'faculty');
-      document.getElementById('container2').classList.toggle('active', role === 'student');
-      if (loginRoleInput) loginRoleInput.value = role;
-      if (registerRoleInput) registerRoleInput.value = role;
+      function setRole(role) {
+        document.getElementById('container').classList.toggle('active', role === 'faculty');
+        document.getElementById('container2').classList.toggle('active', role === 'student');
+        if (loginRoleInput) loginRoleInput.value = role;
+        if (registerRoleInput) registerRoleInput.value = role;
+
+        if (regUsernameLabel) {
+          if (role === 'faculty') {
+            regUsernameLabel.textContent = 'USERNAME:';
+          } else { // role === 'student'
+            regUsernameLabel.textContent = 'USERID:';
+          }
+          // Materialize.updateTextFields() can sometimes help relayout labels
+          // M.updateTextFields(); 
+        }
+      }
+
+      facultySegment.addEventListener('click', () => setRole('faculty'));
+      studentSegment.addEventListener('click', () => setRole('student'));
+
+      const p = new URLSearchParams(window.location.search);
+      if (p.get("login") === "fail") alert("Invalid credentials");
+
+      const regStatus = p.get("reg");
+      if (regStatus === "success") {
+        alert("Registration successful!");
+        switchToLogin(); 
+      } else if (regStatus === "fail") {
+        let reason = p.get("reason");
+        let errorMessage = "Registration failed!";
+        if (reason) {
+            switch (reason) {
+                case "missingfields":
+                    errorMessage = "Registration failed! Please fill in all fields.";
+                    break;
+                case "nomatch":
+                    errorMessage = "Registration failed! Passwords do not match.";
+                    break;
+                case "invalidid":
+                    errorMessage = "Registration failed! Invalid format for Student ID (must be a number).";
+                    break;
+                case "studentnotfound":
+                    errorMessage = "Registration failed! Student ID not found or has no name registered.";
+                    break;
+                case "alreadyregistered":
+                    errorMessage = "Registration failed! An account for this student already exists.";
+                    break;
+                case "usernametaken":
+                    errorMessage = "Registration failed! This username is already taken. Please choose another.";
+                    break;
+                case "invalidfacultyusername":
+                    errorMessage = "Registration failed! Faculty username cannot contain any numbers. Please provide a name with only letters.";
+                    break;
+                case "invalidrole":
+                    errorMessage = "Registration failed! Invalid role selected.";
+                    break;
+                case "dberror":
+                    errorMessage = "Registration failed due to a server error. Please try again later.";
+                    break;
+                default:
+                    errorMessage = "Registration failed! Reason: " + reason.replace(/([A-Z])/g, ' $1').toLowerCase();
+                    break;
+            }
+        }
+        alert(errorMessage);
+      }
+
+      // Initialize the role and label on page load
+      setRole(document.getElementById('container').classList.contains('active') ? 'faculty' : 'student');
+
+      // Initialize Materialize components needed (e.g., text fields for their label animations)
+      M.AutoInit(); // This initializes all Materialize components (forms, etc.)
+    }); // End of DOMContentLoaded
+
+    function switchToRegister() {
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('registerForm').style.display = 'block';
+      const currentRole = document.getElementById('registerRoleInput').value;
+      const regUsernameLabel = document.querySelector('label[for="regUsername"]');
+      if (regUsernameLabel) {
+          regUsernameLabel.textContent = (currentRole === 'faculty') ? 'USERNAME:' : 'USERID:';
+      }
+      // Re-initialize Materialize forms after display change
+      M.updateTextFields();
     }
 
-    facultySegment.addEventListener('click', () => setRole('faculty'));
-    studentSegment.addEventListener('click', () => setRole('student'));
+    function switchToLogin() {
+      document.getElementById('registerForm').style.display = 'none';
+      document.getElementById('loginForm').style.display = 'block';
+      // Re-initialize Materialize forms after display change
+      M.updateTextFields();
+    }
 
-    const p = new URLSearchParams(window.location.search);
-    if (p.get("login") === "fail")  alert("Invalid credentials");
-    if (p.get("reg")   === "success") alert("Registration successful!");
+    function showTemporaryLoader() {
+      const overlay = document.getElementById("loadingOverlay");
+      overlay.style.display = "flex";
+      // This timeout is for visual effect only, actual hiding should be on server response.
+      // For a real app, you'd hide this after the servlet response, not after a fixed time.
+      setTimeout(() => {
+        overlay.style.display = "none";
+      }, 1200); 
+    }
 
-    
-  function switchToRegister() {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('registerForm').style.display = 'block';
-  }
-
-  function switchToLogin() {
-    document.getElementById('registerForm').style.display = 'none';
-    document.getElementById('loginForm').style.display = 'block';
-  }
-  
-  function showTemporaryLoader() {
-    const overlay = document.getElementById("loadingOverlay");
-    overlay.style.display = "flex";
-
-    setTimeout(() => {
-      overlay.style.display = "none";
-    }, 1200); // 1.2 seconds
-  }
-
-  window.addEventListener('DOMContentLoaded', () => {
+    // Moved this part into the single DOMContentLoaded for better practice
+    // window.addEventListener('DOMContentLoaded', () => { ... });
     const loginBtn = document.getElementById("loginBtn");
     const registerBtn = document.getElementById("registerBtn");
 
-    if (loginBtn) {
-      loginBtn.addEventListener("click", showTemporaryLoader);
-    }
+    // Add event listeners within DOMContentLoaded or ensure they are called after elements exist
+    document.addEventListener('DOMContentLoaded', () => {
+        if (loginBtn) {
+            loginBtn.addEventListener("click", showTemporaryLoader);
+        }
+        if (registerBtn) {
+            registerBtn.addEventListener("click", showTemporaryLoader);
+        }
+    });
 
-    if (registerBtn) {
-      registerBtn.addEventListener("click", showTemporaryLoader);
-    }
-  });
-
-
-
- </script>
+</script>
 </body>
 </html>
