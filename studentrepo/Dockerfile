@@ -1,6 +1,7 @@
 # --- Stage 1: Build the Application ---
 # Use a full JDK image for compiling and packaging your Java application.
-FROM maven:3.8.7-openjdk-17 AS build
+# Corrected image tag: using 'jdk-17' instead of 'openjdk-17'
+FROM maven:3.8.7-jdk-17 AS build
 
 # Set the working directory inside the build container.
 WORKDIR /app
