@@ -18,13 +18,11 @@
 
   <dependencies>
     <!-- Servlet API for JSP/Servlets -->
-    <!-- For Java 17, Jakarta EE (jakarta.servlet-api) is generally preferred with newer Tomcat versions (10+).
-         However, javax.servlet-api 4.0.1 is Java EE 8, which Tomcat 9 supports. Keep this in mind if upgrading Tomcat. -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <version>4.0.1</version>
-      <scope>provided</scope> <!-- Provided by the Tomcat server -->
+      <scope>provided</scope>
     </dependency>
 
     <!-- JSTL for JSP pages -->
@@ -48,17 +46,10 @@
         <version>2.10.1</version>
     </dependency>
 
-    <!-- Removed webapp-runner as it's for Heroku, not Docker/Render -->
-    <!-- <dependency>
-        <groupId>com.heroku</groupId>
-        <artifactId>webapp-runner</artifactId>
-        <version>9.0.70.0</version>
-        <scope>provided</scope>
-    </dependency> -->
-
   </dependencies>
 
   <build>
+    <finalName>studentrepo</finalName> <!-- ADD THIS LINE: Sets the WAR file name to 'studentrepo.war' -->
     <resources>
       <resource>
         <directory>src/main/resources</directory>
@@ -70,7 +61,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.13.0</version>
         <configuration>
-          <release>17</release> <!-- Correct for Java 17 -->
+          <release>17</release>
         </configuration>
       </plugin>
 
@@ -78,35 +69,9 @@
         <artifactId>maven-war-plugin</artifactId>
         <version>3.2.3</version>
         <configuration>
-          <failOnMissingWebXml>false</failOnMissingWebXml> <!-- Good for annotation-based Servlets -->
+          <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
       </plugin>
-
-      <!-- Removed maven-dependency-plugin for webapp-runner as it's not needed for Docker/Render -->
-      <!-- <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.1.2</version>
-          <executions>
-              <execution>
-                  <phase>package</phase>
-                  <goals>
-                      <goal>copy</goal>
-                  </goals>
-                  <configuration>
-                      <artifactItems>
-                          <artifactItem>
-                              <groupId>com.heroku</groupId>
-                              <artifactId>webapp-runner</artifactId>
-                              <version>9.0.70.0</version>
-                              <destFileName>webapp-runner.jar</destFileName>
-                          </artifactItem>
-                      </artifactItems>
-                      <outputDirectory>${project.build.directory}/dependency</outputDirectory>
-                  </configuration>
-              </execution>
-          </executions>
-      </plugin> -->
     </plugins>
   </build>
 </project>
