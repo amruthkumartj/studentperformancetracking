@@ -1,773 +1,1302 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Student Performance Tracking</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Student Performance Tracking</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"/>
+<style>
+/* --- Material Design 3 Color Variables (Light Mode) --- */
+:root {
+    --primary: #6750A4;
+    --on-primary: #FFFFFF;
+    --primary-container: #EADDFF;
+    --on-primary-container: #21005D;
+    --secondary: #625B71;
+    --on-secondary: #FFFFFF;
+    --secondary-container: #E8DEF8;
+    --on-secondary-container: #1D192B;
+    --tertiary: #7D5260;
+    --on-tertiary: #FFFFFF;
+    --tertiary-container: #FFD8E4;
+    --on-tertiary-container: #31111D;
+    --error: #B3261E;
+    --on-error: #FFFFFF;
+    --error-container: #F9DEDC;
+    --on-error-container: #410E0B;
+    --background: #FFFBFE;
+    --on-background: #1C1B1F;
+    --surface: #FFFBFE;
+    --on-surface: #1C1B1F;
+    --surface-variant: #E7E0EC;
+    --on-surface-variant: #49454F;
+    --outline: #79747E;
+    --shadow: #000000;
+    --inverse-surface: #313033;
+    --inverse-on-surface: #F4EFF4;
+    --inverse-primary: #D0BCFF; /* Used for subtle highlights or alternative primary shades */
 
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" />
+    /* Custom variables for input fields based on Material Design 3 guidelines */
+    --card-background: rgba(255, 255, 255, 0.95); /* Slightly transparent card */
+    --input-border-color: var(--outline);
+    --input-focus-border-color: var(--primary);
+    --input-label-color: var(--on-surface-variant);
+    --input-label-focus-color: var(--primary);
+}
 
-  <style>
-    /* Material Design 3 inspired colors */
-    :root {
-      --primary: #6750A4; /* M3 Primary */
-      --on-primary: #FFFFFF;
-      --primary-container: #EADDFF;
-      --on-primary-container: #21005D;
-      --secondary: #625B71;
-      --on-secondary: #FFFFFF;
-      --secondary-container: #E8DEF8;
-      --on-secondary-container: #1D192B;
-      --tertiary: #7D5260;
-      --on-tertiary: #FFFFFF;
-      --tertiary-container: #FFD8E4;
-      --on-tertiary-container: #31111D;
-      --error: #B3261E;
-      --on-error: #FFFFFF;
-      --error-container: #F9DEDC;
-      --on-error-container: #410E0B;
-      --background: #FFFBFE; /* M3 background */
-      --on-background: #1C1B1F;
-      --surface: #FFFBFE;
-      --on-surface: #1C1B1F;
-      --surface-variant: #E7E0EC;
-      --on-surface-variant: #49454F;
-      --outline: #79747E;
-      --shadow: #000000;
-      --inverse-surface: #313033;
-      --inverse-on-surface: #F4EFF4;
-      --inverse-primary: #D0BCFF;
+/* --- Dark Mode Variables --- */
+body.dark-mode {
+    --primary: #D0BCFF; /* Lighter primary for dark mode */
+    --on-primary: #381E72; /* Darker text on lighter primary */
+    --primary-container: #4F378B;
+    --on-primary-container: #EADDFF;
+    --secondary: #CCC2DC;
+    --on-secondary: #332D41;
+    --secondary-container: #4A4458;
+    --on-secondary-container: #E8DEF8;
+    --tertiary: #EFB8C8;
+    --on-tertiary: #492532;
+    --tertiary-container: #633B48;
+    --on-tertiary-container: #FFD8E4;
+    --error: #F2B8B5; /* Lighter error for dark mode */
+    --on-error: #601410;
+    --error-container: #8C1D18;
+    --on-error-container: #F9DEDC;
+    --background: #1C1B1F; /* Dark background */
+    --on-background: #E6E1E5; /* Light text on dark background */
+    --surface: #1C1B1F; /* Dark surface */
+    --on-surface: #E6E1E5; /* Light text on dark surface */
+    --surface-variant: #49454F; /* Darker surface variant */
+    --on-surface-variant: #CAC4D0; /* Lighter text on dark surface variant */
+    --outline: #938F99;
+    --shadow: #000000; /* Shadow remains black for contrast */
+    --inverse-surface: #E6E1E5;
+    --inverse-on-surface: #313033;
+    --inverse-primary: #6750A4; /* Darker inverse primary for dark mode */
 
-      /* Custom for this design */
-      --card-background: rgba(255, 255, 255, 0.95); /* Slightly less transparent */
-      --input-border-color: var(--outline);
-      --input-focus-border-color: var(--primary);
-      --input-label-color: var(--on-surface-variant);
-      --input-label-focus-color: var(--primary);
-    }
+    /* Custom variables for input fields based on Material Design 3 guidelines */
+    --card-background: rgba(30, 30, 30, 0.95); /* Dark semi-transparent card */
+    --input-border-color: var(--on-surface-variant); /* Adjust for visibility */
+    --input-focus-border-color: var(--primary); /* Lighter focus color */
+    --input-label-color: var(--on-surface-variant);
+    --input-label-focus-color: var(--primary); /* Maintain primary for focus */
+}
 
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: "Roboto", sans-serif;
-      background: var(--background); /* Use M3 background color */
-      display: flex;
-      flex-direction: column; /* Changed to column for vertical stacking */
-      align-items: center; /* Center horizontally */
-      justify-content: center; /* Center vertically if content is short, or flex-start */
-      background-image: url('https://upload.wikimedia.org/wikipedia/commons/d/d8/NHCE_Campus.jpg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-      overflow-y: auto; /* Allow scrolling if content overflows */
-    }
+/* --- Global & Typography --- */
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: "Roboto", sans-serif;
+    background: var(--background);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/d/d8/NHCE_Campus.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    transition: background-color 0.3s ease; /* Smooth transition for dark mode */
+}
 
+h3.poppins-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: clamp(32px, 8vw, 56px);
+    color: var(--on-background);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    line-height: 1.2;
+    transition: color 0.3s ease; /* For dark mode */
+}
+
+h6.poppins-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: clamp(18px, 4vw, 24px);
+    color: var(--on-surface);
+    margin-bottom: 1.5rem;
+    transition: all 0.4s ease; /* For hiding animation */
+    transform-origin: top; /* For hiding animation */
+}
+
+/* --- Top Left Logo --- */
+.top-left-logo {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    height: clamp(80px, 15vw, 160px);
+    width: auto;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* --- Login Card --- */
+.login-card {
+    max-width: 420px;
+    width: 90%;
+    padding: 1.5rem 2.5rem;
+    border-radius: 20px;
+    background-color: var(--card-background);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    margin: 20px auto;
+    position: relative;
+    top: unset;
+    right: unset;
+    bottom: unset;
+    left: unset;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    transition: max-height 0.6s ease-in-out, background-color 0.3s ease, box-shadow 0.3s ease; /* Added for dark mode */
+}
+
+/* --- Generic Avatar --- */
+.genericavatar {
+    background-color: var(--primary-container);
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: background-color 0.3s ease; /* For dark mode */
+}
+
+.inneravatar {
+    position: relative;
+    height: 80px;
+    width: 80px;
+    transform: rotate(-90deg);
+}
+
+.circle, .circle2 {
+    position: absolute;
+    background-color: var(--primary);
+    border-radius: 50%;
+    transition: background-color 0.3s ease; /* For dark mode */
+}
+
+.circle {
+    width: 40px;
+    height: 40px;
+    top: 20px;
+    left: 20px;
+}
+
+.circle2 {
+    width: 150px;
+    height: 40px;
+    top: 20px;
+}
+
+.circle-left {
+    left: -120px;
+    bottom: 12px;
+    width: 70px;
+    height: 80px;
+    background-color: var(--primary);
+    transform: translateX(80px) translateY(-18px);
+}
+
+.circle-right {
+    right: 0;
+    background-color: var(--primary);
+}
+
+/* --- Segmented Button --- */
+.segmentedbutton {
+    height: 56px; /* Slightly taller for more presence */
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto 2.5rem; /* Increased bottom margin for separation */
+    border: 1px solid var(--outline);
+    border-radius: 100px; /* Fully rounded pill */
+    background: var(--surface);
+    display: flex;
+    overflow: hidden; /* Important for border-radius on inner elements */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle initial shadow */
+    transition: box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Individual Segments (Faculty/Student) */
+.segment-start, .segment-end {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    z-index: 1; /* Ensure content is above background */
+    overflow: hidden; /* For future ripple effects if added */
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.segment-start:not(.active):hover,
+.segment-end:not(.active):hover {
+    background-color: var(--surface-variant); /* Lighter background on hover for inactive */
+    transform: translateY(-1px); /* Subtle lift */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Increased shadow on hover */
+    z-index: 2; /* Bring hovered element slightly to front */
+}
+
+/* Inner Container for Active State */
+.container, .container2 {
+    height: calc(100% - 8px); /* Slightly smaller than parent to show border */
+    width: calc(100% - 8px);  /* Slightly smaller than parent to show border */
+    border-radius: 96px; /* Adjusted radius to match parent's internal curve */
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--on-surface-variant); /* Default text color */
+}
+
+.container.active, .container2.active {
+    background: var(--primary); /* Solid primary color for active background */
+    color: var(--on-primary); /* Text color for active state */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow for active state */
+    transform: scale(0.98); /* Slightly 'pressed' look when active */
+}
+
+/* Separator Line (Simulated) */
+.segment-start::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 20%; /* Vertically center */
+    height: 60%; /* Height of the separator */
+    width: 1px;
+    background-color: var(--outline); /* Color of the separator */
+    transition: background-color 0.3s ease;
+    z-index: 3; /* Ensure separator is on top */
+}
+
+/* Hide separator when segment-start is active */
+.segment-start.active::after {
+    background-color: transparent; /* Hide separator when active */
+}
+
+/* Content Wrapper within Container */
+.segment-content {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Space between label and icon */
+    white-space: nowrap; /* Prevent wrapping */
+}
+
+/* Selected Icon (now a Material Icon) */
+.selectedicon {
+    font-size: 20px; /* Material Icon font size */
+    color: var(--on-primary); /* Default color, overridden by active state */
+    opacity: 0;
+    transition: opacity 0.3s ease, color 0.3s ease; /* Smoother transition */
+    display: flex; /* Ensure it behaves as a flex item */
+    align-items: center;
+    justify-content: center;
+}
+.active .selectedicon {
+    opacity: 1;
+}
+
+/* Adjustments for the segment when active so the icon gets the right color */
+.container.active .selectedicon,
+.container2.active .selectedicon {
+    color: var(--on-primary); /* Explicitly set to on-primary when active */
+}
+
+/* For inactive state, if the icon is ever made visible, it should contrast */
+.container:not(.active) .selectedicon,
+.container2:not(.active) .selectedicon {
+    color: var(--on-surface-variant); /* Example: Use on-surface-variant for inactive text/icons */
+}
+
+/* Text Labels */
+.label-text, .label-text2 {
+    font-size: 1rem;
+    font-family: "Roboto", sans-serif;
+    color: inherit; /* Inherit color from parent (.container/.container2) */
+    display: flex;
+    align-items: center;
+}
+
+/* --- Input Fields --- */
+.input-field {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.input-field label {
+    color: var(--input-label-color) !important;
+    font-size: 1.1rem !important;
+    font-weight: 500 !important;
+    top: 18px !important;
+    left: 48px !important;
+    pointer-events: none;
+    transition: all 0.2s ease-out, color 0.3s ease; /* Added color transition */
+}
+
+.input-field input[type=text]:not(.browser-default),
+.input-field input[type=password]:not(.browser-default),
+.input-field input[type=email]:not(.browser-default) {
+    width: calc(100% - 48px);
+    padding: 12px 16px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 8px;
+    background-color: var(--surface-variant);
+    box-shadow: none !important;
+    color: var(--on-surface);
+    box-sizing: border-box;
+    font-size: 1rem;
+    height: unset;
+    margin-bottom: 0;
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, color 0.3s ease;
+}
+
+.input-field input[type=text]:not(.browser-default):focus,
+.input-field input[type=password]:not(.browser-default):focus,
+.input-field input[type=email]:not(.browser-default):focus {
+    border: 2px solid var(--input-focus-border-color) !important;
+    background-color: var(--surface);
+    box-shadow: 0 0 0 4px var(--primary-container) !important;
+}
+
+.input-field input[type=text]:focus + label,
+.input-field input[type=password]:focus + label,
+.input-field input[type=email]:focus + label,
+.input-field input[type=text]:not(.browser-default):valid + label,
+.input-field input[type=password]:not(.browser-default):valid + label,
+.input-field input[type=email]:not(.browser-default):valid + label,
+.input-field input[type=text]:not(.browser-default):focus:not([value=""]) + label,
+.input-field input[type=password]:not(.browser-default):focus:not([value=""]) + label,
+.input-field input[type=email]:not(.browser-default):focus:not([value=""]) + label {
+    top: 0 !important;
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    color: var(--input-label-focus-color) !important;
+}
+
+.input-field input[type=text]:not(.browser-default):not(:focus):not([value=""]) + label,
+.input-field input[type=password]:not(.browser-default):not(:focus):not([value=""]) + label,
+.input-field input[type=email]:not(.browser-default):not(:focus):not([value=""]) + label {
+    top: 0 !important;
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    color: var(--input-label-color) !important;
+}
+
+.input-field .material-icons.prefix {
+    color: var(--input-label-color) !important;
+    font-size: 24px;
+    line-height: 48px;
+    position: absolute;
+    left: 8px;
+    top: 0;
+    transition: color 0.3s ease; /* For dark mode */
+}
+
+.toggle-pw {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--input-label-color) !important;
+    font-size: 20px !important;
+    transition: color 0.3s ease; /* For dark mode */
+}
+
+/* --- Buttons --- */
+button.state-layer {
+    height: 48px;
+    width: 100%;
+    max-width: 250px;
+    padding: 0 24px;
+    margin-top: 1rem;
+    background-color: var(--primary);
+    color: var(--on-primary);
+    border-radius: 100px;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease; /* Ensure smooth transitions for all properties */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+    position: relative; /* For the shine effect */
+    overflow: hidden; /* Important for the shine effect */
+    border: none; /* Ensure no default button border */
+    cursor: pointer;
+}
+
+/* Shine effect pseudo-element */
+button.state-layer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%; /* Start off-screen to the left */
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2); /* Semi-transparent white for the shine */
+    transform: skewX(-20deg); /* Angle the shine */
+    transition: left 0.4s ease-out; /* Animate the shine moving to the right */
+}
+
+/* Hover state for the button */
+button.state-layer:hover {
+    background: linear-gradient(45deg, var(--primary), var(--inverse-primary)); /* Maintain the gradient on hover */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); /* Even stronger shadow on hover */
+    transform: translateY(-2px) scale(1.01); /* Subtle lift and slight scale */
+}
+
+/* Hover state for the shine effect */
+button.state-layer:hover::before {
+    left: 100%; /* Move the shine across the button */
+}
+
+/* Active (click) state for the button */
+button.state-layer:active {
+    transform: scale(0.98); /* Slightly shrink on click */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Reduce shadow on click */
+}
+
+/* --- Link Styling (for "Not registered yet?") --- */
+h6 a {
+    color: var(--primary); /* Uses primary variable for light mode */
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+h6 a:hover {
+    color: var(--inverse-primary); /* Uses inverse-primary variable for light mode hover */
+    text-decoration: underline;
+}
+
+/* --- Register Form --- */
+#registerForm fieldset {
+    border: 1px solid var(--outline);
+    border-radius: 16px;
+    padding: 1rem;
+    margin: 1rem 0;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease; /* For dark mode */
+}
+
+#registerForm legend {
+    color: var(--primary);
+    font-size: 1.2rem;
+    font-weight: 500;
+    padding: 0 10px;
+    transition: color 0.3s ease; /* For dark mode */
+}
+
+#registerForm table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background: none;
+    box-shadow: none;
+    border: none;
+}
+
+#registerForm table td {
+    padding: 10px 0;
+    border: none;
+    vertical-align: middle;
+}
+
+#registerForm label {
+    color: var(--on-surface-variant);
+    font-size: 0.95rem;
+    font-weight: 400;
+    white-space: nowrap;
+    transition: color 0.3s ease; /* For dark mode */
+}
+
+#registerForm input.control {
+    width: calc(100% - 20px);
+    padding: 10px 12px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 8px;
+    background-color: var(--surface-variant);
+    color: var(--on-surface);
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, color 0.3s ease;
+}
+
+#registerForm input.control:focus {
+    border: 2px solid var(--input-focus-border-color);
+    background-color: var(--surface);
+    box-shadow: 0 0 0 4px var(--primary-container);
+    outline: none;
+}
+
+#registerForm button {
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 100px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 5px;
+    border: none; /* Ensure no default button border */
+}
+
+#registerBtn {
+    background-color: var(--primary);
+    color: var(--on-primary);
+}
+
+#registerBtn:hover {
+    background-color: var(--inverse-primary);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+#registerForm button[type="reset"] {
+    background-color: var(--surface-variant);
+    color: var(--on-surface-variant);
+    border: 1px solid var(--outline);
+}
+
+#registerForm button[type="reset"]:hover {
+    background-color: var(--secondary-container);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+#registerForm center a {
+    color: var(--primary);
+    text-decoration: none;
+    margin-top: 1rem;
+    display: inline-block;
+    font-weight: 500;
+    transition: color 0.3s ease; /* For dark mode */
+}
+
+#registerForm center a:hover {
+    text-decoration: underline;
+}
+
+/* --- Loader & Overlay --- */
+.loading-overlay {
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+    backdrop-filter: blur(6px); /* Stronger blur for a frosted glass effect */
+    z-index: 999; /* Ensures it's on top of everything */
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0; /* Covers the entire parent (login-card in this case) */
+    display: flex; /* Flexbox for centering the loader */
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease; /* Smooth fade-in/out */
+    /* Initially hidden via JavaScript: display: none; */
+}
+
+.loader {
+    border: 4px solid var(--primary-container); /* Base color for the spinner */
+    border-top: 4px solid var(--primary); /* Primary color for the spinning part */
+    border-radius: 50%; /* Makes it a circle */
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite, glow 1.5s infinite alternate; /* Two animations combined */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes glow {
+    from { box-shadow: 0 0 8px var(--primary); } /* Start with a subtle glow */
+    to { box-shadow: 0 0 20px var(--primary), 0 0 30px var(--inverse-primary); } /* Expand and intensify glow */
+}
+
+/* --- Custom Message Overlay Styles --- */
+#customMessageOverlay {
+    position: fixed; /* Fixed to viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* Dark semi-transparent background */
+    backdrop-filter: blur(8px); /* Blurs content behind it */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Ensure it's on top of everything */
+    opacity: 0; /* Start hidden for fade-in effect */
+    visibility: hidden; /* Also hidden for accessibility/click events */
+    transition: opacity 0.3s ease, visibility 0.3s ease; /* Smooth transition */
+}
+
+#customMessageOverlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+#customMessageContent {
+    background-color: var(--surface); /* White or light background for the message box */
+    padding: 2.5rem;
+    border-radius: 20px; /* Rounded corners for the message box */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 350px; /* Limit width for better readability */
+    width: 90%; /* Responsive width */
+    transform: translateY(-20px); /* Start slightly up for slide-down effect */
+    opacity: 0; /* Hidden for content fade-in */
+    transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    display: flex; /* Use flexbox for icon and text alignment */
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+#customMessageOverlay.show #customMessageContent {
+    transform: translateY(0); /* Slide down into place */
+    opacity: 1;
+}
+
+#customMessageContent i {
+    font-size: 3.5rem; /* Large icon */
+    margin-bottom: 0.5rem;
+    transition: color 0.3s ease; /* For dark mode */
+}
+
+#customMessageContent p {
+    font-size: 1.1rem;
+    color: var(--on-surface);
+    margin: 0;
+    transition: color 0.3s ease; /* For dark mode */
+}
+
+#customMessageContent button {
+    height: 48px;
+    padding: 0 24px;
+    margin-top: 1.5rem;
+    background-color: var(--primary); /* Default button color */
+    color: var(--on-primary);
+    border-radius: 100px;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.3s ease;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+#customMessageContent button:hover {
+    background-color: var(--inverse-primary);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+}
+
+/* Color variations for messages */
+#customMessageContent.success i { color: var(--primary); }
+#customMessageContent.error i { color: var(--error); }
+#customMessageContent.info i { color: var(--outline); } /* Using outline for info */
+
+#customMessageContent.success button { background-color: var(--primary); }
+#customMessageContent.error button { background-color: var(--error); }
+#customMessageContent.info button { background-color: var(--outline); }
+
+/* --- Dark Mode Overrides for Specific Elements --- */
+body.dark-mode .segmentedbutton {
+    border-color: var(--outline); /* Ensure it's visible in dark mode */
+    background: var(--surface);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Slightly stronger shadow */
+}
+
+body.dark-mode .segment-start:not(.active):hover,
+body.dark-mode .segment-end:not(.active):hover {
+    background-color: var(--surface-variant); /* Darker hover background for inactive */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .container.active,
+body.dark-mode .container2.active {
+    background: var(--primary); /* Dark mode primary */
+    color: var(--on-primary); /* Dark mode on-primary */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .segment-start::after {
+    background-color: var(--outline); /* Dark mode outline color */
+}
+
+/* Dark Mode Overrides for Link */
+body.dark-mode h6 a {
+    color: var(--inverse-primary); /* Lighter color for links in dark mode */
+}
+
+body.dark-mode h6 a:hover {
+    color: var(--primary); /* Hover color for links in dark mode */
+}
+
+/* Loader and Message Overlay adjustments for dark mode */
+body.dark-mode .loading-overlay {
+    background-color: rgba(0, 0, 0, 0.7); /* Darker blur overlay */
+}
+
+body.dark-mode .loader {
+    border-color: var(--primary-container);
+    border-top-color: var(--primary);
+}
+
+body.dark-mode #customMessageContent {
+    background-color: var(--surface); /* Uses the dark mode surface */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); /* Stronger shadow in dark mode */
+}
+
+body.dark-mode #customMessageContent p {
+    color: var(--on-surface); /* Uses the dark mode on-surface text color */
+}
+
+/* Ensure icons adapt */
+body.dark-mode #customMessageContent.success i { color: var(--primary); }
+body.dark-mode #customMessageContent.error i { color: var(--error); }
+body.dark-mode #customMessageContent.info i { color: var(--outline); }
+body.dark-mode #customMessageContent.success button { background-color: var(--primary); }
+body.dark-mode #customMessageContent.error button { background-color: var(--error); }
+body.dark-mode #customMessageContent.info button { background-color: var(--outline); }
+
+/* --- Utility Classes --- */
+.title-hidden {
+    transform: scaleY(0);
+    opacity: 0;
+    height: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.login-card.scrollable {
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 85vh;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+}
+
+.login-card.scrollable::-webkit-scrollbar { width: 8px; }
+.login-card.scrollable::-webkit-scrollbar-track { background: transparent; }
+.login-card.scrollable::-webkit-scrollbar-thumb {
+    background: var(--primary-container);
+    border-radius: 8px;
+}
+.login-card.scrollable::-webkit-scrollbar-thumb:hover {
+    background: var(--inverse-primary);
+}
+
+/* --- Media Queries (Responsive Design) --- */
+@media (max-width: 768px) {
     h3.poppins-title {
-      font-family: 'Poppins', sans-serif;
-      font-weight: 700; /* Bolder */
-      font-size: clamp(32px, 8vw, 56px); /* Responsive font size */
-      color: var(--on-background); /* Use M3 color */
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.1); /* Subtle shadow for readability */
-      margin-top: 20px; /* Add some top margin */
-      margin-bottom: 20px;
-      text-align: center; /* Ensure it's centered */
-      line-height: 1.2;
-    }
-
-    h6.poppins-title {
-      font-family: 'Poppins', sans-serif;
-      font-weight: 500;
-      font-size: clamp(18px, 4vw, 24px); /* Responsive font size */
-      color: var(--on-surface);
-      margin-bottom: 1.5rem;
-    }
-
-    .top-left-logo {
-      position: absolute;
-      top: 20px; /* Slightly more padding */
-      left: 20px; /* Slightly more padding */
-      height: clamp(80px, 15vw, 160px); /* Responsive height */
-      width: auto; /* Maintain aspect ratio */
-      z-index: 1000;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow */
-      border-radius: 8px; /* Slightly rounded corners */
-    }
-
-    .login-card {
-      max-width: 420px;
-      width: 90%; /* Responsive width */
-      padding: 2.5rem; /* Increased padding */
-      border-radius: 20px; /* More rounded corners (M3 style) */
-      background-color: var(--card-background);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Stronger, softer shadow */
-      margin: 40px auto; /* Center with margin, provide vertical spacing */
-      position: relative; /* Remove fixed positioning */
-      top: unset;
-      right: unset;
-      bottom: unset;
-      left: unset;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    /* Avatar styling (kept your unique design, with minor adjustments) */
-    .genericavatar {
-      background-color: var(--primary-container); /* M3-inspired light background */
-      height: 120px; /* Slightly smaller for mobile, scales */
-      width: 120px;
-      border-radius: 50%; /* Make it a perfect circle */
-      margin: 0 auto 2rem; /* More vertical space */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-
-    .inneravatar {
-      position: relative;
-      height: 80px; /* Scaled down */
-      width: 80px;
-      transform: rotate(-90deg);
-    }
-
-    .circle, .circle2 {
-      position: absolute;
-      background-color: var(--primary); /* Use primary color */
-      border-radius: 50%;
-    }
-
-    .circle {
-      width: 40px; height: 40px;
-      top: 20px; /* Scaled down */
-      left: 20px; /* Scaled down */
-    }
-
-    .circle2 {
-      width: 150px; /* Adjusted to fit the new avatar size */
-      height: 40px;
-      top: 20px; /* Scaled down */
-    }
-
-    .circle-left {
-      left: -120px;
-      bottom: 12px;
-      width: 70px;
-      height: 80px;
-      background-color: var(--primary); /* Consistent with M3 primary */
-      transform: translateX(80px) translateY(-18px);
-    }
-
-    .circle-right {
-      right: 0;
-      background-color: var(--primary);
-    }
-
-    /* Segmented Button (M3-style) */
-    .segmentedbutton {
-      height: 56px; /* Taller */
-      width: 100%;
-      max-width: 320px; /* Wider */
-      margin: 0 auto 2.5rem; /* More spacing */
-      border: 1px solid var(--outline); /* Softer border */
-      border-radius: 100px;
-      background: var(--surface); /* Match surface color */
-      display: flex;
-      overflow: hidden; /* Important for border-radius */
-    }
-
-    .segment-start, .segment-end {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      position: relative;
-      transition: background-color 0.2s ease, color 0.2s ease;
-      border-right: 1px solid var(--outline); /* Separator */
-    }
-    .segment-end {
-        border-right: none; /* No separator on the last segment */
-    }
-
-    .container, .container2 {
-      height: 100%;
-      width: 100%;
-      border-radius: 100px; /* Applies to the inner element to mimic button shape */
-      transition: background 0.2s, color 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      font-size: 1rem; /* Base font size */
-      color: var(--on-surface-variant); /* Default text color */
-      font-weight: 500;
-    }
-
-    .container.active, .container2.active {
-      background: var(--primary-container); /* M3 active state */
-      color: var(--on-primary-container); /* Text color for active state */
-    }
-
-    .selectedicon {
-      height: 20px; /* Slightly larger icon */
-      width: 20px;
-      margin-left: 8px; /* More spacing */
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .active .selectedicon {
-      opacity: 1;
-    }
-
-    .label-text, .label-text2 {
-      font-size: 1rem;
-      font-family: "Roboto", sans-serif;
-      color: inherit; /* Inherit color from parent (.container) */
-      display: flex;
-      align-items: center;
-    }
-
-    /* Materialize Input Field Overrides (M3-style filled/outlined) */
-    .input-field {
-      margin-bottom: 2rem; /* More spacing between inputs */
-      position: relative; /* For label animation */
-    }
-
-    .input-field label {
-      color: var(--input-label-color) !important;
-      font-size: 1rem; /* Base label font size */
-      top: 18px !important; /* Adjust initial label position */
-      left: 48px !important; /* Adjust for icon */
-      pointer-events: none; /* Make label unclickable */
-      transition: all 0.2s ease-out;
-    }
-
-    .input-field input[type=text]:not(.browser-default),
-    .input-field input[type=password]:not(.browser-default),
-    .input-field input[type=email]:not(.browser-default) {
-      width: calc(100% - 48px); /* Account for prefix icon padding */
-      padding: 12px 16px; /* More vertical padding */
-      border: 1px solid var(--input-border-color); /* Initial border */
-      border-radius: 8px; /* Rounded corners for input fields */
-      background-color: var(--surface-variant); /* Light background for filled style */
-      box-shadow: none !important; /* Remove Materialize default shadow */
-      color: var(--on-surface);
-      box-sizing: border-box; /* Include padding/border in width */
-      font-size: 1rem;
-      height: unset; /* Let padding define height */
-      margin-bottom: 0; /* Remove default margin */
-      transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    /* Input focus and validation states */
-    .input-field input[type=text]:not(.browser-default):focus,
-    .input-field input[type=password]:not(.browser-default):focus,
-    .input-field input[type=email]:not(.browser-default):focus {
-      border: 2px solid var(--input-focus-border-color) !important; /* Thicker border on focus */
-      background-color: var(--surface); /* Clear background on focus */
-      box-shadow: 0 0 0 4px var(--primary-container) !important; /* Focus ring */
-    }
-
-    /* Materialize label animation fix for M3 style */
-    .input-field input[type=text]:focus + label,
-    .input-field input[type=password]:focus + label,
-    .input-field input[type=email]:focus + label,
-    .input-field input[type=text]:not(.browser-default):valid + label,
-    .input-field input[type=password]:not(.browser-default):valid + label,
-    .input-field input[type=email]:not(.browser-default):valid + label,
-    .input-field input[type=text]:not(.browser-default):focus:not([value=""]) + label,
-    .input-field input[type=password]:not(.browser-default):focus:not([value=""]) + label,
-    .input-field input[type=email]:not(.browser-default):focus:not([value=""]) + label {
-      top: 0 !important; /* Move label to top */
-      font-size: 0.75rem !important; /* Smaller font for top label */
-      color: var(--input-label-focus-color) !important;
-    }
-    
-    /* Hide label when input has value and is not focused, Materialize bug fix */
-    .input-field input[type=text]:not(.browser-default):not(:focus):not([value=""]) + label,
-    .input-field input[type=password]:not(.browser-default):not(:focus):not([value=""]) + label,
-    .input-field input[type=email]:not(.browser-default):not(:focus):not([value=""]) + label {
-        top: 0 !important;
-        font-size: 0.75rem !important;
-        color: var(--input-label-color) !important; /* Keep original color when not focused */
-    }
-
-
-    .input-field .material-icons.prefix {
-      color: var(--input-label-color) !important; /* Icon color */
-      font-size: 24px; /* Default icon size */
-      line-height: 48px; /* Align icon vertically */
-      position: absolute;
-      left: 8px; /* Adjust icon position */
-      top: 0;
-    }
-
-    .toggle-pw {
-      position: absolute;
-      right: 12px; /* Adjust position */
-      top: 50%;
-      transform: translateY(-50%); /* Vertically center */
-      cursor: pointer;
-      color: var(--input-label-color) !important;
-      font-size: 20px !important; /* Adjust size */
-    }
-
-    /* M3 style button */
-    button.state-layer {
-      height: 48px; /* Taller button */
-      width: 100%; /* Full width of its container */
-      max-width: 250px; /* Max width for consistency */
-      padding: 0 24px; /* Horizontal padding */
-      margin-top: 1.5rem; /* More space above button */
-      background-color: var(--primary); /* Primary button color */
-      color: var(--on-primary); /* Text color on primary */
-      border-radius: 100px; /* Pill shape */
-      font-size: 1rem;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-      transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
-      display: flex; /* To center content */
-      justify-content: center;
-      align-items: center;
-      text-transform: uppercase; /* Material Design standard */
-    }
-
-    button.state-layer:hover {
-      background-color: var(--inverse-primary); /* Lighter hover color */
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
-    }
-
-    button.state-layer:active {
-        transform: scale(0.98); /* Slight press effect */
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Register link styling */
-    h6 a {
-      color: var(--primary); /* Link color */
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.2s ease;
-    }
-    h6 a:hover {
-      color: var(--inverse-primary);
-      text-decoration: underline;
-    }
-
-    /* Registration Form Styling (non-Materialize part) */
-    #registerForm fieldset {
-      border: 1px solid var(--outline);
-      border-radius: 16px; /* Rounded corners */
-      padding: 1.5rem;
-      margin: 1.5rem 0; /* Add margin */
-      width: 100%; /* Full width within card */
-      box-sizing: border-box;
-    }
-    #registerForm legend {
-      color: var(--primary);
-      font-size: 1.2rem;
-      font-weight: 500;
-      padding: 0 10px;
-    }
-    #registerForm table {
-      width: 100%;
-      border-collapse: collapse; /* Remove table borders */
-      margin-top: 1rem;
-      background: none; /* No background for table */
-      box-shadow: none; /* No shadow */
-      border: none;
-    }
-    #registerForm table td {
-      padding: 10px 0; /* Adjust padding */
-      border: none; /* Remove default table cell borders */
-      vertical-align: middle;
-    }
-    #registerForm label {
-      color: var(--on-surface-variant);
-      font-size: 0.95rem;
-      font-weight: 400;
-      white-space: nowrap; /* Prevent label wrapping */
-    }
-    #registerForm input.control {
-      width: calc(100% - 20px); /* Adjust width */
-      padding: 10px 12px;
-      border: 1px solid var(--input-border-color);
-      border-radius: 8px;
-      background-color: var(--surface-variant);
-      color: var(--on-surface);
-      font-size: 0.95rem;
-      box-sizing: border-box;
-      transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    #registerForm input.control:focus {
-      border: 2px solid var(--input-focus-border-color);
-      background-color: var(--surface);
-      box-shadow: 0 0 0 4px var(--primary-container);
-      outline: none;
-    }
-
-    #registerForm button {
-      height: 40px; /* Smaller buttons for inner form */
-      padding: 0 20px;
-      border-radius: 100px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: background-color 0.2s ease, box-shadow 0.2s ease;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      margin: 5px; /* Spacing between buttons */
-    }
-    #registerBtn {
-      background-color: var(--primary);
-      color: var(--on-primary);
-      border: none;
-    }
-    #registerBtn:hover {
-      background-color: var(--inverse-primary);
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-    }
-    #registerForm button[type="reset"] {
-      background-color: var(--surface-variant);
-      color: var(--on-surface-variant);
-      border: 1px solid var(--outline);
-    }
-    #registerForm button[type="reset"]:hover {
-      background-color: var(--secondary-container);
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-    }
-    #registerForm center a {
-        color: var(--primary);
-        text-decoration: none;
-        margin-top: 1rem;
-        display: inline-block;
-        font-weight: 500;
-    }
-    #registerForm center a:hover {
-        text-decoration: underline;
-    }
-
-    /* Loader */
-    .loading-overlay {
-      background-color: rgba(255, 255, 255, 0.7); /* Slightly more opaque */
-      backdrop-filter: blur(4px); /* Stronger blur */
-    }
-    .loader {
-      border-top: 4px solid var(--primary); /* Use primary color for loader */
-    }
-
-    /* Responsive Adjustments */
-    @media (max-width: 768px) {
-      h3.poppins-title {
         font-size: clamp(28px, 7vw, 48px);
         margin-top: 10px;
         margin-bottom: 15px;
-      }
-
-      .top-left-logo {
+    }
+    .top-left-logo {
         top: 10px;
         left: 10px;
         height: clamp(60px, 12vw, 100px);
-      }
-
-      .login-card {
-        width: 95%; /* Wider on small screens */
+    }
+    .login-card {
+        width: 95%;
         padding: 1.5rem;
-        margin: 20px auto; /* Adjust vertical margin */
+        margin: 20px auto;
         border-radius: 16px;
-      }
-
-      .genericavatar {
+    }
+    .genericavatar {
         height: 100px;
         width: 100px;
         margin-bottom: 1.5rem;
-      }
-      .inneravatar {
+    }
+    .inneravatar {
         height: 70px;
         width: 70px;
-      }
-      .circle { width: 35px; height: 35px; top: 18px; left: 18px; }
-      .circle2 { width: 120px; height: 35px; top: 18px; }
-      .circle-left { left: -100px; bottom: 10px; width: 60px; height: 70px; transform: translateX(70px) translateY(-15px); }
+    }
+    .circle { width: 35px; height: 35px; top: 18px; left: 18px; }
+    .circle2 { width: 120px; height: 35px; top: 18px; }
+    .circle-left { left: -100px; bottom: 10px; width: 60px; height: 70px; transform: translateX(70px) translateY(-15px); }
 
-      .segmentedbutton {
+    .segmentedbutton {
         height: 48px;
         max-width: 280px;
         margin-bottom: 2rem;
-      }
+    }
+    .container, .container2 {
+        height: calc(100% - 6px); /* Adjust internal spacing */
+        width: calc(100% - 6px);
+        border-radius: 94px; /* Adjust radius */
+    }
+    .segment-content {
+        gap: 6px; /* Slightly less gap on mobile */
+    }
+    .selectedicon {
+        font-size: 18px; /* Adjusted font size for mobile */
+    }
 
-      .input-field {
+    .input-field {
         margin-bottom: 1.5rem;
-      }
-      .input-field label {
+    }
+    .input-field label {
         font-size: 0.9rem;
         left: 48px !important;
-      }
-      .input-field input:not(.browser-default) {
+    }
+    .input-field input:not(.browser-default) {
         padding: 10px 14px;
         font-size: 0.9rem;
-      }
-      .input-field input:focus + label,
-      .input-field input:not(.browser-default):valid + label,
-      .input-field input:not(.browser-default):focus:not([value=""]) + label,
-      .input-field input:not(.browser-default):not(:focus):not([value=""]) + label {
+    }
+    .input-field input:focus + label,
+    .input-field input:not(.browser-default):valid + label,
+    .input-field input:not(.browser-default):focus:not([value=""]) + label,
+    .input-field input:not(.browser-default):not(:focus):not([value=""]) + label {
         font-size: 0.65rem !important;
-      }
-      .input-field .material-icons.prefix {
+    }
+    .input-field .material-icons.prefix {
         font-size: 20px;
         line-height: 40px;
-      }
-      .toggle-pw {
+    }
+    .toggle-pw {
         font-size: 18px !important;
-      }
-
-      button.state-layer {
+    }
+    button.state-layer {
         height: 44px;
         font-size: 0.95rem;
         max-width: 220px;
-      }
-
-      h6 {
-        font-size: clamp(14px, 3.5vw, 18px);
-      }
     }
-  </style>
+    h6 {
+        font-size: clamp(14px, 3.5vw, 18px);
+    }
+}
+</style>
 </head>
 <body>
-  <h3 class="center-align poppins-title">WELCOME TO NHCE</h3>
-  
-  <img src="https://www.apps-newhorizonindia.in/institution/misc/nhce.png" alt="NHCE Logo" class="top-left-logo" />
 
-  <div class="login-card z-depth-1">
-    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
-      <div class="loader"></div>
+<img src="https://www.apps-newhorizonindia.in/institution/misc/nhce.png" alt="NHCE Logo" class="top-left-logo"/>
+<div class="login-card z-depth-1">
+    <div id="loginViewContent">
+        <div id="loadingOverlay" class="loading-overlay" style="display:none;">
+            <div class="loader"></div>
+        </div>
+        <h6 class="center-align poppins-title">Student Performance Tracking</h6><br>
+        <div class="genericavatar">
+            <div class="inneravatar">
+                <div class="circle2 circle-left"></div>
+                <div class="circle circle-right"></div>
+            </div>
+        </div>
+        <div id="segmentedbutton" class="segmentedbutton">
+
+            <div data-role="faculty" id="segment-start" class="segment-start">
+                <div id="container" class="container active">
+                    <span class="segment-content">
+                        <span class="label-text">Faculty</span>
+                        <i id="selectedicon" class="material-icons selectedicon">check</i>
+                    </span>
+                </div>
+            </div>
+
+            <div data-role="student" id="segment-end" class="segment-end">
+                <div id="container2" class="container2">
+                    <span class="segment-content">
+                        <span class="label-text2">Student</span>
+                        <i id="selectedicon2" class="material-icons selectedicon">check</i>
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
     </div>
+<div id="loginFields">
+<form name="loginForm" id="loginForm" action="LoginServlet" method="post">
+<input type="hidden" id="loginRoleInput" name="role" value="faculty"/>
+<div class="input-field">
+<i class="material-icons prefix">person</i>
+<input id="username" name="username" type="text" class="validate" required/>
+<label for="username">Username</label>
+</div>
+<div class="input-field">
+<i class="material-icons prefix">lock</i>
+<input id="password" name="password" type="password" class="validate" required/>
+<label for="password">Password</label>
+<i class="material-icons toggle-pw" id="togglePw">visibility_off</i>
+</div>
+<center>
+<button class="state-layer" id="loginBtn" type="submit">
+<span id="formButtonLabel" class="label">Login</span>
+</button><br><br>
+<h6>Have not registered yet?<a href="#" onclick="switchToRegister()"><u>&nbsp;Register</u></a></h6>
+</center>
+</form>
+</div>
+<form name="registerForm" id="registerForm" action="RegisterServlet" method="post" style="display:none;">
+<input type="hidden" id="registerRoleInput" name="role" value="faculty"/>
+<fieldset>
+<legend>Registration Form</legend>
+<div class="register-input-group">
+<label for="regUsername">USERID:</label>
+<input class="control" type="text" id="regUsername" name="regUsername">
+</div>
+<div class="register-input-group">
+<label for="regEmail">EMAIL:</label>
+<input class="control" type="email" id="regEmail" name="email" placeholder="EMAIL">
+</div>
+<div class="register-input-group">
+<label for="regPassword">PASSWORD:</label>
+<input class="control" type="password" id="regPassword" name="regPassword">
+</div>
+<div class="register-input-group">
+<label for="confirmPassword">CONFIRM PASSWORD:</label>
+<input class="control" type="password" id="confirmPassword" name="confirmPassword" placeholder="CONFIRM PASSWORD">
+</div>
+<div class="register-buttons">
+<button id="registerBtn" type="submit">REGISTER</button>
+<button type="reset">CLEAR</button>
+</div>
+<center><a href="#" onclick="switchToLogin()">Back to Login</a></center>
+</fieldset>
+</form>
+</div>
 
-    <h6 class="center-align poppins-title">Student Performance Tracking</h6><br>
-    <div class="genericavatar">
-      <div class="inneravatar">
-        <div class="circle2 circle-left"></div>
-        <div class="circle circle-right"></div>
-      </div>
+<div id="customMessageOverlay">
+    <div id="customMessageContent">
+        <i id="customMessageIcon" class="material-icons"></i>
+        <p id="customMessageText"></p>
+        <button id="customMessageOkBtn">OK</button>
     </div>
+</div>
 
-    <div id="segmentedbutton" class="segmentedbutton">
-      <div data-role="faculty" id="segment-start" class="segment-start">
-        <div id="container" class="container active">
-          <span class="label-text">Faculty</span>
-          <img id="selectedicon" class="selectedicon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAASCAYAAAC5DOVpAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAC/SURBVHgB7dIhDsIwFIDh994mYGpHWILlEAUmBmqKVI4TcAS4AUcgKBLUHIKQ7QgTSBLCDaaGgRSG2koTWiCo/artS748UYCmvxX4nMlvBB808vmMAJPhYBx+hZUQAM4Fwmq738TVGYJBNWi3juR5DQsY98iiRXErJmka5yZQGUk3BihCx24njIWuCfSy2XO7Po+IcPk4ZsX10nPs1lQHUmJVEAFzAcLVgcos1ePxdMg6XveMCFwXepvqYzb9tjvHg0ZvV5YLFwAAAABJRU5ErkJggg==" />
-        </div>
-      </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script>
+/* ── Pretty feedback dialog (success | error | info) ─────────── */
+function showMessage(type, text) {
+  const iconMap = { success: 'check_circle', error: 'error', info: 'info' };
+  const overlay = document.getElementById('customMessageOverlay');
+  const content = document.getElementById('customMessageContent');
+  const iconEl  = document.getElementById('customMessageIcon');
+  const textEl  = document.getElementById('customMessageText');
+  const okBtn   = document.getElementById('customMessageOkBtn');
 
-      <div data-role="student" id="segment-end" class="segment-end">
-        <div id="container2" class="container2">
-          <span class="label-text2">Student</span>
-          <img id="selectedicon2" class="selectedicon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAASCAYAAAC5DOVpAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAC/SURBVHgB7dIhDsIwFIDh994mYGpHWILlEAUmBmqKVI4TcAS4AUcgKBLUHIKQ7QgTSBLCDaaG2koTWiCo/artS748UYCmvxX4nMlvBB808vmMAJPhYBx+hZUQAM4Fwmq738TVGYJBNWi3juR5DQsY98iiRXErJmka5yZQGUk3BihCx24njIWuCfSy2XO7Po+IcPk4ZsX10nPs1lQHUmJVEAFzAcLVgcos1ePxdMg6XveMCFwXepvqYzb9tjvHg0ZvV5YLFwAAAABJRU5ErkJggg==" />
-        </div>
-      </div>
-    </div>
-  
-    <div id="loginFields">
-      <form name="loginForm" id="loginForm" action="LoginServlet" method="post">
-        <input type="hidden" id="loginRoleInput" name="role" value="faculty" />
+  if (!overlay || !content || !iconEl || !textEl || !okBtn) {
+      console.error("Custom message overlay elements not found in DOM!");
+      return; // Exit if elements are missing
+  }
 
-        <div class="input-field">
-          <i class="material-icons prefix">person</i>
-          <input id="username" name="username" type="text" class="validate" required />
-          <label for="username">Username</label>
-        </div>
+  /* Set icon and text */
+  iconEl.textContent = iconMap[type] || 'info';
+  textEl.textContent = text;
 
-        <div class="input-field">
-          <i class="material-icons prefix">lock</i>
-          <input id="password" name="password" type="password" class="validate" required />
-          <label for="password">Password</label>
-          <i class="material-icons toggle-pw" id="togglePw">visibility_off</i>
-        </div>
+  /* Color-coding: add class 'success' or 'error' to the content box */
+  content.classList.remove('success', 'error', 'info');
+  content.classList.add(type);
 
-        <center>
-          <button class="state-layer" id="loginBtn" type="submit">
-            <span id="formButtonLabel" class="label">Login</span>
-          </button><br><br>
-          <h6>Have not registered yet?<a href="#" onclick="switchToRegister()"><u>&nbsp;Register</u></a></h6>
-        </center>
-      </form>
-    </div>
+  // Set button color based on type
+  okBtn.style.backgroundColor = getComputedStyle(document.documentElement)
+                                .getPropertyValue(`--${type}`);
 
-    <form name="registerForm" id="registerForm" action="RegisterServlet" method="post" style="display: none;">
-      <input type="hidden" id="registerRoleInput" name="role" value="faculty" />
-      <fieldset>
-        <legend>Registration Form</legend>
-        <div class="register-input-group">
-          <label for="regUsername">USERID:</label>
-          <input class="control" type="text" id="regUsername" name="regUsername">
-        </div>
-        <div class="register-input-group">
-          <label for="regEmail">EMAIL:</label>
-          <input class="control" type="email" id="regEmail" name="email" placeholder="EMAIL">
-        </div>
-        <div class="register-input-group">
-          <label for="regPassword">PASSWORD:</label>
-          <input class="control" type="password" id="regPassword" name="regPassword">
-        </div>
-        <div class="register-input-group">
-          <label for="confirmPassword">CONFIRM PASSWORD:</label>
-          <input class="control" type="password" id="confirmPassword" name="confirmPassword" placeholder="CONFIRM PASSWORD">
-        </div>
-        <div class="register-buttons">
-          <button id="registerBtn" type="submit">REGISTER</button>
-          <button type="reset">CLEAR</button>
-        </div>
-        <center><a href="#" onclick="switchToLogin()">Back to Login</a></center>
-      </fieldset>
-    </form>
-  </div>
+  // Show the overlay
+  overlay.classList.add('show');
+  console.log(`Custom message overlay shown with type: ${type} and text: "${text}"`);
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const pwField = document.getElementById('password');
-      const toggle = document.getElementById('togglePw');
-      if (toggle && pwField) { // Check if elements exist before adding listener
-          toggle.addEventListener('click', () => {
+  // Add event listener to OK button to hide the overlay AND clear URL params
+  // Use addEventListener and remove it to prevent multiple listeners if showMessage is called repeatedly
+  const okButtonListener = () => {
+      overlay.classList.remove('show');
+      console.log("Custom message overlay hidden.");
+
+      // --- CRITICAL CHANGE: Clear URL parameters after message is acknowledged ---
+      // Get the current URL without query parameters
+      const cleanURL = window.location.origin + window.location.pathname;
+      // Replace the current history state with the clean URL without reloading
+      history.replaceState(null, '', cleanURL);
+      console.log("URL parameters cleared in browser history.");
+
+      // Remove this specific event listener to prevent it from firing multiple times
+      okBtn.removeEventListener('click', okButtonListener);
+  };
+  okBtn.addEventListener('click', okButtonListener);
+}
+
+// --- NEW UTILITY FUNCTION to animate card height ---
+function setCardHeight(card) {
+    if (card) {
+        card.style.maxHeight = card.scrollHeight + 'px';
+        console.log("setCardHeight called. Card max-height set to:", card.scrollHeight + 'px');
+    }
+}
+
+// --- UPDATED to animate and hide title ---
+function switchToRegister () {
+    const loginCard   = document.querySelector('.login-card');
+    const title       = loginCard.querySelector('h6.poppins-title');
+    const loginForm   = document.getElementById('loginForm');
+    const registerForm= document.getElementById('registerForm');
+
+    if (title) title.classList.add('title-hidden');
+    if (loginForm) loginForm.style.display   = 'none';
+    if (registerForm) registerForm.style.display= 'block';
+
+    /* allow inner scrolling + cap height */
+    if (loginCard) {
+        loginCard.classList.add('scrollable');
+        loginCard.style.maxHeight = '85vh';        // keeps the transition alive
+        console.log("switchToRegister: Switched to register view, card set to scrollable.");
+    }
+}
+
+/* --- UPDATED to animate and show title --- */
+function switchToLogin () {
+    const loginCard   = document.querySelector('.login-card');
+    const title       = loginCard.querySelector('h6.poppins-title');
+    const loginForm   = document.getElementById('loginForm');
+    const registerForm= document.getElementById('registerForm');
+
+    if (registerForm) registerForm.style.display = 'none';
+    if (title) title.classList.remove('title-hidden');
+    if (loginForm) loginForm.style.display    = 'block';
+
+    /* restore original behaviour */
+    if (loginCard) {
+        loginCard.classList.remove('scrollable');
+        setCardHeight(loginCard); // This call should now work!
+        console.log("switchToLogin: Switched to login view, card height reset.");
+    }
+}
+
+// Modified to be triggered by form's submit event, not button click
+function showLoaderForForm(formElement) {
+    // Only show loader if the form is valid (browser's native validation)
+    if (formElement && formElement.checkValidity()) {
+        const overlay = document.getElementById("loadingOverlay");
+        if (overlay) {
+            overlay.style.display = "flex";
+            console.log("Loader shown because form is valid and submitting.");
+        } else {
+            console.warn("Loader overlay element not found!");
+        }
+    } else {
+        console.log("Form is not valid, loader not shown. Browser's validation will trigger.");
+    }
+}
+
+// --- Main script logic ---
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOMContentLoaded fired.");
+
+    // --- Element References ---
+    const loginCard = document.querySelector('.login-card');
+    const pwField = document.getElementById('password');
+    const toggle = document.getElementById('togglePw');
+    const facultySegment = document.querySelector('[data-role="faculty"]');
+    const studentSegment = document.querySelector('[data-role="student"]');
+    const loginRoleInput = document.getElementById('loginRoleInput');
+    const registerRoleInput = document.getElementById('registerRoleInput');
+    const loginForm = document.getElementById('loginForm'); // Get the form itself
+    const registerForm = document.getElementById('registerForm'); // Get the register form
+
+    // --- Event Listeners ---
+    if (toggle && pwField) {
+        toggle.addEventListener('click', () => {
             const showing = pwField.type === 'text';
             pwField.type = showing ? 'password' : 'text';
             toggle.textContent = showing ? 'visibility_off' : 'visibility';
-          });
-      }
+            console.log(`Password visibility toggled to: ${pwField.type}`);
+        });
+    }
 
-      const regUsernameInput = document.getElementById('regUsername');
-      const regUsernameLabel = document.querySelector('label[for="regUsername"]'); 
-      const facultySegment = document.querySelector('[data-role="faculty"]');
-      const studentSegment = document.querySelector('[data-role="student"]');
-      const loginRoleInput = document.getElementById('loginRoleInput');
-      const registerRoleInput = document.getElementById('registerRoleInput');
+    // Attach showLoaderForForm to the form's submit event
+    if (loginForm) {
+        loginForm.addEventListener("submit", (event) => {
+            showLoaderForForm(loginForm);
+            // No event.preventDefault() here, allow default form submission for redirect
+        });
+    } else {
+        console.error("Login form element not found!");
+    }
+    if (registerForm) {
+        registerForm.addEventListener("submit", (event) => {
+            showLoaderForForm(registerForm);
+            // No event.preventDefault() here
+        });
+    } else {
+        console.error("Register form element not found!");
+    }
 
-      function setRole(role) {
-        document.getElementById('container').classList.toggle('active', role === 'faculty');
-        document.getElementById('container2').classList.toggle('active', role === 'student');
+    function setRole(role) {
+        const container = document.getElementById('container');
+        const container2 = document.getElementById('container2');
+        if (container) container.classList.toggle('active', role === 'faculty');
+        if (container2) container2.classList.toggle('active', role === 'student');
+
         if (loginRoleInput) loginRoleInput.value = role;
         if (registerRoleInput) registerRoleInput.value = role;
 
-        if (regUsernameLabel) {
-          if (role === 'faculty') {
-            regUsernameLabel.textContent = 'USERNAME:';
-          } else { // role === 'student'
-            regUsernameLabel.textContent = 'USERID:';
-          }
-          // Materialize.updateTextFields() can sometimes help relayout labels
-          // M.updateTextFields(); 
+        const dynamicRegUsernameLabel = document.querySelector('#registerForm label[for="regUsername"]');
+        if (dynamicRegUsernameLabel) {
+             dynamicRegUsernameLabel.textContent = (role === 'faculty') ? 'USERNAME:' : 'USERID:';
         }
-      }
+        // This call will now work correctly after setCardHeight is in global scope
+        setTimeout(() => {
+            if (loginCard) setCardHeight(loginCard);
+        }, 0); // Use setTimeout to allow DOM to render potential changes first
+        console.log(`Role set to: ${role}`);
+    }
 
-      facultySegment.addEventListener('click', () => setRole('faculty'));
-      studentSegment.addEventListener('click', () => setRole('student'));
+    if (facultySegment) facultySegment.addEventListener('click', () => setRole('faculty'));
+    if (studentSegment) studentSegment.addEventListener('click', () => setRole('student'));
 
-      const p = new URLSearchParams(window.location.search);
-      if (p.get("login") === "fail") alert("Invalid credentials");
+    // --- URL Parameter Handling ---
+    const p = new URLSearchParams(window.location.search);
+    console.log("URLSearchParams object created:", p);
 
-      const regStatus = p.get("reg");
-      if (regStatus === "success") {
-        alert("Registration successful!");
-        switchToLogin(); 
-      } else if (regStatus === "fail") {
-        let reason = p.get("reason");
-        let errorMessage = "Registration failed!";
-        if (reason) {
-            switch (reason) {
-                case "missingfields":
-                    errorMessage = "Registration failed! Please fill in all fields.";
-                    break;
-                case "nomatch":
-                    errorMessage = "Registration failed! Passwords do not match.";
-                    break;
-                case "invalidid":
-                    errorMessage = "Registration failed! Invalid format for Student ID (must be a number).";
-                    break;
-                case "studentnotfound":
-                    errorMessage = "Registration failed! Student ID not found or has no name registered.";
-                    break;
-                case "alreadyregistered":
-                    errorMessage = "Registration failed! An account for this student already exists.";
-                    break;
-                case "usernametaken":
-                    errorMessage = "Registration failed! This username is already taken. Please choose another.";
-                    break;
-                case "invalidfacultyusername":
-                    errorMessage = "Registration failed! Faculty username cannot contain any numbers. Please provide a name with only letters.";
-                    break;
-                case "invalidrole":
-                    errorMessage = "Registration failed! Invalid role selected.";
-                    break;
-                case "dberror":
-                    errorMessage = "Registration failed due to a server error. Please try again later.";
-                    break;
-                default:
-                    errorMessage = "Registration failed! Reason: " + reason.replace(/([A-Z])/g, ' $1').toLowerCase();
-                    break;
+    const loginStatus = p.get("login");
+    const loginReason = p.get("reason");
+
+    console.log("loginStatus (from URL):", loginStatus);
+    console.log("loginReason (from URL):", loginReason);
+
+    // Only process URL parameters if they exist
+    if (loginStatus || p.get("reg")) { // Check for either login or reg parameters
+        if (loginStatus === "fail") {
+            console.log("Detected login=fail in URL. Processing error message.");
+            let errorMessage = "Login failed!";
+            if (loginReason) {
+                switch (loginReason) {
+                    case "missingfields":
+                        errorMessage = "Please enter both username and password.";
+                        break;
+                    case "invalid":
+                        errorMessage = "Invalid username or password. Please try again.";
+                        break;
+                    default:
+                        errorMessage = "Login failed: " + loginReason.replace(/([A-Z])/g, ' $1').toLowerCase();
+                }
             }
+            showMessage('error', errorMessage);
+        } else if (loginStatus === "success") {
+            console.log("Detected login=success in URL.");
+            showMessage('success', 'Login successful!');
         }
-        alert(errorMessage);
-      }
 
-      // Initialize the role and label on page load
-      setRole(document.getElementById('container').classList.contains('active') ? 'faculty' : 'student');
-
-      // Initialize Materialize components needed (e.g., text fields for their label animations)
-      M.AutoInit(); // This initializes all Materialize components (forms, etc.)
-    }); // End of DOMContentLoaded
-
-    function switchToRegister() {
-      document.getElementById('loginForm').style.display = 'none';
-      document.getElementById('registerForm').style.display = 'block';
-      const currentRole = document.getElementById('registerRoleInput').value;
-      const regUsernameLabel = document.querySelector('label[for="regUsername"]');
-      if (regUsernameLabel) {
-          regUsernameLabel.textContent = (currentRole === 'faculty') ? 'USERNAME:' : 'USERID:';
-      }
-      // Re-initialize Materialize forms after display change
-      M.updateTextFields();
+        /* registration feedback */
+        const regStatus = p.get("reg");
+        if (regStatus === "success") {
+            console.log("Detected reg=success in URL. Showing success message.");
+            showMessage('success', 'Registration successful!');
+            switchToLogin();
+        } else if (regStatus === "fail") {
+            console.log("Detected reg=fail in URL. Processing error message.");
+            let reason = p.get("reason");
+            let errorMessage = "Registration failed!";
+            if (reason) {
+              switch (reason) {
+                case "missingfields":
+                  errorMessage = "Registration failed! Please fill in all fields.";
+                  break;
+                case "nomatch":
+                  errorMessage = "Registration failed! Passwords do not match.";
+                  break;
+                case "invalidid":
+                  errorMessage = "Registration failed! Invalid format for Student ID (must be a number).";
+                  break;
+                case "studentnotfound":
+                  errorMessage = "Registration failed! Student ID not found or has no name registered.";
+                  break;
+                case "alreadyregistered":
+                  errorMessage = "Registration failed! An account for this student already exists.";
+                  break;
+                case "usernametaken":
+                  errorMessage = "Registration failed! This username is already taken. Please choose another.";
+                  break;
+                case "invalidfacultyusername":
+                  errorMessage = "Registration failed! Faculty username cannot contain any numbers.";
+                  break;
+                case "invalidrole":
+                  errorMessage = "Registration failed! Invalid role selected.";
+                  break;
+                case "dberror":
+                  errorMessage = "Registration failed due to a server error. Please try again later.";
+                  break;
+                default:
+                  errorMessage = "Registration failed! Reason: " +
+                                 reason.replace(/([A-Z])/g, ' $1').toLowerCase();
+              }
+            }
+            showMessage('error', errorMessage);
+          }
+    } else {
+        console.log("No 'login' or 'reg' parameters found in URL on DOMContentLoaded.");
     }
 
-    function switchToLogin() {
-      document.getElementById('registerForm').style.display = 'none';
-      document.getElementById('loginForm').style.display = 'block';
-      // Re-initialize Materialize forms after display change
-      M.updateTextFields();
+
+    // Initial setup of role and card height
+    // Ensure loginCard exists before attempting to use it
+    if (loginCard) {
+        setRole(document.getElementById('container').classList.contains('active') ? 'faculty' : 'student');
+        setCardHeight(loginCard);
+    } else {
+        console.error("Login card element (.login-card) not found in the DOM!");
+    }
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const darkModeIcon = document.getElementById('darkModeIcon');
+    const body = document.body;
+
+    // Check for saved theme preference or system preference on load
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark' || (savedTheme === null && prefersDark)) {
+        body.classList.add('dark-mode');
+        if (darkModeIcon) darkModeIcon.textContent = 'wb_sunny'; // Sun icon for light mode
+        console.log("Dark mode activated on load (saved preference or system preference).");
+    } else {
+        if (darkModeIcon) darkModeIcon.textContent = 'brightness_2'; // Moon icon for dark mode
+        console.log("Light mode activated on load.");
     }
 
-    function showTemporaryLoader() {
-      const overlay = document.getElementById("loadingOverlay");
-      overlay.style.display = "flex";
-      // This timeout is for visual effect only, actual hiding should be on server response.
-      // For a real app, you'd hide this after the servlet response, not after a fixed time.
-      setTimeout(() => {
-        overlay.style.display = "none";
-      }, 1200); 
+    // Toggle function
+    if (darkModeToggle && darkModeIcon) {
+        darkModeToggle.addEventListener('click', () => {
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+                darkModeIcon.textContent = 'brightness_2'; // Moon icon for dark mode
+                console.log("Switched to light mode.");
+            } else {
+                body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+                darkModeIcon.textContent = 'wb_sunny'; // Sun icon for light mode
+                console.log("Switched to dark mode.");
+            }
+        });
+    } else {
+        console.warn("Dark mode toggle elements not found!");
     }
-
-    // Moved this part into the single DOMContentLoaded for better practice
-    // window.addEventListener('DOMContentLoaded', () => { ... });
-    const loginBtn = document.getElementById("loginBtn");
-    const registerBtn = document.getElementById("registerBtn");
-
-    // Add event listeners within DOMContentLoaded or ensure they are called after elements exist
-    document.addEventListener('DOMContentLoaded', () => {
-        if (loginBtn) {
-            loginBtn.addEventListener("click", showTemporaryLoader);
-        }
-        if (registerBtn) {
-            registerBtn.addEventListener("click", showTemporaryLoader);
-        }
-    });
-
+});
 </script>
+<div class="fixed-action-btn">
+    <a class="btn-floating btn-large grey darken-3" id="darkModeToggle">
+        <i class="large material-icons" id="darkModeIcon">brightness_2</i> </a>
+</div>
 </body>
 </html>

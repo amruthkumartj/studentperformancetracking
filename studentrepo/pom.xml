@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -16,36 +17,45 @@
   </properties>
 
   <dependencies>
+    <!-- Servlet API for JSP/Servlets -->
+    <!-- For Java 17, Jakarta EE (jakarta.servlet-api) is generally preferred with newer Tomcat versions (10+).
+         However, javax.servlet-api 4.0.1 is Java EE 8, which Tomcat 9 supports. Keep this in mind if upgrading Tomcat. -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <version>4.0.1</version>
-      <scope>provided</scope>
+      <scope>provided</scope> <!-- Provided by the Tomcat server -->
     </dependency>
 
-    <dependency>
-        <groupId>com.heroku</groupId>
-        <artifactId>webapp-runner</artifactId>
-        <version>9.0.70.0</version>
-        <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-        <groupId>com.google.code.gson</groupId>
-        <artifactId>gson</artifactId>
-        <version>2.10.1</version> </dependency>
-
+    <!-- JSTL for JSP pages -->
     <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>jstl</artifactId>
         <version>1.2</version>
     </dependency>
 
+    <!-- MySQL JDBC Driver -->
     <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
         <version>8.0.33</version>
     </dependency>
+
+    <!-- Google Gson for JSON processing (if your project uses it) -->
+    <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.10.1</version>
+    </dependency>
+
+    <!-- Removed webapp-runner as it's for Heroku, not Docker/Render -->
+    <!-- <dependency>
+        <groupId>com.heroku</groupId>
+        <artifactId>webapp-runner</artifactId>
+        <version>9.0.70.0</version>
+        <scope>provided</scope>
+    </dependency> -->
+
   </dependencies>
 
   <build>
@@ -60,7 +70,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.13.0</version>
         <configuration>
-          <release>17</release>
+          <release>17</release> <!-- Correct for Java 17 -->
         </configuration>
       </plugin>
 
@@ -68,14 +78,16 @@
         <artifactId>maven-war-plugin</artifactId>
         <version>3.2.3</version>
         <configuration>
-          <failOnMissingWebXml>false</failOnMissingWebXml>
+          <failOnMissingWebXml>false</failOnMissingWebXml> <!-- Good for annotation-based Servlets -->
         </configuration>
       </plugin>
 
-      <plugin>
+      <!-- Removed maven-dependency-plugin for webapp-runner as it's not needed for Docker/Render -->
+      <!-- <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.1.2</version> <executions>
+          <version>3.1.2</version>
+          <executions>
               <execution>
                   <phase>package</phase>
                   <goals>
@@ -86,14 +98,15 @@
                           <artifactItem>
                               <groupId>com.heroku</groupId>
                               <artifactId>webapp-runner</artifactId>
-                              <version>9.0.70.0</version> <destFileName>webapp-runner.jar</destFileName>
+                              <version>9.0.70.0</version>
+                              <destFileName>webapp-runner.jar</destFileName>
                           </artifactItem>
                       </artifactItems>
                       <outputDirectory>${project.build.directory}/dependency</outputDirectory>
                   </configuration>
               </execution>
           </executions>
-      </plugin>
-      </plugins>
+      </plugin> -->
+    </plugins>
   </build>
 </project>

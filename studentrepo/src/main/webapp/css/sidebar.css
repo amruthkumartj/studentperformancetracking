@@ -881,3 +881,52 @@ body.dark #studentsTable th {
 .btn-action-edit {
     margin-right: 10px; /* Adjust this value as needed for your desired space */
 }
+  .feature-card-wrap {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px; /* Adjust as needed */
+        }
+        .feature-card {
+            background-color: var(--card-bg-color, #ffffff); /* Use CSS variables if defined */
+            color: var(--text-color, #333);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        /* Style for back buttons */
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+        /* Style for the actual content containers */
+        .content-container {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 10px;
+            background: var(--card-bg-color, #ffffff);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
