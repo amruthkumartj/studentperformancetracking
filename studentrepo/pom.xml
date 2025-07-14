@@ -17,7 +17,6 @@
   </properties>
 
   <dependencies>
-    <!-- Servlet API for JSP/Servlets -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -25,31 +24,58 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- JSTL for JSP pages -->
     <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>jstl</artifactId>
         <version>1.2</version>
     </dependency>
-
-    <!-- MySQL JDBC Driver -->
-    <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>8.0.33</version>
-    </dependency>
-
-    <!-- Google Gson for JSON processing (if your project uses it) -->
+    
     <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
         <version>2.10.1</version>
     </dependency>
 
+    <dependency>
+        <groupId>com.fatboyindustrial.gson-javatime-serialisers</groupId>
+        <artifactId>gson-javatime-serialisers</artifactId>
+        <version>1.1.1</version>
+    </dependency>
+
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>8.0.33</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.zaxxer</groupId>
+        <artifactId>HikariCP</artifactId>
+        <version>5.1.0</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>2.0.13</version>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>2.0.13</version>
+        <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>org.mindrot</groupId>
+        <artifactId>jbcrypt</artifactId>
+        <version>0.4</version>
+    </dependency>
+
   </dependencies>
 
   <build>
-    <finalName>studentrepo</finalName> <!-- ADD THIS LINE: Sets the WAR file name to 'studentrepo.war' -->
+    <finalName>studentrepo</finalName>
     <resources>
       <resource>
         <directory>src/main/resources</directory>

@@ -3,7 +3,8 @@ package com.portal;
 public class Student {
     private int studentId;
     private String fullName;
-    private String course;
+    private int programId; 
+    private String programName; 
     private int semester;
     private String phone;
     private String email;
@@ -21,12 +22,21 @@ public class Student {
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
-    public String getCourse() {
-        return course;
+
+    public int getProgramId() {
+        return programId;
     }
-    public void setCourse(String course) {
-        this.course = course;
+    public void setProgramId(int programId) {
+        this.programId = programId;
     }
+
+    public String getProgramName() {
+        return programName;
+    }
+    public void setProgramName(String programName) {
+        this.programName = programName;
+    }
+
     public int getSemester() {
         return semester;
     }

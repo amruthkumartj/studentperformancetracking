@@ -2,6 +2,8 @@ package com.portal;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DBUtil {
@@ -63,7 +65,7 @@ public class DBUtil {
                 // Aiven requires SSL, so 'sslmode=require' is essential.
                 // Keeping serverTimezone=UTC and allowPublicKeyRetrieval=true for consistency.
                 finalJdbcUrl = String.format("jdbc:mysql://%s:%s/%s?sslmode=require&serverTimezone=UTC&allowPublicKeyRetrieval=true",
-                                             aivenHost, aivenPort, aivenDatabase);
+                                              aivenHost, aivenPort, aivenDatabase);
                 dbUser = aivenUsername;
                 dbPassword = aivenPassword;
 
@@ -89,7 +91,7 @@ public class DBUtil {
             try {
                 // For local, useSSL=false is generally appropriate.
                 finalJdbcUrl = String.format("jdbc:mysql://%s:%s/%s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true",
-                                             LOCAL_DB_HOST, LOCAL_DB_PORT, LOCAL_DB_NAME);
+                                              LOCAL_DB_HOST, LOCAL_DB_PORT, LOCAL_DB_NAME);
                 dbUser = LOCAL_DB_USERNAME;
                 dbPassword = LOCAL_DB_PASSWORD;
 
@@ -100,7 +102,7 @@ public class DBUtil {
                 System.out.println("✅✅✅ Local Database connection SUCCESSFUL!");
                 return conn; // Successfully connected to Local DB
             } catch (SQLException e) {
-                System.err.println("🚫🚫🚫 DATABASE CONNECTION FAILED for both Aiven and Local!");
+                System.err.println("�🚫🚫 DATABASE CONNECTION FAILED for both Aiven and Local!");
                 System.err.println("    - Final URL Attempted (Local): " + finalJdbcUrl);
                 System.err.println("    - SQL State: " + e.getSQLState());
                 System.err.println("    - Error Code: " + e.getErrorCode());
@@ -113,12 +115,46 @@ public class DBUtil {
         return null;
     }
 
+    /**
+     * Closes a database connection.
+     * @param conn The Connection object to close.
+     */
     public static void closeConnection(Connection conn) {
         if (conn != null) {
             try {
                 conn.close();
             } catch (SQLException e) {
                 System.err.println("Error closing database connection: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Closes a PreparedStatement.
+     * @param preparedStatement The PreparedStatement object to close.
+     */
+    public static void closePreparedStatement(PreparedStatement preparedStatement) {
+        if (preparedStatement != null) {
+            try {
+                preparedStatement.close();
+            } catch (SQLException e) {
+                System.err.println("Error closing PreparedStatement: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Closes a ResultSet.
+     * @param resultSet The ResultSet object to close.
+     */
+    public static void closeResultSet(ResultSet resultSet) {
+        if (resultSet != null) {
+            try {
+                resultSet.close();
+            } catch (SQLException e) {
+                System.err.println("Error closing ResultSet: " + e.getMessage());
                 e.printStackTrace();
             }
         }

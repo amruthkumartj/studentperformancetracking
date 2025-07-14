@@ -1,16 +1,26 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <title>Faculty Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Faculty Dashboard</title>
 
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 	<link rel="stylesheet" href="<%= request.getContextPath() %>/css/sidebar.css" />
-	<script src="js/faculty.js"></script>
+
+   <script>
+    window.currentFacultyId = "<c:out value='${sessionScope.user.id}'/>";
+    window.allProgramsData = JSON.parse('<c:out value="${requestScope.allProgramsJson}" escapeXml="false" default="[]" />');
+    window.assignedProgramIdsData = JSON.parse('<c:out value="${requestScope.assignedProgramIdsJson}" escapeXml="false" default="[]" />');
+</script>
+<script src="<%= request.getContextPath() %>/js/faculty.js"></script>
+
 </head>
 
 <body>
@@ -34,42 +44,41 @@
                     <i class='bx bx-search icon'></i>
                     <input type="text" placeholder="Search..." />
                 </li>
-                <!-- Main navigation links -->
                 <li class="nav-link">
-                    <a href="facultyDashboard.jsp">
+                    <a href="javascript:void(0);" id="dashboardNavLink" >
                         <i class='bx bx-home-alt icon'></i>
                         <span class="text nav-text">Dashboard</span>
                     </a>
                 </li>
    				<li class="nav-link has-dropdown">
-    <a href="#" class="dropdown-toggle">
-        <i class='bx bxs-graduation icon'></i>
-        <span class="text nav-text">Students</span>
-        <i class='bx bx-chevron-down dropdown-arrow'></i>
-    </a>
-    <ul class="dropdown-menu">
-        <li>
-            <a href="<%= request.getContextPath() %>/faculty/view-student-performance.jsp">
-                <i class='bx bx-bar-chart-alt icon'></i>
-                <span class="text">View Student Performance</span>
-            </a>
-        </li>
-        <li>
-            <a href="#" id="manageStudentsLink">
-                <i class='bx bx-cog icon'></i>
-                <span class="text">Manage Students</span>
-            </a>
-        </li>
-    </ul>
-</li>
+                    <a href="#" class="dropdown-toggle">
+                        <i class='bx bxs-graduation icon'></i>
+                        <span class="text nav-text">Students</span>
+                        <i class='bx bx-chevron-down dropdown-arrow'></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="<c:url value='/faculty/view-student-performance.jsp' />">
+                                <i class='bx bx-bar-chart-alt icon'></i>
+                                <span class="text">View Student Performance</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" id="manageStudentsLink">
+                                <i class='bx bx-cog icon'></i>
+                                <span class="text">Manage Students</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
                 <li class="nav-link">
-                    <a href="<c:url value='/entermarks.jsp' />">
+                    <a href="javascript:void(0);" id="enterMarksNavLink">
                         <i class='bx bx-pencil icon'></i>
                         <span class="text nav-text">Enter Marks</span>
                     </a>
                 </li>
                 <li class="nav-link">
-    				<a href="#" id="attendanceNavLink">
+    				<a href="javascript:void(0);" id="attendanceNavLink">
         			<i class='bx bx-check-square icon'></i>
         			<span class="text nav-text">Attendance</span>
     				</a>
@@ -116,230 +125,320 @@
             </ul>
         </div>
     </div>
+    <div class="sidebar-overlay"></div>
 </nav>
+<section class="home">
+        <i class='bx bx-menu mobile-toggle'></i>
 
+        <div class="text">Welcome, <c:out value="${sessionScope.user.role}" />!</div>
+        </section>
 <div class="home">
-    <!-- DASHBOARD SECTION -->
-    <div id="dashboardSection">
-        <h2 class="text" style="font-weight:bold;margin-top:60px">Welcome, Faculty!</h2>
+    <div class="main-content">
+        <div id="dashboardSection">
+            <h2 class="text page-title">Welcome, <c:out value="${sessionScope.user.username}" />!</h2>
 
-        <div class="dashboard-widgets">
-            <div class="card">
-                <i class='bx bx-group' style="font-size:36px;color:var(--primary);margin-bottom:10px"></i>
-                <h3>Total Students</h3>
-                <p class="counter" data-target="<%=request.getAttribute("totalStudents")%>">0</p>
+            <div class="dashboard-widgets">
+                <div class="card">
+                    <i class='bx bx-group' style="font-size:36px;color:var(--primary);margin-bottom:10px"></i>
+                    <h3>Total Students (Overall)</h3>
+                    <p class="counter" data-target="<c:out value='${requestScope.totalOverallStudents}' default='0'/>">
+                        <c:out value="${requestScope.totalOverallStudents}" default="0"/>
+                    </p>
+                </div>
+
+                <div class="card">
+                    <i class='bx bx-book' style="font-size:36px;color:var(--primary);margin-bottom:10px"></i>
+                    <h3>Courses Assigned (Overall)</h3>
+                    <p class="counter" data-target="<c:out value='${requestScope.totalAssignedCourses}' default='0'/>">
+                        <c:out value="${requestScope.totalAssignedCourses}" default="0"/>
+                    </p>
+                </div>
+
+                <div class="card">
+                    <i class='bx bx-envelope' style="font-size:36px;color:var(--primary);margin-bottom:10px"></i>
+                    <h3>Messages</h3>
+                    <p class="counter" data-target="0">0</p>
+                </div>
+
+                <c:if test="${sessionScope.user.role == 'ADMIN'}">
+                    <div class="card admin-approval-widget-card">
+                        <i class='bx bx-shield-alt icon'></i>
+                        <h3>Approve Faculty</h3>
+                        <a href="<c:url value='/admin/approveFaculty' />">
+                            View & Approve
+                        </a>
+                    </div>
+                </c:if>
             </div>
 
-            <div class="card">
-                <i class='bx bx-book' style="font-size:36px;color:var(--primary);margin-bottom:10px"></i>
-                <h3>Courses Assigned</h3>
-                <p class="counter" data-target="<%=request.getAttribute("assignedCourses")%>">0</p>
+            <div class="assigned-programs-section" style="margin-top: 30px;">
+                <h2 class="text page-title" style="font-size: 1.5rem; margin-bottom: 20px;">Assigned Programs</h2>
+                
+                <div class="dashboard-widgets">
+                    <c:choose>
+                        <c:when test="${not empty requestScope.assignedProgramsWithCounts}">
+                            <c:forEach var="entry" items="${requestScope.assignedProgramsWithCounts}">
+                                <div class="card">
+                                    <i class='bx bx-chalkboard' style="font-size:36px;color:var(--primary);margin-bottom:10px;"></i>
+                                    <h3><c:out value="${entry.key}" /></h3>
+                                    <p>
+                                        <strong><c:out value="${entry.value}" /></strong> Students
+                                    </p>
+                                </div>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                             <div class="card" style="width: 100%; text-align: center;">
+                                <i class='bx bx-info-circle' style="font-size:36px;color:var(--text-color);margin-bottom:10px;"></i>
+                                <p style="font-style: italic;">No programs currently assigned or no students are enrolled.</p>
+                             </div>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </div>
             </div>
 
-            <div class="card">
-                <i class='bx bx-envelope' style="font-size:36px;color:var(--primary);margin-bottom:10px"></i>
-                <h3>Messages</h3>
-                <p class="counter" data-target="<%=request.getAttribute("newMessages")%>">0</p>
-            </div>
+        <section id="studentFeatures" style="display:none;">
+        <h2 class="text page-title">Manage Students</h2>
+
+        <div class="feature-card-wrap">
+            <div class="feature-card" onclick="showStudentFeature('add')">➕ Add&nbsp;Student</div>
+            <div class="feature-card" onclick="showStudentFeature('view')">📋 View&nbsp;All</div>
+            <div class="feature-card" onclick="showStudentFeature('edit')">✏️ Edit&nbsp;Info</div>
+            <div class="feature-card" onclick="showStudentFeature('delete')">🗑️ Delete</div>
+            <div class="feature-card" onclick="showStudentFeature('search')">🔍 Search&nbsp;/&nbsp;Filter</div>
         </div>
-    </div>
 
-    <!-- STUDENT MANAGEMENT SECTION -->
-   <section id="studentFeatures" style="display:none;margin-top:70px;margin-left: 50px;">
-    <h2 class="text" style="margin-bottom:18px;font-weight: bold; font-size: 30px;">Manage Students</h2>
+        <div id="addStudentCard" class="form-card" style="display:none;">
+            <h3 style="color:#007bff;margin-bottom:20px;">Add New Student</h3>
 
-    <div class="feature-card-wrap" style="display:flex;gap:20px;flex-wrap:wrap">
-        <div class="feature-card" onclick="showStudentFeature('add')">➕ Add&nbsp;Student</div>
-        <div class="feature-card" onclick="showStudentFeature('view')">📋 View&nbsp;All</div>
-        <div class="feature-card" onclick="showStudentFeature('edit')">✏️ Edit&nbsp;Info</div>
-        <div class="feature-card" onclick="showStudentFeature('delete')">🗑️ Delete</div>
-        <div class="feature-card" onclick="showStudentFeature('search')">🔍 Search&nbsp;/&nbsp;Filter</div>
-    </div>
+            <div id="addStudentMessage" style="display:none;"></div>
 
-    <div id="addStudentCard" style="display:none;max-width:700px;margin-top:30px;padding:25px;border-radius:10px;background:white;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
-        <h3 style="color:#007bff;margin-bottom:20px;">Add New Student</h3>
+            <form id="addStudentForm">
+                <div class="form-group">
+                    <label for="programIdAdd">Select Program</label>
+                    <select id="programIdAdd" name="programId" required>
+                        <option value="" selected disabled>-- choose program --</option>
+                    </select>
+                </div>
 
-        <div id="addStudentMessage" style="display:none; margin:15px 0; padding:12px; border-radius:6px;"></div>
+                <div id="studentFields" style="display:none; flex-direction: row; flex-wrap: wrap; gap: 20px; width: 100%;">
+                    <div class="form-group">
+                        <label for="studentId">Student ID</label>
+                        <input type="number" min = "0" max="9999999" id="studentId" name="studentId" required>
+                    </div>
 
-        <form id="addStudentForm" style="display:flex;flex-direction:column;gap:18px;">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="fullName" required>
+                    </div>
 
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="semester">Semester</label>
+                        <input type="number" id="semester" name="semester" min="1" max="6" required>
+                    </div>
+
+                    <div class="form-buttons">
+                        <button type="submit">Add Student</button>
+                        <button type="button" id="cancelAddBtn">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+      <div id="viewStudentSection" style="display:none;">
+        <button id="backToFeaturesBtn">Back to Features</button>
+
+        <div class="table-filters">
+            <div class="form-group">
+                <label for="studentSearchInput">Search Students (ID, Name, Email, Phone)</label>
+                <input type="text" id="studentSearchInput" placeholder="Type to search...">
+            </div>
 
             <div class="form-group">
-                <label for="coursePickerAdd">Select Course</label>
-                <select id="coursePickerAdd" name="course" required>
-                    <option value="" selected disabled>-- choose course --</option>
-                    <option>B.Tech</option>
-                    <option>BCA</option>
-                    <option>MCA</option>
-                    <option>M.Tech</option>
-                    <option>BVoc</option>
-                    <option>Mech</option>
+                <label for="programFilterDropdown">Filter by Program</label>
+                <select id="programFilterDropdown">
+                    <option value="">All Programs</option>
                 </select>
             </div>
-
-            <div id="studentFields" style="display:none;flex-direction:column;gap:15px;">
-                <div class="form-group">
-                    <label for="studentId">Student ID</label>
-                    <input type="number" id="studentId" name="studentId" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" name="fullName" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" name="phone" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="semester">Semester</label>
-                    <input type="number" id="semester" name="semester" min="1" max="6" required>
-                </div>
-
-                <div class="form-buttons">
-                    <button type="submit">Add Student</button>
-                    <button type="button" id="cancelAddBtn">Cancel</button>
-                </div>
-            </div>
-        </form>
-    </div>
-
-  <div id="viewStudentSection" style="display:none; margin-top: 30px; max-width: 1700px;">
-    <button id="backToFeaturesBtn" style="margin-bottom: 15px; /* Add any other existing styles here */">Back to Features</button>
-
-    <div style="display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; align-items: flex-end;">
-        <div class="form-group" style="flex: 1; min-width: 250px;">
-            <label for="studentSearchInput">Search Students (ID, Name, Email, Phone)</label>
-            <input type="text" id="studentSearchInput" placeholder="Type to search..." style="width: 100%;">
+            <button id="resetFiltersBtn">Reset Filters</button>
         </div>
 
-        <div class="form-group" style="min-width: 150px;">
-            <label for="courseFilterDropdown">Filter by Course</label>
-            <select id="courseFilterDropdown" style="width: 100%;">
-                <option value="">All Courses</option>
-                <option>B.Tech</option>
-                <option>BCA</option>
-                <option>MCA</option>
-                <option>M.Tech</option>
-                <option>BVoc</option>
-                <option>Mech</option>
-            </select>
-        </div>
-        <button id="resetFiltersBtn" style="height: 40px; margin-bottom: 1px;">Reset Filters</button>
+        <div class="table-responsive">
+        <table id="studentsTable">
+         <thead>
+            <tr >
+                <th data-sort-col="0" data-sort-dir="asc" >
+                    Student ID &nbsp;&nbsp;<span class="fa-solid fa-sort sort-icon"></span>
+                </th>
+                <th>Name</th>
+                <th>Program</th>
+                <th data-sort-col="3" data-sort-dir="asc" >
+                    Semester <span class="fa-solid fa-sort sort-icon"></span>
+                </th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody  id="studentsTableBody">
+        </tbody>
+    </table>
     </div>
-    
-    <div class="table-responsive">
-    <table id="studentsTable">
-     <thead>
-        <tr >
-            <th data-sort-col="0" data-sort-dir="asc" >
-                Student ID &nbsp;&nbsp;<span style="position: relative; right: -165px;" class="fa-solid fa-sort sort-icon"></span>
-            </th>
-            <th style="padding: 12px 15px; width:300px; text-align: left; background: #3; color: white;">Name</th>
-            <th style="padding: 12px 15px; width: 100px;text-align: left; background: #3; color: white;">Course</th>
-            <th data-sort-col="3" data-sort-dir="asc" style="padding: 12px 15px; width: 150px; text-align: left; background: #3; color: white; cursor: pointer;">
-                Semester <span style="position: relative; right: -30px;" class="fa-solid fa-sort sort-icon"></span>
-            </th>
-            <th style="padding: 12px 15px; width: 300px;text-align: left; background: #3; color: white;">Email</th>
-            <th style="padding: 12px 15px; width: 300px;text-align: left; background: #3; color: white;">Phone</th>
-            <th style="padding: 12px 15px; width:250px; text-align: left; background: #3; color: white;">Actions</th>
-        </tr>
-    </thead>
-    <tbody  id="studentsTableBody">
-    </tbody>
-</table>
-</div>
+        <div id="noStudentsFilteredMessage" style="display:none;">No students match the current filters.</div>
     </div>
 
     <div id="todoPlaceholder" style="display:none;margin-top:30px;font-style:italic;color:grey"></div>
-</section>
-<!-- ───────────────────  ATTENDANCE MANAGEMENT  ──────────────────── -->
-<section id="attendanceManagementSection"
-         style="display:none;margin-top:70px;margin-left:50px;">
-  <h2 class="text" style="margin-bottom:18px;font-weight:bold;font-size:30px;">
-      Attendance Management
-  </h2>
+    </section>
 
-  <div id="attendanceFeatureCards" class="feature-card-wrap"
-       style="display:flex;gap:20px;flex-wrap:wrap">
-      <div class="feature-card" onclick="showAttendanceAction('take')">
-          📝 Take&nbsp;Attendance
+
+    <section id="attendanceManagementSection" style="display:none;">
+      <h2 class="text page-title">Attendance Management</h2>
+
+      <div id="attendanceFeatureCards" class="feature-card-wrap">
+          <div class="feature-card" onclick="showAttendanceAction('take')">
+              📝 Take&nbsp;Attendance
+          </div>
+          <div class="feature-card" onclick="showAttendanceAction('view')">
+              📊 View&nbsp;Attendance
+          </div>
       </div>
-      <div class="feature-card" onclick="showAttendanceAction('view')">
-          📊 View&nbsp;Attendance
+
+    <div id="takeAttendanceSection" class="form-card" style="display:none;">
+
+      <h3 style="color:#007bff;margin-bottom:20px;">Take Attendance</h3>
+
+      <div class="form-group">
+          <label for="attDateTime">Date & Time (auto)</label>
+          <input id="attDateTime" type="text" readonly>
       </div>
-  </div>
 
-<!-- TAKE ATTENDANCE ────────────────────────────────────────────── -->
-<div id="takeAttendanceSection" style="display:none;max-width:800px;
-     margin-top:30px;padding:25px;border-radius:10px;
-     background:#fff;box-shadow:0 4px 20px rgba(0,0,0,.08);">
+      <div class="form-group">
+          <label for="programSelect">Program</label>
+          <select id="programSelect" required>
+              <option value="" disabled selected>-- choose program --</option>
+              </select>
+      </div>
 
-  <h3 style="color:#007bff;margin-bottom:20px;">Take Attendance</h3>
+      <div class="form-group">
+          <label for="semesterSelect">Semester</label>
+          <select id="semesterSelect" disabled required>
+              <option value="" disabled selected>-- choose semester --</option>
+              <option>1</option><option>2</option><option>3</option>
+              <option>4</option><option>5</option><option>6</option>
+          </select>
+      </div>
 
-  <!-- TIMESTAMP -->
-  <div class="form-group" style="margin-bottom:18px;">
-      <label for="attDateTime">Date & Time (auto)</label>
-      <input id="attDateTime" type="text" readonly
-             style="width:100%;background:#f5f5f5;border:1px solid #ccc;
-                    padding:8px 10px;border-radius:6px;font-weight:500;">
-  </div>
+      <div class="form-group">
+          <label for="subjectSelect">Subject</label>
+          <select id="subjectSelect" disabled required>
+              <option value="" disabled selected>-- choose subject --</option>
+              </select>
+      </div>
 
-  <!-- PROGRAM -->
-  <div class="form-group" style="margin-bottom:18px;">
-      <label for="programSelect">Program</label>
-      <select id="programSelect" required style="width:100%;">
-          <option value="" disabled selected>-- choose program --</option>
-          <option value="MCA">MCA</option>
-          <option value="MBA">MBA</option>
-          <option value="B.Tech">B.Tech</option>
-          <option value="BCA">BCA</option>
-          <option value="M.Tech">M.Tech</option>
-          <option value="BVoc">BVoc</option>
-          <option value="Mech">Mech</option>
-      </select>
-  </div>
-
-  <!-- SEMESTER -->
-  <div class="form-group" style="margin-bottom:18px;">
-      <label for="semesterSelect">Semester</label>
-      <select id="semesterSelect" disabled required style="width:100%;">
-          <option value="" disabled selected>-- choose semester --</option>
-          <option>1</option><option>2</option><option>3</option>
-          <option>4</option><option>5</option><option>6</option>
-      </select>
-  </div>
-
-  <!-- SUBJECT -->
-  <div class="form-group" style="margin-bottom:25px;">
-      <label for="subjectSelect">Subject</label>
-      <select id="subjectSelect" disabled required style="width:100%;">
-          <option value="" disabled selected>-- choose subject --</option>
-      </select>
-  </div>
-
-  <button id="loadStudentsBtn" style="margin-right:15px;">Load students</button>
-  <button onclick="showAttendanceAction('')">Back</button>
-</div>
+      <div class="form-buttons">
+          <button id="startAttendanceSessionBtn">Take Attendance</button>
+          <button type="button" id="cancelTakeAttendanceBtn">Back</button>
+      </div>
+    </div>
 
 
-  <div id="viewAttendanceSection" style="display:none;max-width:900px;margin-top:30px;">
-      <h3 style="color:#007bff;margin-bottom:20px;">View Attendance</h3>
-      <!-- TODO: replace with your table / filters -->
-      <p>Display attendance records here…</p>
-      <button onclick="showAttendanceAction('')" style="margin-top:15px;">Back</button>
-  </div>
-</section>
-<!-- ──────────────────────────────────────────────────────────────── -->
+      <div id="viewAttendanceSection" style="display:none;">
+        <h3 style="color:#007bff;margin-bottom:20px;">View Attendance Records</h3>
+        <button onclick="showAttendanceAction('')" class="btn-primary" style="margin-bottom: 15px;">Back to Features</button>
 
+        <div class="table-filters">
 
+            <div class="form-group">
+                <label for="attProgramFilter">Filter by Program</label>
+                <select id="attProgramFilter">
+                    <option value="">All Programs</option>
+                    </select>
+            </div>
+
+            <div class="form-group">
+                <label for="attSemesterFilter">Filter by Semester</label>
+                <select id="attSemesterFilter">
+                    <option value="">All Semesters</option>
+                    </select>
+            </div>
+
+            <div class="form-group">
+                <label for="attSubjectFilter">Filter by Subject</label>
+                <select id="attSubjectFilter">
+                    <option value="">All Subjects</option>
+                    </select>
+            </div>
+
+            <div class="form-group">
+                <label for="attDateFilter">Filter by Date</label>
+                <input type="date" id="attDateFilter">
+            </div>
+
+            <div class="form-group">
+                <label for="attStudentSearchInput">Search by Student (ID or Name)</label>
+                <input type="text" id="attStudentSearchInput" placeholder="Enter student name or ID...">
+            </div>
+
+            <button id="resetAttendanceFiltersBtn">Reset</button>
+        </div>
+
+        <div class="table-responsive">
+            <table id="attendanceRecordsTable">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Date</th>
+                        <th>Subject</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceRecordsTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align:center;padding:20px;">No records to display. Use filters to load data.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+      </div>
+      </section>
+
+      <section id="marksManagementSection" style="display:none;">
+          <h2 class="text page-title">Enter Marks</h2>
+
+          <div id="marksFeatureCards" class="feature-card-wrap">
+              <div class="feature-card" onclick="window.location.href='<%= request.getContextPath() %>/enterCourseMarks.jsp'">
+                  <i class='bx bx-book-add' style="font-size:36px;color:var(--primary);margin-bottom:10px;"></i>
+                  <p>Course-wise Entry</p>
+              </div>
+              <div class="feature-card" onclick="showMarksAction('student')">
+                  <i class='bx bx-user-plus' style="font-size:36px;color:var(--primary);margin-bottom:10px;"></i>
+                  <p>Student-wise Entry</p>
+              </div>
+          </div>
+
+          <div id="enterMarksStudentSection" class="form-card" style="display:none;">
+              <h3 style="color:#007bff;margin-bottom:20px;">Enter Marks for a Specific Student</h3>
+              <button onclick="showMarksAction('')" class="btn-primary" style="margin-bottom: 15px;">Back to Options</button>
+              <p>This feature will be implemented later. It would allow you to search for a student and then view/enter marks for them across different courses/exam types.</p>
+              </div>
+
+      </section>
+
+    </div>
 </div>
 
 </body>

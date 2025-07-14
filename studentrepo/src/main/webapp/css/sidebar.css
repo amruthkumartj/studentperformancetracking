@@ -482,7 +482,7 @@ nav.sidebar.close .has-dropdown > a{
 .sidebar.close .has-dropdown.active .dropdown-menu {
   display: flex !important;
   position: absolute;
-  left: 88px;
+     left: 95px;
   top: auto;
   transform: translateY(-50%);
   min-width: 220px;
@@ -575,358 +575,829 @@ nav.sidebar .has-dropdown > a {
   align-items: center;
   gap: 10px;
 }
-/* ╭─ DASHBOARD CARDS ────────────────────────────────────────╮ */
+/* Finally, make the floating dropdown visible when active */
+.sidebar.close .has-dropdown.active .dropdown-menu {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(-50%) translateX(0); /* Animate to final position */
+}
 
+
+/* ----- Home Section (Main Content Area) ----- */
+.home {
+    position: absolute;
+    top: 0;
+    left: 250px;
+    height: 100vh; /* Set a default height, but content will extend it */
+    width: calc(100% - 250px);
+    background: var(--body-color);
+    transition: var(--tran-05);
+    display: flex; /* Make .home a flex container */
+    flex-direction: column; /* Stack content vertically */
+}
+
+nav.sidebar.close ~ .home {
+    left: 88px; /* Adjusted from 78px to match new sidebar collapsed width */
+    width: calc(100% - 88px);
+}
+
+.home .main-content { /* NEW: Padding for the main content area */
+    padding: 24px 40px; /* Generous padding for desktop */
+    padding-top: 80px; /* Account for potential fixed header later, or just general top spacing */
+    flex-grow: 1; /* Allow content to fill available space */
+    width: 100%;
+    box-sizing: border-box; /* Include padding in width */
+}
+
+/* Page Titles */
+.home .page-title {
+    font-weight: 700; /* Bolder */
+    font-size: 2.2rem; /* Larger */
+    color: var(--text-color);
+    margin-top: 0px; /* Reset from inline style */
+    margin-bottom: 30px; /* Consistent spacing below title */
+    padding: 0; /* Remove padding from .text class */
+    text-align: left;
+}
+body.dark .home .page-title {
+    color: var(--text-color); /* Already handled, but just to be sure */
+}
+
+/* Dashboard Widgets */
+.dashboard-widgets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Min width 220px for smaller cards */
+    gap: 30px; /* Increased gap for more breathing room */
+    padding: 0; /* Removed padding from here as it's handled by .main-content */
+    margin-bottom: 40px; /* Space below widgets */
+}
+
+.card {
+    background: var(--sidebar-color);
+    color: var(--text-color);
+    padding: 28px; /* Slightly more padding */
+    border-radius: 15px; /* More rounded corners */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex; /* Make cards flex containers */
+    flex-direction: column; /* Stack content vertically */
+    align-items: flex-start; /* Align content to the left */
+    overflow: hidden; /* Clip anything outside */
+    position: relative;
+}
+
+.card:hover {
+    transform: translateY(-8px); /* More noticeable lift */
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+}
 
 .card i.icon {
-  font-size: 36px;
-  color: var(--primary);
-  margin-bottom: 10px;
+    font-size: 44px; /* Larger icons */
+    color: var(--primary-color);
+    margin-bottom: 12px;
 }
 
 .card h3 {
-  font-size: 18px;
-  margin-bottom: 6px;
-  color: var(--text);
-  font-weight: 500;
+    font-size: 1.1rem; /* Slightly larger heading */
+    margin-bottom: 8px;
+    color: var(--text-color);
+    font-weight: 600;
 }
 
 .card p {
-  font-size: 28px;
-  font-weight: 600;
-  color: var(--primary);
-  margin: 0;
+    font-size: 2.2rem; /* Larger numbers */
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+    line-height: 1.2;
 }
 
-body.dark .card {
-  background: var(--dark-sidebar);
+/* Admin Approval Widget Card - Refine */
+.admin-approval-widget-card {
+    background-color: var(--primary-color-light); /* Lighter version of primary for distinction */
+    border: none; /* No explicit border */
+    align-items: center; /* Center content horizontally */
+    justify-content: center; /* Center content vertically */
+    text-align: center;
+    padding: 28px; /* Match other cards */
+    min-height: 160px; /* Ensure similar height to other cards */
 }
 
-body.dark .card h3 {
-  color: var(--dark-text);
+.admin-approval-widget-card i.icon {
+    font-size: 48px; /* Even larger icon for this prominent card */
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.admin-approval-widget-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+.admin-approval-widget-card a {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px; /* More rounded button */
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.admin-approval-widget-card a:hover {
+    background-color: #0d47a1; /* Darken for hover */
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Dark mode for Admin Card */
+body.dark .admin-approval-widget-card {
+    background-color: var(--primary-color); /* Use primary color for dark mode background */
+    color: var(--text-color);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+body.dark .admin-approval-widget-card i.icon {
+    color:  var(--text-color); /* Lighter icon in dark mode */
+}
+body.dark .admin-approval-widget-card h3 {
+    color: var(--text-color);
+}
+body.dark .admin-approval-widget-card a {
+    background-color: var(--primary-color-light);
+    color: var(--text-color);
+}
+body.dark .admin-approval-widget-card a:hover {
+    background-color: #5d5d6d; /* Darken for hover in dark mode */
 }
 
 body.dark .card p {
-  color: #81a4ff;
+    color: #81a4ff;
 }
+/* Feature Card Wrap (for student and attendance sections) */
+.feature-card-wrap {
+    display: flex;
+    gap: 25px; /* More space between cards */
+    flex-wrap: wrap;
+    margin-bottom: 40px; /* Space before forms/tables */
+    justify-content: flex-start; /* Align cards to the start */
+}
+
 .feature-card {
-  background: #f0f0f0;
-  padding: 18px 22px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s ease;
-  min-width: 160px;
-  text-align: center;
+    background-color: var(--primary-color-light); /* Use theme variable */
+    color: var(--primary-color); /* Use theme variable for text */
+    padding: 25px 30px; /* More padding */
+    border-radius: 12px; /* More rounded */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-weight: 600;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+    min-width: 180px; /* Slightly larger min-width */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.05em;
+    border: 1px solid rgba(0,0,0,0.05); /* Subtle border */
 }
+
 .feature-card:hover {
-  background: #dfeaff;
-  transform: scale(1.03);
+    transform: translateY(-7px); /* Lift more */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    background-color: var(--primary-color); /* Primary color on hover */
+    color: white; /* White text on hover */
+}
+
+/* Dark mode for feature cards */
+body.dark .feature-card {
+    background-color: var(--primary-color); /* Dark background */
+    color: var(--text-color); /* Light text */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+body.dark .feature-card:hover {
+    background-color: var(--primary-color-light); /* Lighter on hover */
+    color:  var(--text-color); /* Darker text on hover */
+}
+
+/* --- Form Card (Add/View Student, Take/View Attendance) --- */
+.form-card {
+    max-width: 900px; /* Or whatever max width suits your design */
+    margin-top: 30px;
+    padding: 35px; /* Increased padding */
+    border-radius: 15px; /* More rounded */
+    background: var(--sidebar-color);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    box-sizing: border-box; /* Include padding in width */
+}
+
+.form-card h3 {
+    color: var(--primary-color);
+    margin-bottom: 30px; /* More space below heading */
+    font-weight: 600;
+    font-size: 1.6rem; /* Slightly larger heading */
+    text-align: center;
+}
+
+/* *** CRITICAL ALIGNMENT FIXES FOR DYNAMIC FORMS *** */
+/* This targets the main form container */
+#addStudentForm,
+#takeAttendanceSection { /* Apply to both forms */
+    display: flex;
+    flex-direction: column; /* Stack main sections (Select Program, Student Fields, Buttons) vertically */
+    gap: 25px; /* Space between "Select Program" and the #studentFields div, etc. */
+}
+
+/* General Form Group Styling (label and input container) */
+.form-group {
+    display: flex;
+    flex-direction: column; /* Stack label above input */
+    gap: 8px; /* Space between label and input */
+    flex: 1 1 calc(50% - 12.5px); /* This makes them go into two columns, accounting for 25px gap */
+    min-width: 250px; /* Prevent shrinking too much on smaller screens */
 }
 
 .form-group label {
-  font-weight: 500;
-  margin-bottom: 6px;
-  color: #333;
+    font-weight: 500;
+    font-size: 0.95rem; /* Slightly larger label */
+    color: var(--text-color);
 }
+
+/* Styling for all INPUTS and SELECTS to match the desired transparent, bottom-border look */
 .form-group input,
 .form-group select {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1rem;
-  outline-color: #007bff;
-}
-
-button {
-  padding: 10px 20px;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-button:hover {
-  background-color: #218838;
-}
-body.dark .feature-card {
-  background: #1e1e2f;
-  color: #eee;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-}
-
-body.dark #addStudentCard {
-  background: #2a2a3d;
-  color: #f5f5f5;
-}
-
-body.dark input,
-body.dark select,
-body.dark label {
-  background-color: #3a3a4d;
-  color: #fff;
-  border: 1px solid #555;
-}
-
-body.dark input:focus,
-body.dark select:focus {
-  border-color: #888;
-  outline: none;
-}
-
-body.dark button {
-  background-color: #4c8bf5;
-  color: white;
-  border: none;
-}
-
-body.dark button:hover {
-  background-color: #366fdd;
-}
-/* ─── DARK MODE STYLES FOR THE FORM ───────────────────────────── */
-
-/* Default (light mode) */
-#addStudentCard {
-  background-color: white;
-  color: black;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Text fields and selects default */
-#addStudentCard input,
-#addStudentCard select {
-  background-color: white;
-  color: black;
-  border: 1px solid #ccc;
-  padding: 10px;
-  border-radius: 6px;
-}
-
-/* Labels default */
-#addStudentCard label {
-  color: black;
-}
-
-/* Button default */
-#addStudentCard button[type="submit"] {
-  background-color: #4c8bf5;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  font-weight: bold;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-/* =============================== */
-/* DARK MODE via body.dark class  */
-/* =============================== */
-
-body.dark #addStudentCard {
-  background-color: #1e1e2f !important;
-  color: #f1f1f1 !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-}
-
-body.dark #addStudentCard input,
-body.dark #addStudentCard select {
-  background-color: #2e2e44 !important;
-  color: #f9f9f9 !important;
-  border: 1px solid #555 !important;
-}
-
-body.dark #addStudentCard label,
-body.dark #addStudentCard h3,
-body.dark #addStudentCard h2 {
-  color: #e0e0e0 !important;
-}
-
-body.dark #addStudentCard button[type="submit"] {
-  background-color: #3a6ee8 !important;
-  color: white !important;
-}
-
-body.dark #addStudentCard button[type="submit"]:hover {
-  background-color: #2d5fcb !important;
-}
-/* Add these styles to your CSS */
-#addStudentMessage {
-    transition: all 0.3s ease;
-}
-
-.loading-message {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #0066cc;
-}
-
-.success-message {
-    color: #008000;
-    background-color: #eaffea;
-    border: 1px solid #b7efb7;
+    width: 100%;
     padding: 12px;
-    border-radius: 6px;
+    border: none; /* No border initially */
+    border-bottom: 2px solid var(--toggle-color); /* Thicker, subtle bottom border */
+    border-radius: 0; /* No border-radius initially */
+    background-color: transparent; /* Transparent background */
+    color: var(--text-color);
+    font-size: 1rem;
+    box-sizing: border-box; /* Include padding in width calculation */
+    transition: all 0.3s ease; /* Smooth transition for focus effect */
+    -webkit-appearance: none; /* Remove default browser styling for select */
+    -moz-appearance: none;
+    appearance: none;
+    line-height: 1.5; /* Ensure text sits nicely */
 }
 
-.error-message {
-    color: #d8000c;
-    background-color: #ffebeb;
-    border: 1px solid #ffb3b3;
-    padding: 12px;
-    border-radius: 6px;
+/* Placeholder styling */
+.form-group input::placeholder {
+    color: var(--text-color); /* Use text color for consistency */
+    opacity: 0.6; /* Slightly faded */
+}
+body.dark .form-group input::placeholder {
+    color: var(--text-color);
+    opacity: 0.4;
 }
 
-.spinner {
-    border: 3px solid rgba(0, 102, 204, 0.3);
-    border-radius: 50%;
-    border-top: 3px solid #0066cc;
-    width: 20px;
-    height: 20px;
-    animation: spin 1s linear infinite;
+/* Focus state for inputs and selects */
+.form-group input:focus,
+.form-group select:focus {
+    outline: none; /* Remove default browser outline */
+    border: 2px solid var(--primary-color); /* Full border on focus, same thickness */
+    border-radius: 8px; /* Rounded corners on focus */
+    box-shadow: 0 0 0 4px rgba(23, 7, 196, 0.2); /* Soft glow, based on primary-color */
+    background-color: var(--primary-color-light); /* Lighter background on focus */
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+/* Specific styling for readonly inputs (like auto date/time) */
+.form-group input[readonly] {
+    border: 1px solid var(--toggle-color);
+    border-radius: 8px;
+    background-color: var(--primary-color-light); /* Consistent light background */
+    cursor: default; /* Indicate not editable */
+}
+body.dark .form-group input[readonly] {
+    background-color: var(--primary-color); /* Darker background in dark mode */
+    border-color: var(--primary-color-light);
+}
+.form-group input[readonly]:focus {
+    box-shadow: none;
+    border-color: var(--toggle-color); /* Keep non-interactive border */
+    background-color: var(--primary-color-light); /* No change on focus */
+}
+body.dark .form-group input[readonly]:focus {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color-light);
 }
 
+
+/* Form Buttons */
 .form-buttons {
     display: flex;
-    gap: 12px;
-    margin-top: 20px;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    justify-content: flex-end; /* Align buttons to the right */
+    width: 100%; /* Take full width of parent #studentFields */
 }
-
 .form-buttons button {
-    flex: 1;
-    padding: 10px;
+    padding: 14px 30px; /* Larger buttons */
     border: none;
-    border-radius: 5px;
+    border-radius: 10px; /* More rounded buttons */
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    flex-grow: 1; /* Allow buttons to grow */
+    min-width: 140px; /* Minimum width for each button */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.form-buttons button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
-.form-buttons button[type="submit"] {
-    background-color: #007bff;
+.form-buttons button[type="submit"],
+#startAttendanceSessionBtn {
+    background-color: var(--primary-color);
     color: white;
 }
-
-.form-buttons button[type="button"] {
-    background-color: #f0f0f0;
-    color: #333;
-}
-#dashboardSection {
-    display: block; /* Show by default */
+.form-buttons button[type="submit"]:hover,
+#startAttendanceSessionBtn:hover {
+    background-color: #0d47a1; /* Darken primary */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-#studentFeatures {
-    display: none; /* Hide by default */
+.form-buttons button[type="button"], /* Cancel button */
+#cancelAddBtn, #cancelTakeAttendanceBtn, #backToFeaturesBtn {
+    background-color: var(--toggle-color); /* Light grey for cancel */
+    color: var(--text-color);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
-#studentsTable {
-            display: table;
-            width: 95%;
-            margin-top: 30px;
-            
-            border-collapse: collapse;
-            background: var(--sidebar-color);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        #studentsTable th, #studentsTable td {
-            padding: 12px 15px;
+.form-buttons button[type="button"]:hover,
+#cancelAddBtn:hover, #cancelTakeAttendanceBtn:hover, #backToFeaturesBtn:hover {
+    background-color: #b0b0b0; /* Darker grey for hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Message containers for forms */
+#addStudentMessage {
+    margin: 15px 0 25px; /* More vertical space */
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+.loading-message {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+.success-message {
+    color: #28a745; /* Green */
+    background-color: #e6ffe6;
+    border: 1px solid #a6e8a6;
+}
+.error-message {
+    color: #dc3545; /* Red */
+    background-color: #ffe6e6;
+    border: 1px solid #e8a6a6;
+}
+.spinner {
+    border: 4px solid rgba(0, 102, 204, 0.2);
+    border-top: 4px solid var(--primary-color); /* Use primary color */
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+/* Dark Mode Form Overrides */
+body.dark .form-card {
+    background-color: var(--sidebar-color);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+body.dark .form-card h3 {
+    color: var(--text-color);
+}
+body.dark .form-group label {
+    color: var(--text-color);
+}
+body.dark .form-group input,
+body.dark .form-group select {
+    background-color: transparent;
+    color: var(--text-color);
+    border-bottom-color: var(--toggle-color);
+}
+body.dark .form-group input:focus,
+body.dark .form-group select:focus {
+    background-color: var(--primary-color); /* Darker background on focus in dark mode */
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1); /* Lighter glow */
+}
+body.dark .form-buttons button[type="submit"],
+body.dark #startAttendanceSessionBtn {
+    background-color: var(--primary-color);
+    color: white;
+}
+body.dark .form-buttons button[type="submit"]:hover,
+body.dark #startAttendanceSessionBtn:hover {
+    background-color: #5d5d6d; /* Adjust hover for dark mode */
+}
+body.dark .form-buttons button[type="button"],
+body.dark #cancelAddBtn, body.dark #cancelTakeAttendanceBtn, body.dark #backToFeaturesBtn {
+    background-color: var(--primary-color-light);
+    color: var(--text-color);
+}
+body.dark .form-buttons button[type="button"]:hover,
+body.dark #cancelAddBtn:hover, body.dark #cancelTakeAttendanceBtn:hover, body.dark #backToFeaturesBtn:hover {
+    background-color: var(--primary-color); /* Adjust hover for dark mode */
+}
+body.dark .loading-message {
+    color: var(--primary-color-light); /* Lighter loading text */
+}
+body.dark .success-message {
+    background-color: rgba(40, 167, 69, 0.2);
+    border-color: rgba(40, 167, 69, 0.5);
+    color: #92e692; /* Lighter green text */
+}
+body.dark .error-message {
+    background-color: rgba(220, 53, 69, 0.2);
+    border-color: rgba(220, 53, 69, 0.5);
+    color: #ff9999; /* Lighter red text */
+}
+body.dark .spinner {
+    border-top-color: var(--primary-color-light);
+    border-color: rgba(var(--primary-color-light), 0.3);
+}
+
+/* Responsive adjustments for forms */
+@media (max-width: 768px) {
+    .form-group {
+        flex: 1 1 100%; /* Stack elements vertically on smaller screens */
+        min-width: unset; /* Remove min-width */
+    }
+    .form-buttons {
+        flex-direction: column; /* Stack buttons vertically */
+    }
+}
+
+
+/* --- Tables (General Styling for Students and Attendance) --- */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto; /* Enable horizontal scrolling on small screens */
+    margin-top: 25px; /* Space above table */
+    border-radius: 10px; /* Rounded corners for the container */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08); /* Subtle shadow */
+}
+
+/* Ensure the table itself fits the container */
+#studentsTable,
+#attendanceRecordsTable {
+    width: 100%;
+    border-collapse: separate; /* Allows border-radius on cells */
+    border-spacing: 0; /* Remove default cell spacing */
+    background: var(--sidebar-color);
+    color: var(--text-color);
+    border-radius: 10px; /* Apply to table itself */
+    overflow: hidden; /* Ensure rounded corners clip content */
+}
+
+#studentsTable th, #studentsTable td,
+#attendanceRecordsTable th, #attendanceRecordsTable td {
+    padding: 15px 20px; /* More padding for cells */
     text-align: left;
-    border-bottom: 1px solid #eee;
-    color: var(--text-color); /* ADD THIS LINE */
-        }
-        
-        #studentsTable th {
-            background: var(--primary-color);
-            color: white;
-            font-weight: 500;
-        }
-        
-        #studentsTable tr:hover {
-            background-color: rgba(0,0,0,0.03);
-        }
-        /* ensure the message’s text never collapses */
-#addStudentMessage div {  
-    display: inline-block;
-    max-width: 100%;
-    word-wrap: break-word;   /* long lines wrap */
-}
- #addStudentMessage { transition: all .2s ease; }  
-   body.dark #studentsTable {
-    background: #2a2a3d; /* A slightly different dark background for the table */
-    box-shadow: 0 4px 20px rgba(0,0,0,0.6); /* Stronger shadow in dark mode */
+    border-bottom: 1px solid var(--toggle-color); /* Lighter separator */
+    color: var(--text-color);
+    font-size: 0.95rem; /* Slightly smaller font for dense data */
 }
 
-/* Ensure the text color within the table remains readable in dark mode */
-body.dark #studentsTable td {
-    color: black; 
-    background-color: #2e2e44 !important;
-  color: #f9f9f9 !important;
-  border: 1px solid #555 !important;/* A very light gray for better contrast against dark background */
+#studentsTable th,
+#attendanceRecordsTable th {
+    background: var(--primary-color);
+    color: white;
+    font-weight: 600; /* Bolder header text */
+    position: sticky; /* Keep headers visible on scroll */
+    top: 0; /* Stick to top of table-responsive */
+    z-index: 10; /* Ensure headers are above content */
+    white-space: nowrap; /* Prevent headers from wrapping unexpectedly */
 }
 
-/* Optional: Adjust header background in dark mode if needed */
-body.dark #studentsTable th {
-    background: var(--primary-color); /* This should work well if primary-color is dark enough */
-    color: #f5f5f5; /* Light color for headers */
-     border: 1px solid #555 !important;
+/* Rounded corners for table headers */
+#studentsTable thead tr:first-child th:first-child,
+#attendanceRecordsTable thead tr:first-child th:first-child {
+    border-top-left-radius: 10px;
 }
+#studentsTable thead tr:first-child th:last-child,
+#attendanceRecordsTable thead tr:first-child th:last-child {
+    border-top-right-radius: 10px;
+}
+
+#studentsTable tbody tr:last-child td,
+#attendanceRecordsTable tbody tr:last-child td {
+    border-bottom: none; /* No bottom border for last row */
+}
+
+#studentsTable tr:nth-child(even), /* Zebra striping */
+#attendanceRecordsTable tr:nth-child(even) {
+    background-color: var(--primary-color-light); /* Lighter background for even rows */
+}
+
+#studentsTable tr:hover,
+#attendanceRecordsTable tr:hover {
+    background-color: var(--primary-color-light); /* Hover effect using light primary */
+    cursor: pointer;
+}
+body.dark #studentsTable tr:nth-child(even),
+body.dark #attendanceRecordsTable tr:nth-child(even) {
+    background-color: rgba(58, 59, 60, 0.5); /* Semi-transparent dark */
+}
+body.dark #studentsTable tr:hover,
+body.dark #attendanceRecordsTable tr:hover {
+    background-color: rgba(58, 59, 60, 0.8);
+}
+
+
+/* Table Action Buttons */
+.btn-action-edit, .btn-action-delete {
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-right: 8px; /* Space between buttons */
+    white-space: nowrap; /* Keep buttons from breaking */
+    border: none;
+    cursor: pointer;
+}
+
 .btn-action-edit {
-    margin-right: 10px; /* Adjust this value as needed for your desired space */
+    background-color: #007bff; /* Blue for edit */
+    color: white;
 }
-  .feature-card-wrap {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-top: 20px; /* Adjust as needed */
-        }
-        .feature-card {
-            background-color: var(--card-bg-color, #ffffff); /* Use CSS variables if defined */
-            color: var(--text-color, #333);
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            min-width: 200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.1em;
-            font-weight: bold;
-        }
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-        /* Style for back buttons */
-        .back-button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .back-button:hover {
-            background-color: #0056b3;
-        }
-        /* Style for the actual content containers */
-        .content-container {
-            margin-top: 30px;
-            padding: 25px;
-            border-radius: 10px;
-            background: var(--card-bg-color, #ffffff);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
+.btn-action-edit:hover {
+    background-color: #0056b3;
+}
+
+.btn-action-delete {
+    background-color: #dc3545; /* Red for delete */
+    color: white;
+}
+.btn-action-delete:hover {
+    background-color: #c82333;
+}
+
+/* Dark mode for table buttons */
+body.dark .btn-action-edit {
+    background-color: #6a5acd; /* Lighter blue/purple */
+    color: white;
+}
+body.dark .btn-action-edit:hover {
+    background-color: #5345b5;
+}
+body.dark .btn-action-delete {
+    background-color: #e76f51; /* Lighter red/orange */
+    color: white;
+}
+body.dark .btn-action-delete:hover {
+    background-color: #d15c40;
+}
+
+/* Table sorting icons */
+#studentsTable th[data-sort-col] {
+    cursor: pointer;
+    white-space: nowrap; /* Prevent wrapping */
+    position: relative;
+}
+#studentsTable th .sort-icon {
+    margin-left: 5px;
+    font-size: 0.9em;
+    vertical-align: middle;
+    transition: transform 0.2s ease;
+    color: rgba(255,255,255,0.7); /* Slightly transparent */
+}
+#studentsTable th.sort-asc .sort-icon {
+    transform: rotate(0deg);
+}
+#studentsTable th.sort-desc .sort-icon {
+    transform: rotate(180deg);
+}
+
+/* No records message in table */
+#noStudentsFilteredMessage,
+#attendanceRecordsTableBody tr:last-child td[colspan="6"] { /* Specific selector for initial attendance message */
+    text-align: center;
+    padding: 20px;
+    color: var(--text-color);
+    font-style: italic;
+    opacity: 0.7;
+}
+
+/* Attendance Status Badges */
+.status-present {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: 600;
+}
+.status-absent {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: 600;
+}
+body.dark .status-present {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #92e692;
+}
+body.dark .status-absent {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #ff9999;
+}
+
+/* Filter/Search Bar for Tables */
+.table-filters { /* NEW CLASS for the filter row */
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    align-items: flex-end; /* Align items to the bottom */
+    background: var(--sidebar-color);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+body.dark .table-filters {
+    background: var(--sidebar-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.table-filters .form-group {
+    flex: 1; /* Allow each filter group to grow */
+    min-width: 180px; /* Min width for individual filter inputs */
+    margin-bottom: 0; /* Remove default margin */
+}
+
+.table-filters button {
+    height: 44px; /* Match height of input fields */
+    margin-bottom: 0; /* Align with inputs */
+    padding: 0 20px;
+    font-weight: 600;
+}
+
+/* --- Core Dropdown Styles --- */
+
+/* --- Mobile Sidebar Text Visibility Fix --- */
+@media (max-width: 768px) {
+    nav.sidebar.open {
+        width: 250px !important; /* Ensure it's fully open */
+        left: 0 !important; /* Ensure it's positioned correctly */
+    }
+
+    nav.sidebar.open .text {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: block !important; /* Ensure it's not display: none */
+        white-space: nowrap !important; /* Prevent wrapping if it's causing issues */
+        pointer-events: auto !important;
+    }
+
+    /* Apply to icons as well, just in case they are also hidden */
+    nav.sidebar.open .icon {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: flex !important;
+        color: #000 !important; /* Ensure icons have color in light mode */
+    }
+    body.dark nav.sidebar.open .icon {
+        color: var(--text-color) !important; /* Ensure icons have color in dark mode */
+    }
+
+    /* Specifically for the search box input */
+    nav.sidebar.open li.search-box input {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+
+    /* Ensure dropdown menu items are visible */
+    nav.sidebar.open .dropdown-menu a .text {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: inline-block !important; /* or flex, depending on its original display */
+        white-space: normal !important; /* Allow wrapping for dropdown items */
+    }
+
+    /* Make sure the primary text color is applied */
+    nav.sidebar.open .text,
+    nav.sidebar.open .logo-text .name,
+    nav.sidebar.open .logo-text .profession,
+    nav.sidebar.open .search-box input,
+    nav.sidebar.open .mode-text,
+    nav.sidebar.open .sun-moon i,
+    nav.sidebar.open .dropdown-menu a .text {
+        color: var(--text-color) !important;
+    }
+
+    /* Handle dark mode colors specifically for open state */
+    body.dark nav.sidebar.open .text,
+    body.dark nav.sidebar.open .logo-text .name,
+    body.dark nav.sidebar.open .logo-text .profession,
+    body.dark nav.sidebar.open .search-box input,
+    body.dark nav.sidebar.open .mode-text,
+    body.dark nav.sidebar.open .sun-moon i,
+    body.dark nav.sidebar.open .dropdown-menu a .text {
+        color: #CCCCCC !important; /* Or whatever your dark mode text color is */
+    }
+
+    /* Ensure the toggle button rotates correctly when open on mobile */
+    nav.sidebar.open header .toggle {
+        transform: translateY(-50%) rotate(180deg) !important;
+    }nav.sidebar.open .text,
+    nav.sidebar.open .icon,
+    nav.sidebar.open li.search-box input,
+    nav.sidebar.open .logo-text .name,
+    nav.sidebar.open .logo-text .profession,
+    nav.sidebar.open .mode-text,
+    nav.sidebar.open .sun-moon i {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: block !important; /* Or inline-block/flex as needed */
+        pointer-events: auto !important;
+    }
+    nav.sidebar.open .icon {
+        display: flex !important;
+    }
+
+    /* Ensure specific colors for mobile open state */
+    nav.sidebar.open .text,
+    nav.sidebar.open .logo-text .profession,
+    nav.sidebar.open .search-box input,
+    nav.sidebar.open .mode-text,
+    nav.sidebar.open .sun-moon i {
+        color: var(--text-color) !important;
+    }
+    body.dark nav.sidebar.open .text,
+    body.dark nav.sidebar.open .logo-text .profession,
+    body.dark nav.sidebar.open .search-box input,
+    body.dark nav.sidebar.open .mode-text,
+    body.dark nav.sidebar.open .sun-moon i {
+        color: #CCCCCC !important;
+    }  nav.sidebar.open {
+        width: 250px !important;
+        left: 0 !important;
+    }
+    nav.sidebar.open .text,
+    nav.sidebar.open .icon,
+    nav.sidebar.open li.search-box input,
+    nav.sidebar.open .logo-text .name,
+    nav.sidebar.open .logo-text .profession,
+    nav.sidebar.open .mode-text,
+    nav.sidebar.open .sun-moon i {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: block !important;
+        pointer-events: auto !important;
+    }
+    nav.sidebar.open .icon {
+        display: flex !important;
+    }
+
+    nav.sidebar.open .text,
+    nav.sidebar.open .logo-text .profession,
+    nav.sidebar.open .search-box input,
+    nav.sidebar.open .mode-text,
+    nav.sidebar.open .sun-moon i {
+        color: var(--text-color) !important;
+    }
+    body.dark nav.sidebar.open .text,
+    body.dark nav.sidebar.open .logo-text .profession,
+    body.dark nav.sidebar.open .search-box input,
+    body.dark nav.sidebar.open .mode-text,
+    body.dark nav.sidebar.open .sun-moon i {
+        color: #CCCCCC !important;
+    }
+    /* Ensure the mobile dropdown menu is visible when its parent is active */
+    nav.sidebar.open .has-dropdown.active .dropdown-menu {
+        display: flex !important;
+        position: static !important; /* Not floating on mobile open */
+        transform: none !important;
+        width: auto !important;
+        left: auto !important;
+        padding-left: 50px !important; /* Standard indentation */
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+    nav.sidebar.open .has-dropdown.active .dropdown-menu a .text,
+    nav.sidebar.open .has-dropdown.active .dropdown-menu a .icon {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: inline-block !important; /* Or flex */
+        color: var(--text-color) !important;
+    }
+    
+}
