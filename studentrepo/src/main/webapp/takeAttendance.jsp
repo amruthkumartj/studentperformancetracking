@@ -2,9 +2,10 @@
 <%@ page import="com.portal.AttendanceSession" %>
 <%@ page import="com.portal.Student" %>
 <%-- REMOVE THIS: @page import="java.time.LocalDateTime" --%>
-<%@ page import="java.time.Instant" %>             <%-- ADD THIS --%>
-<%@ page import="java.time.ZonedDateTime" %>        <%-- ADD THIS --%>
-<%@ page import="java.time.ZoneOffset" %>           <%-- ADD THIS for UTC --%>
+<%@ page import="java.time.Instant" %>             <%-- Keep this --%>
+<%@ page import="java.time.ZonedDateTime" %>        <%-- Keep this --%>
+<%@ page import="java.time.ZoneId" %>               <%-- ADD THIS for specific timezone --%>
+<%@ page import="java.time.ZoneOffset" %>          <%-- ADD THIS for UTC --%>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.google.gson.Gson" %>
@@ -469,12 +470,12 @@
             <div class="detail-card"><strong>Subject:</strong> <span><%= currentSession.getSubjectName() %></span></div>
             <div class="detail-card"><strong>Expiry Time:</strong> <span id="sessionExpiryTime">
                 <%
-                    // THIS IS THE LINE THAT NEEDS TO BE CHANGED
+                    // THIS IS THE LINE THAT HAS BEEN CHANGED TO IST
                     Instant expiryInstant = currentSession.getSessionExpiryTime();
-                    // Convert to ZonedDateTime in UTC for formatting
-                    ZonedDateTime expiryZoned = expiryInstant.atZone(ZoneOffset.UTC);
-                    // Now format it
-                    out.print(expiryZoned.format(DateTimeFormatter.ofPattern("HH:mm:ss 'UTC'")));
+                    // Convert to ZonedDateTime in Indian Standard Time (Asia/Kolkata) for formatting
+                    ZonedDateTime expiryIST = expiryInstant.atZone(ZoneId.of("Asia/Kolkata"));
+                    // Now format it, including 'z' for timezone abbreviation
+                    out.print(expiryIST.format(DateTimeFormatter.ofPattern("HH:mm:ss z")));
                 %>
             </span></div></div>
 
