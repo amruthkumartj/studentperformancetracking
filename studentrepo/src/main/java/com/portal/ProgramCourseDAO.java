@@ -23,7 +23,7 @@ public class ProgramCourseDAO {
      * @return true if the program was added successfully, false otherwise.
      */
     public boolean addProgram(String programName) {
-        String sql = "INSERT INTO Programs (program_name) VALUES (?)";
+        String sql = "INSERT INTO programs (program_name) VALUES (?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, programName.trim());
@@ -42,7 +42,7 @@ public class ProgramCourseDAO {
      * @return true if the program exists, false otherwise.
      */
     public boolean programExists(String programName) {
-        String sql = "SELECT 1 FROM Programs WHERE program_name = ?";
+        String sql = "SELECT 1 FROM programs WHERE program_name = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, programName.trim());
@@ -65,7 +65,7 @@ public class ProgramCourseDAO {
      */
     public List<String[]> getAllPrograms() { // Consider deprecating this in favor of ProgramDAO's List<Program>
         List<String[]> programs = new ArrayList<>();
-        String sql = "SELECT program_id, program_name FROM Programs ORDER BY program_name";
+        String sql = "SELECT program_id, program_name FROM programs ORDER BY program_name";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -94,7 +94,7 @@ public class ProgramCourseDAO {
         // ProgramDAO programDAO = new ProgramDAO();
         // return programDAO.getProgramById(programId);
 
-        String sql = "SELECT program_id, program_name FROM Programs WHERE program_id = ?";
+        String sql = "SELECT program_id, program_name FROM programs WHERE program_id = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, programId);
@@ -121,7 +121,7 @@ public class ProgramCourseDAO {
         // return programDAO.getTotalPrograms();
 
         int totalPrograms = 0;
-        String sql = "SELECT COUNT(*) FROM Programs";
+        String sql = "SELECT COUNT(*) FROM programs";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
@@ -145,7 +145,7 @@ public class ProgramCourseDAO {
      * @return true if the course was added successfully, false otherwise.
      */
     public boolean addCourse(int programId, int semester, String courseId, String courseName) {
-        String sql = "INSERT INTO Courses (program_id, semester, course_id, course_name) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO courses (program_id, semester, course_id, course_name) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, programId);
@@ -175,7 +175,7 @@ public class ProgramCourseDAO {
      * @return true if the course exists, false otherwise.
      */
     public boolean courseExists(int programId, int semester, String courseId) {
-        String sql = "SELECT 1 FROM Courses WHERE program_id = ? AND semester = ? AND course_id = ?";
+        String sql = "SELECT 1 FROM courses WHERE program_id = ? AND semester = ? AND course_id = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, programId);
@@ -201,11 +201,11 @@ public class ProgramCourseDAO {
         String sql;
         if (programId > 0) {
             sql = "SELECT c.course_id, c.program_id, c.semester, c.course_name, p.program_name " +
-                  "FROM Courses c JOIN Programs p ON c.program_id = p.program_id " +
+                  "FROM courses c JOIN programs p ON c.program_id = p.program_id " +
                   "WHERE c.program_id = ? ORDER BY c.program_id, c.semester, c.course_name";
         } else {
             sql = "SELECT c.course_id, c.program_id, c.semester, c.course_name, p.program_name " +
-                  "FROM Courses c JOIN Programs p ON c.program_id = p.program_id " +
+                  "FROM courses c JOIN programs p ON c.program_id = p.program_id " +
                   "ORDER BY c.program_id, c.semester, c.course_name";
         }
 
@@ -240,7 +240,7 @@ public class ProgramCourseDAO {
      */
     public int getTotalStudentsInProgram(int programId) throws SQLException {
         int studentCount = 0;
-        String sql = "SELECT COUNT(student_id) AS student_count FROM Students WHERE program_id = ?"; // Corrected table name to 'Students' (plural)
+        String sql = "SELECT COUNT(student_id) AS student_count FROM students WHERE program_id = ?"; // Corrected table name to 'Students' (plural)
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -262,7 +262,7 @@ public class ProgramCourseDAO {
      */
     public int getTotalCoursesInProgram(int programId) throws SQLException {
         int courseCount = 0;
-        String sql = "SELECT COUNT(course_id) AS course_count FROM Courses WHERE program_id = ?";
+        String sql = "SELECT COUNT(course_id) AS course_count FROM courses WHERE program_id = ?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

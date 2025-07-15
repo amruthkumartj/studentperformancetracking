@@ -52,9 +52,9 @@ public class FacultyDAO {
     public int getAssignedCoursesCount(int facultyId) { // Changed parameter to facultyId for consistency with 'assignProgramToFaculty'
         int count = 0;
         String sql = "SELECT COUNT(DISTINCT C.course_id) " +
-                     "FROM Courses C " +
-                     "JOIN Programs P ON C.program_id = P.program_id " +
-                     "JOIN FacultyPrograms FP ON P.program_id = FP.program_id " +
+                     "FROM courses C " +
+                     "JOIN programs P ON C.program_id = P.program_id " +
+                     "JOIN facultyprograms FP ON P.program_id = FP.program_id " +
                      "WHERE FP.faculty_id = ?";
 
         try (Connection conn = DBUtil.getConnection();
@@ -102,7 +102,7 @@ public class FacultyDAO {
      * @return true if assignment was successful, false otherwise.
      */
     public boolean assignProgramToFaculty(int facultyId, int programId) {
-        String sql = "INSERT INTO FacultyPrograms (faculty_id, program_id) VALUES (?, ?)";
+        String sql = "INSERT INTO facultyprograms (faculty_id, program_id) VALUES (?, ?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, facultyId);
@@ -128,7 +128,7 @@ public class FacultyDAO {
      */
     public int getAssignedProgramsCount(int facultyId) {
         int count = 0;
-        String sql = "SELECT COUNT(*) FROM FacultyPrograms WHERE faculty_id = ?";
+        String sql = "SELECT COUNT(*) FROM facultyprograms WHERE faculty_id = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, facultyId);
@@ -156,7 +156,7 @@ public class FacultyDAO {
         List<String[]> assignedPrograms = new ArrayList<>();
         String sql = "SELECT p.program_id, p.program_name " +
                      "FROM Programs p " +
-                     "JOIN FacultyPrograms fp ON p.program_id = fp.program_id " +
+                     "JOIN facultyprograms fp ON p.program_id = fp.program_id " +
                      "WHERE fp.faculty_id = ?";
 
         try (Connection conn = DBUtil.getConnection();

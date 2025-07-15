@@ -279,7 +279,7 @@ public class UserDAO {
     public List<Student> getAllStudents() {
         List<Student> students = new ArrayList<>();
         String sql = "SELECT s.student_id, s.student_name, s.program_id, p.program_name, s.sem, s.phone, s.email " +
-                     "FROM Students s JOIN Programs p ON s.program_id = p.program_id";
+                     "FROM students s JOIN Programs p ON s.program_id = p.program_id";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -331,7 +331,7 @@ public class UserDAO {
             conn = DBUtil.getConnection();
             conn.setAutoCommit(false);
 
-            String studentSql = "INSERT INTO Students (student_id, student_name, program_id, sem, phone, email) VALUES (?, ?, ?, ?, ?, ?)";
+            String studentSql = "INSERT INTO students (student_id, student_name, program_id, sem, phone, email) VALUES (?, ?, ?, ?, ?, ?)";
             studentStmt = conn.prepareStatement(studentSql);
             studentStmt.setInt(1, studentId);
             studentStmt.setString(2, name);
@@ -455,7 +455,7 @@ public class UserDAO {
             int studentCoursesDeleted = deleteStudentCoursesStmt.executeUpdate();
             System.out.println("DEBUG: Deleted " + studentCoursesDeleted + " student_courses records for student ID: " + id);
 
-            String deleteStudentSql = "DELETE FROM Students WHERE student_id = ?";
+            String deleteStudentSql = "DELETE FROM students WHERE student_id = ?";
             deleteStudentStmt = conn.prepareStatement(deleteStudentSql);
             deleteStudentStmt.setInt(1, id);
             int studentsDeleted = deleteStudentStmt.executeUpdate();
@@ -504,7 +504,7 @@ public class UserDAO {
     }
 
     public boolean emailExists(String email) {
-        String sql = "SELECT 1 FROM Students WHERE email = ?";
+        String sql = "SELECT 1 FROM students WHERE email = ?";
         try (Connection c = DBUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, email);
@@ -516,7 +516,7 @@ public class UserDAO {
     }
 
     public boolean phoneExists(String phone) {
-        String sql = "SELECT 1 FROM Students WHERE phone = ?";
+        String sql = "SELECT 1 FROM students WHERE phone = ?";
         try (Connection c = DBUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, phone);

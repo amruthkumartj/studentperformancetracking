@@ -21,7 +21,7 @@ public class AttendanceDAO {
     }
 
     public int createAttendanceSession(AttendanceSession session) throws SQLException {
-        String sql = "INSERT INTO AttendanceSessions (course_id, topic, faculty_id, session_start_time, session_expiry_time, status, location) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO attendancesessions (course_id, topic, faculty_id, session_start_time, session_expiry_time, status, location) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, session.getCourseId());
             ps.setString(2, session.getTopic());
@@ -49,7 +49,7 @@ public class AttendanceDAO {
         String sql = "SELECT asess.session_id, asess.course_id, asess.topic, asess.faculty_id, " +
                      "asess.session_start_time, asess.session_expiry_time, asess.status, asess.location, " +
                      "c.program_id, c.course_name, c.semester, p.program_name " +
-                     "FROM AttendanceSessions asess " +
+                     "FROM attendancesessions asess " +
                      "JOIN courses c ON asess.course_id = c.course_id " +
                      "JOIN programs p ON c.program_id = p.program_id " +
                      "WHERE asess.session_id = ?";
@@ -119,7 +119,7 @@ public class AttendanceDAO {
         sql.append("JOIN ");
         sql.append("    students s ON e.student_id = s.student_id ");
         sql.append("JOIN ");
-        sql.append("    AttendanceSessions asess ON ar.session_id = asess.session_id "); // Join AttendanceSessions
+        sql.append("    attendancesessions asess ON ar.session_id = asess.session_id "); // Join AttendanceSessions
         sql.append("JOIN ");
         sql.append("    courses c ON asess.course_id = c.course_id "); // Join courses via AttendanceSessions.course_id
 
@@ -188,7 +188,7 @@ public class AttendanceDAO {
         return records;
     }
     public boolean updateAttendanceSessionStatus(int sessionId, String status) throws SQLException {
-        String sql = "UPDATE AttendanceSessions SET status = ? WHERE session_id = ?";
+        String sql = "UPDATE attendancesessions SET status = ? WHERE session_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, sessionId);
