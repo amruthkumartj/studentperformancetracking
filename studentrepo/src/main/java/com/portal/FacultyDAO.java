@@ -155,7 +155,7 @@ public class FacultyDAO {
     public List<String[]> getAssignedPrograms(int facultyId) throws SQLException {
         List<String[]> assignedPrograms = new ArrayList<>();
         String sql = "SELECT p.program_id, p.program_name " +
-                     "FROM Programs p " +
+                     "FROM programs p " +
                      "JOIN facultyprograms fp ON p.program_id = fp.program_id " +
                      "WHERE fp.faculty_id = ?";
 
