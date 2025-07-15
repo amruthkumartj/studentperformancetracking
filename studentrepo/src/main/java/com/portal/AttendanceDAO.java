@@ -11,8 +11,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Date; // <--- MAKE SURE THIS IMPORT IS PRESENT for java.util.Date
-
+ // Make sure this is imported
+import java.time.Instant; 
 public class AttendanceDAO {
     private Connection connection;
 
@@ -26,8 +26,20 @@ public class AttendanceDAO {
             ps.setString(1, session.getCourseId());
             ps.setString(2, session.getTopic());
             ps.setInt(3, session.getFacultyId());
-            ps.setTimestamp(4, Timestamp.valueOf(session.getSessionStartTime()));
-            ps.setTimestamp(5, Timestamp.valueOf(session.getSessionExpiryTime()));
+
+            // --- CHANGE HERE for sessionStartTime ---
+            if (session.getSessionStartTime() != null) {
+                ps.setTimestamp(4, Timestamp.from(session.getSessionStartTime()));
+            } else {
+                ps.setNull(4, java.sql.Types.TIMESTAMP); // Handle null if possible
+            }
+            // --- CHANGE HERE for sessionExpiryTime ---
+            if (session.getSessionExpiryTime() != null) {
+                ps.setTimestamp(5, Timestamp.from(session.getSessionExpiryTime()));
+            } else {
+                ps.setNull(5, java.sql.Types.TIMESTAMP); // Handle null if possible
+            }
+
             ps.setString(6, session.getStatus());
             ps.setString(7, session.getLocation());
 
@@ -66,12 +78,18 @@ public class AttendanceDAO {
 
                     Timestamp startTimeStamp = rs.getTimestamp("session_start_time");
                     if (startTimeStamp != null) {
-                        session.setSessionStartTime(startTimeStamp.toLocalDateTime());
+                        // --- CHANGE HERE for sessionStartTime ---
+                        session.setSessionStartTime(startTimeStamp.toInstant());
+                    } else {
+                        session.setSessionStartTime(null); // Or handle as appropriate if null is not allowed
                     }
 
                     Timestamp expiryTimeStamp = rs.getTimestamp("session_expiry_time");
                     if (expiryTimeStamp != null) {
-                        session.setSessionExpiryTime(expiryTimeStamp.toLocalDateTime());
+                        // --- CHANGE HERE for sessionExpiryTime ---
+                        session.setSessionExpiryTime(expiryTimeStamp.toInstant());
+                    } else {
+                        session.setSessionExpiryTime(null); // Or handle as appropriate if null is not allowed
                     }
 
                     session.setStatus(rs.getString("status"));
@@ -88,6 +106,7 @@ public class AttendanceDAO {
         }
         return null;
     }
+
 
     /**
      * Retrieves attendance records with optional filters.

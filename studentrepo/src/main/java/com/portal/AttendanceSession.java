@@ -1,16 +1,22 @@
 package com.portal;
 
+// Import Instant (and potentially ZonedDateTime if you need to work with specific timezones for input/output)
+import java.time.Instant;
+// Keep these for now if other parts of your app still use them, but try to migrate
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.LocalDateTime;
+import java.time.LocalDateTime; // You will remove this for sessionStartTime/sessionExpiryTime
+
 
 public class AttendanceSession {
     private int sessionId;
     private String courseId;
     private String topic;
     private int facultyId;
-    private LocalDateTime sessionStartTime;
-    private LocalDateTime sessionExpiryTime;
+    // --- CHANGE THESE FIELDS ---
+    private Instant sessionStartTime; // Change from LocalDateTime to Instant
+    private Instant sessionExpiryTime; // Change from LocalDateTime to Instant
+    // --- END CHANGE ---
     private String status;
     private String location; // Add location based on DB schema
 
@@ -24,15 +30,15 @@ public class AttendanceSession {
 
     // Constructor (for creating new sessions - without sessionId initially)
     public AttendanceSession(String courseId, String topic, int facultyId,
-                             LocalDateTime sessionStartTime, LocalDateTime sessionExpiryTime,
-                             String status, String location) { // Added location
+                             Instant sessionStartTime, Instant sessionExpiryTime, // Change parameter types to Instant
+                             String status, String location) {
         this.courseId = courseId;
         this.topic = topic;
         this.facultyId = facultyId;
         this.sessionStartTime = sessionStartTime;
         this.sessionExpiryTime = sessionExpiryTime;
         this.status = status;
-        this.location = location; // Assign location
+        this.location = location;
     }
 
     // Default constructor for retrieval (from DB)
@@ -52,17 +58,19 @@ public class AttendanceSession {
     public int getFacultyId() { return facultyId; }
     public void setFacultyId(int facultyId) { this.facultyId = facultyId; }
 
-    public LocalDateTime getSessionStartTime() { return sessionStartTime; }
-    public void setSessionStartTime(LocalDateTime sessionStartTime) { this.sessionStartTime = sessionStartTime; }
+    // --- CHANGE THESE GETTERS AND SETTERS ---
+    public Instant getSessionStartTime() { return sessionStartTime; } // Change return type
+    public void setSessionStartTime(Instant sessionStartTime) { this.sessionStartTime = sessionStartTime; } // Change parameter type
 
-    public LocalDateTime getSessionExpiryTime() { return sessionExpiryTime; }
-    public void setSessionExpiryTime(LocalDateTime sessionExpiryTime) { this.sessionExpiryTime = sessionExpiryTime; }
+    public Instant getSessionExpiryTime() { return sessionExpiryTime; } // Change return type
+    public void setSessionExpiryTime(Instant sessionExpiryTime) { this.sessionExpiryTime = sessionExpiryTime; } // Change parameter type
+    // --- END CHANGE ---
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public String getLocation() { return location; } // Getter for location
-    public void setLocation(String location) { this.location = location; } // Setter for location
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 
     // --- Getters and Setters for NEW FIELDS ---
     public int getProgramId() { return programId; }
@@ -75,5 +83,5 @@ public class AttendanceSession {
     public void setSemester(int semester) { this.semester = semester; }
 
     public String getProgramName() { return programName; }
-    public void setProgramName(String programName) { this.programName = programName; } // Needed for JSP display
+    public void setProgramName(String programName) { this.programName = programName; }
 }
