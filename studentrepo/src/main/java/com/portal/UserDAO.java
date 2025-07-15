@@ -12,7 +12,7 @@ import com.portal.Student;
 import com.portal.User;
 
 public class UserDAO {
-
+/**update**/
     /**
      * Registers a new user in the database.
      * Passwords are now hashed using BCrypt.
