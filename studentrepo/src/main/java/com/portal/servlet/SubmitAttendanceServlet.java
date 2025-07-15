@@ -7,7 +7,6 @@ import com.portal.AttendanceDAO;
 import com.portal.AttendanceRecord;
 import com.portal.AttendanceSession;
 import com.portal.DBUtil;
-// import com.portal.User; // Not used in this servlet, can remove import if not used elsewhere
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,8 +18,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalDate;     // Keep this import
+// import java.time.LocalDateTime; // REMOVE THIS IMPORT if not used elsewhere
+import java.time.Instant;       // ADD THIS IMPORT
+import java.time.ZoneOffset;    // ADD THIS IMPORT for UTC conversion
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class SubmitAttendanceServlet extends HttpServlet {
             AttendanceDAO attendanceDAO = new AttendanceDAO(conn);
 
             JsonObject requestData = gson.fromJson(request.getReader(), JsonObject.class);
-            // CHANGED: Get sessionId as int, as per updated AttendanceSession and DB
+            
             int sessionIdFromRequest = requestData.get("sessionId").getAsInt();
             JsonArray recordsArray = requestData.getAsJsonArray("records");
 
@@ -54,8 +55,6 @@ public class SubmitAttendanceServlet extends HttpServlet {
                 currentSession = (AttendanceSession) httpSession.getAttribute("currentAttendanceSession");
             }
 
-            // Check if session is valid and matches
-            // CHANGED: Compare int session IDs directly
             if (currentSession == null || currentSession.getSessionId() != sessionIdFromRequest) {
                 jsonResponse.addProperty("status", "error");
                 jsonResponse.addProperty("message", "Invalid or expired attendance session. Session ID mismatch or not found in session.");
@@ -64,9 +63,7 @@ public class SubmitAttendanceServlet extends HttpServlet {
                 return;
             }
 
-            // --- IMPORTANT: Removed old subjectName extraction logic ---
-            // The corrected AttendanceSession now holds the actual 'course_id' (e.g., "MCA101")
-            String courseIdForAttendanceRecords = currentSession.getCourseId(); // Use the actual course_id from session
+            String courseIdForAttendanceRecords = currentSession.getCourseId();
 
             if (courseIdForAttendanceRecords == null || courseIdForAttendanceRecords.isEmpty()) {
                 jsonResponse.addProperty("status", "error");
@@ -76,13 +73,11 @@ public class SubmitAttendanceServlet extends HttpServlet {
                 return;
             }
 
-            // --- DEBUGGING START ---
             System.out.println("--- SubmitAttendanceServlet Debugging ---");
             System.out.println("Session ID from Request: " + sessionIdFromRequest);
             System.out.println("Session ID from currentSession Object: " + currentSession.getSessionId());
             System.out.println("Course ID from Session (for attendance records): " + courseIdForAttendanceRecords);
-            System.out.println("Session Start Time: " + currentSession.getSessionStartTime());
-            // --- DEBUGGING END ---
+            System.out.println("Session Start Time: " + currentSession.getSessionStartTime()); // This will now print an Instant
 
             int academicYear = Year.now().getValue(); // Current year for academic_year in enrollments
 
@@ -99,19 +94,18 @@ public class SubmitAttendanceServlet extends HttpServlet {
                 attendanceRecords.add(record);
             }
 
-         // In SubmitAttendanceServlet.java
-         // Find the line where you call addMultipleAttendanceRecordsToAttendanceTable:
+            // --- CRITICAL CHANGE HERE: Convert Instant to LocalDate using ZoneOffset.UTC ---
             boolean recordsAdded = attendanceDAO.addMultipleAttendanceRecordsToAttendanceTable(
-                                            attendanceRecords,
-                                            courseIdForAttendanceRecords,
-                                            currentSession.getSessionStartTime().toLocalDate(),
-                                            academicYear,
-                                            currentSession.getProgramId(),
-                                            currentSession.getSessionId() // <--- ADD THIS ARGUMENT
-                                        );
+                                                attendanceRecords,
+                                                courseIdForAttendanceRecords,
+                                                currentSession.getSessionStartTime().atOffset(ZoneOffset.UTC).toLocalDate(), // FIX HERE
+                                                academicYear,
+                                                currentSession.getProgramId(),
+                                                currentSession.getSessionId() 
+                                            );
+            // --- END CRITICAL CHANGE ---
 
             if (recordsAdded) {
-                // CHANGED: Pass int sessionIdFromRequest to updateAttendanceSessionStatus
                 boolean sessionStatusUpdated = attendanceDAO.updateAttendanceSessionStatus(sessionIdFromRequest, "COMPLETED");
 
                 if (sessionStatusUpdated) {

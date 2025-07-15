@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.portal.AttendanceDAO;
 import com.portal.AttendanceSession;
 import com.portal.DBUtil;
-import com.portal.User; // Import User for faculty_id
+import com.portal.User;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,8 +17,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.Year; // For academic year
+// import java.time.LocalDateTime; // REMOVE THIS IMPORT as you're no longer using LocalDateTime for session times
+import java.time.Instant; // ADD THIS IMPORT
+import java.time.Duration; // ADD THIS IMPORT for easily adding time
+import java.time.Year;
 
 @WebServlet("/StartAttendanceSessionServlet")
 public class StartAttendanceSessionServlet extends HttpServlet {
@@ -50,29 +52,28 @@ public class StartAttendanceSessionServlet extends HttpServlet {
             AttendanceDAO attendanceDAO = new AttendanceDAO(conn);
 
             JsonObject requestData = gson.fromJson(request.getReader(), JsonObject.class);
-            // NOTE: programId and semester are no longer sent directly from faculty.js for StartAttendanceSessionServlet
-            // Instead, courseId and topic are sent. We need to get programId and semester from the course.
-            String courseIdFromUI = requestData.get("courseId").getAsString(); // This is like "MCA101"
-            String topicFromUI = requestData.get("topic").getAsString(); // This is like "Digital Logic Design"
-            int facultyId = requestData.get("facultyId").getAsInt();
-            // String clientDateTime = requestData.get("clientDateTime").getAsString(); // If you need to log client time
-
-            // Fetch course details to get programId and semester
-            // This requires a new DAO method or modifying an existing one to get Course object by courseId
-            // For now, let's assume we can get it from AttendanceDAO.getAttendanceSession if we pass a dummy session ID
-            // OR, better, create a new DAO method: getCourseDetailsByCourseId(String courseId)
             
-            // For simplicity, let's just use the courseId directly and rely on the DAO to fetch full session details later
-            // The programId and semester will be populated when getAttendanceSession is called later.
+            String courseIdFromUI = requestData.get("courseId").getAsString();
+            String topicFromUI = requestData.get("topic").getAsString();
+            int facultyId = requestData.get("facultyId").getAsInt();
+            
+            // Placeholder for location - make dynamic if needed
+            String location = "Classroom A"; 
+
+            // --- CRITICAL CHANGE HERE: Use Instant.now() and Duration ---
+            Instant sessionStartTime = Instant.now(); // This is the current time in UTC
+            // Set expiry for 15 minutes from now, in UTC
+            Instant sessionExpiryTime = sessionStartTime.plus(Duration.ofMinutes(15)); 
+            // --- END CRITICAL CHANGE ---
 
             // Create a new AttendanceSession object
             AttendanceSession newSession = new AttendanceSession();
-            newSession.setCourseId(courseIdFromUI); // Set the actual course_id (e.g., "BCA102")
-            newSession.setTopic(topicFromUI); // Use the course_name as topic
-            newSession.setLocation("Classroom A"); // Placeholder, can be dynamic
-            newSession.setFacultyId(facultyId); // Use the facultyId from the request
-            newSession.setSessionStartTime(LocalDateTime.now());
-            newSession.setSessionExpiryTime(LocalDateTime.now().plusMinutes(15)); // 15-minute session
+            newSession.setCourseId(courseIdFromUI);
+            newSession.setTopic(topicFromUI);
+            newSession.setLocation(location);
+            newSession.setFacultyId(facultyId);
+            newSession.setSessionStartTime(sessionStartTime); // Now passing Instant
+            newSession.setSessionExpiryTime(sessionExpiryTime); // Now passing Instant
             newSession.setStatus("ACTIVE");
 
             int generatedSessionId = attendanceDAO.createAttendanceSession(newSession); // This sets newSession.sessionId
@@ -85,7 +86,7 @@ public class StartAttendanceSessionServlet extends HttpServlet {
                     session.setAttribute("currentAttendanceSession", fullSession); // Store full session in HTTP session
                     jsonResponse.addProperty("status", "success");
                     jsonResponse.addProperty("message", "Attendance session started successfully!");
-                    jsonResponse.addProperty("sessionId", fullSession.getSessionId()); // Send the int session ID
+                    jsonResponse.addProperty("sessionId", fullSession.getSessionId());
                 } else {
                     jsonResponse.addProperty("status", "error");
                     jsonResponse.addProperty("message", "Failed to retrieve full session details after creation.");
