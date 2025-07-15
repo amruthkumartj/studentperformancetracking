@@ -279,7 +279,7 @@ public class UserDAO {
     public List<Student> getAllStudents() {
         List<Student> students = new ArrayList<>();
         String sql = "SELECT s.student_id, s.student_name, s.program_id, p.program_name, s.sem, s.phone, s.email " +
-                     "FROM students s JOIN Programs p ON s.program_id = p.program_id";
+                     "FROM students s JOIN programs p ON s.program_id = p.program_id";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
