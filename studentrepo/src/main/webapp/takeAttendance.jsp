@@ -1,7 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.portal.AttendanceSession" %>
 <%@ page import="com.portal.Student" %>
-<%@ page import="java.time.LocalDateTime" %>
+<%-- REMOVE THIS: @page import="java.time.LocalDateTime" --%>
+<%@ page import="java.time.Instant" %>             <%-- ADD THIS --%>
+<%@ page import="java.time.ZonedDateTime" %>        <%-- ADD THIS --%>
+<%@ page import="java.time.ZoneOffset" %>           <%-- ADD THIS for UTC --%>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.google.gson.Gson" %>
@@ -464,8 +467,16 @@
             <div class="detail-card"><strong>Program:</strong> <span><%= currentSession.getProgramName() != null ? currentSession.getProgramName() : "N/A" %></span></div>
             <div class="detail-card"><strong>Semester:</strong> <span><%= currentSession.getSemester() %></span></div>
             <div class="detail-card"><strong>Subject:</strong> <span><%= currentSession.getSubjectName() %></span></div>
-            <div class="detail-card"><strong>Expiry Time:</strong> <span id="sessionExpiryTime"><%= currentSession.getSessionExpiryTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")) %></span></div>
-        </div>
+            <div class="detail-card"><strong>Expiry Time:</strong> <span id="sessionExpiryTime">
+                <%
+                    // THIS IS THE LINE THAT NEEDS TO BE CHANGED
+                    Instant expiryInstant = currentSession.getSessionExpiryTime();
+                    // Convert to ZonedDateTime in UTC for formatting
+                    ZonedDateTime expiryZoned = expiryInstant.atZone(ZoneOffset.UTC);
+                    // Now format it
+                    out.print(expiryZoned.format(DateTimeFormatter.ofPattern("HH:mm:ss 'UTC'")));
+                %>
+            </span></div></div>
 
         <div class="controls-card">
             <div class="action-buttons">
