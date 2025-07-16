@@ -1,43 +1,39 @@
+// src/main/java/com/portal/AttendanceDAO.java
 package com.portal;
 
 import java.sql.Connection;
-// import java.sql.Date; // <--- REMOVE OR COMMENT OUT THIS LINE if it's there and causing conflict
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
- // Make sure this is imported
-import java.time.Instant; 
-public class AttendanceDAO {
-    private Connection connection;
+import java.util.Map;
 
-    public AttendanceDAO(Connection connection) {
-        this.connection = connection;
-    }
+public class AttendanceDAO {
+    // Removed the Connection field and constructor, as DBUtil will provide connections dynamically.
 
     public int createAttendanceSession(AttendanceSession session) throws SQLException {
         String sql = "INSERT INTO attendancesessions (course_id, topic, faculty_id, session_start_time, session_expiry_time, status, location) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DBUtil.getConnection(); // Get connection from pool
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, session.getCourseId());
             ps.setString(2, session.getTopic());
             ps.setInt(3, session.getFacultyId());
 
-            // --- CHANGE HERE for sessionStartTime ---
             if (session.getSessionStartTime() != null) {
                 ps.setTimestamp(4, Timestamp.from(session.getSessionStartTime()));
             } else {
-                ps.setNull(4, java.sql.Types.TIMESTAMP); // Handle null if possible
+                ps.setNull(4, java.sql.Types.TIMESTAMP);
             }
-            // --- CHANGE HERE for sessionExpiryTime ---
             if (session.getSessionExpiryTime() != null) {
                 ps.setTimestamp(5, Timestamp.from(session.getSessionExpiryTime()));
             } else {
-                ps.setNull(5, java.sql.Types.TIMESTAMP); // Handle null if possible
+                ps.setNull(5, java.sql.Types.TIMESTAMP);
             }
 
             ps.setString(6, session.getStatus());
@@ -54,7 +50,7 @@ public class AttendanceDAO {
                 }
             }
             return -1;
-        }
+        } // Connection, PreparedStatement are auto-closed by try-with-resources
     }
 
     public AttendanceSession getAttendanceSession(int sessionId) throws SQLException {
@@ -66,7 +62,8 @@ public class AttendanceDAO {
                      "JOIN programs p ON c.program_id = p.program_id " +
                      "WHERE asess.session_id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection conn = DBUtil.getConnection(); // Get connection from pool
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, sessionId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -78,18 +75,16 @@ public class AttendanceDAO {
 
                     Timestamp startTimeStamp = rs.getTimestamp("session_start_time");
                     if (startTimeStamp != null) {
-                        // --- CHANGE HERE for sessionStartTime ---
                         session.setSessionStartTime(startTimeStamp.toInstant());
                     } else {
-                        session.setSessionStartTime(null); // Or handle as appropriate if null is not allowed
+                        session.setSessionStartTime(null);
                     }
 
                     Timestamp expiryTimeStamp = rs.getTimestamp("session_expiry_time");
                     if (expiryTimeStamp != null) {
-                        // --- CHANGE HERE for sessionExpiryTime ---
                         session.setSessionExpiryTime(expiryTimeStamp.toInstant());
                     } else {
-                        session.setSessionExpiryTime(null); // Or handle as appropriate if null is not allowed
+                        session.setSessionExpiryTime(null);
                     }
 
                     session.setStatus(rs.getString("status"));
@@ -150,7 +145,6 @@ public class AttendanceDAO {
             params.add(programId);
         }
         if (semester > 0) {
-            // *** CRUCIAL FIX: Changed from 'e.semester' to 'c.semester' ***
             conditions.add("c.semester = ?"); // Assuming 'semester' column is in the 'courses' table
             params.add(semester);
         }
@@ -165,11 +159,9 @@ public class AttendanceDAO {
         if (studentSearch != null && !studentSearch.trim().isEmpty()) {
             try {
                 int studentId = Integer.parseInt(studentSearch.trim());
-                // If it's a valid number, search ONLY by student ID
                 conditions.add("e.student_id = ?");
                 params.add(studentId);
             } catch (NumberFormatException e) {
-                // If it's not a number (e.g., a name), search ONLY by student name
                 conditions.add("s.student_name LIKE ?");
                 params.add("%" + studentSearch.trim() + "%");
             }
@@ -185,7 +177,8 @@ public class AttendanceDAO {
         System.out.println("DEBUG: getAttendanceRecords SQL: " + sql.toString());
         System.out.println("DEBUG: getAttendanceRecords Params: " + params);
 
-        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+        try (Connection conn = DBUtil.getConnection(); // Get connection from pool
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
@@ -194,7 +187,7 @@ public class AttendanceDAO {
                 while (rs.next()) {
                     AttendanceRecord record = new AttendanceRecord();
                     record.setRecordId(rs.getInt("attendance_id"));
-                    record.setSessionId(rs.getString("session_id"));
+                    record.setSessionId(rs.getString("session_id")); // Assuming session_id is string in AttendanceRecord DTO
                     record.setStudentId(rs.getInt("student_id"));
                     record.setAttendanceStatus(rs.getString("status"));
                     record.setStudentName(rs.getString("student_name"));
@@ -206,9 +199,11 @@ public class AttendanceDAO {
         }
         return records;
     }
+
     public boolean updateAttendanceSessionStatus(int sessionId, String status) throws SQLException {
         String sql = "UPDATE attendancesessions SET status = ? WHERE session_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection conn = DBUtil.getConnection(); // Get connection from pool
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, sessionId);
             int rowsAffected = ps.executeUpdate();
@@ -226,7 +221,7 @@ public class AttendanceDAO {
         List<Object> params = new ArrayList<>();
         params.add(programId);
 
-        if (semester > 0) { // Only add semester filter if a valid semester is provided
+        if (semester > 0) {
             sql.append("AND s.sem = ?");
             params.add(semester);
         }
@@ -236,7 +231,8 @@ public class AttendanceDAO {
         System.out.println("DEBUG: getStudentsByProgramAndSemester SQL: " + sql.toString());
         System.out.println("DEBUG: getStudentsByProgramAndSemester Params: " + params);
 
-        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+        try (Connection conn = DBUtil.getConnection(); // Get connection from pool
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
@@ -259,7 +255,8 @@ public class AttendanceDAO {
 
     public String getCourseIdBySubjectName(String subjectName, int programId, int semester) throws SQLException {
         String sql = "SELECT course_id FROM courses WHERE course_name = ? AND program_id = ? AND semester = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection conn = DBUtil.getConnection(); // Get connection from pool
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, subjectName);
             ps.setInt(2, programId);
             ps.setInt(3, semester);
@@ -274,7 +271,8 @@ public class AttendanceDAO {
 
     public int getOrCreateEnrollment(int studentId, int academicYear, int programId) throws SQLException {
         String selectSql = "SELECT enrollment_id FROM enrollments WHERE student_id = ? AND academic_year = ? AND program_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(selectSql)) {
+        try (Connection conn = DBUtil.getConnection(); // Get connection from pool
+             PreparedStatement ps = conn.prepareStatement(selectSql)) {
             ps.setInt(1, studentId);
             ps.setInt(2, academicYear);
             ps.setInt(3, programId);
@@ -286,7 +284,8 @@ public class AttendanceDAO {
         }
 
         String insertSql = "INSERT INTO enrollments (student_id, academic_year, program_id) VALUES (?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DBUtil.getConnection(); // Get connection from pool
+             PreparedStatement ps = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, studentId);
             ps.setInt(2, academicYear);
             ps.setInt(3, programId);
@@ -305,19 +304,19 @@ public class AttendanceDAO {
     public boolean addMultipleAttendanceRecordsToAttendanceTable(
             List<AttendanceRecord> attendanceRecords,
             String courseId,
-            LocalDate attendanceDate, // This is LocalDate
+            LocalDate attendanceDate,
             int academicYear,
             int programId,
             int sessionId
     ) throws SQLException {
         String sql = "INSERT INTO attendancerecords (enrollment_id, attendance_date, status, session_id) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection conn = DBUtil.getConnection(); // Get connection from pool
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             for (AttendanceRecord record : attendanceRecords) {
                 int enrollmentId = getOrCreateEnrollment(record.getStudentId(), academicYear, programId);
 
                 ps.setInt(1, enrollmentId);
-                // <<< FIX FOR Date.valueOf(attendanceDate) ERROR >>>
-                ps.setDate(2, java.sql.Date.valueOf(attendanceDate)); // Correctly use java.sql.Date.valueOf(LocalDate)
+                ps.setDate(2, java.sql.Date.valueOf(attendanceDate));
                 
                 String statusForDb;
                 if ("P".equalsIgnoreCase(record.getAttendanceStatus())) {
@@ -337,5 +336,171 @@ public class AttendanceDAO {
             }
             return true;
         }
+    }
+
+    /**
+     * Calculates the attendance percentage for a specific student in a given course, program, and semester.
+     * @param studentId The ID of the student.
+     * @param courseId The ID of the course.
+     * @param programId The ID of the program.
+     * @param semester The semester.
+     * @return The attendance percentage as a double (e.g., 85.5), or 0.0 if no sessions or records found.
+     * @throws SQLException If a database access error occurs.
+     */
+    public double getAttendancePercentageForStudentCourse(int studentId, String courseId, int programId, int semester) throws SQLException {
+        double attendancePercentage = 0.0;
+        int totalSessions = 0;
+        int presentSessions = 0;
+
+        // Step 1: Get total sessions for the course, program, and semester
+        String totalSessionsSql = "SELECT COUNT(DISTINCT asess.session_id) AS total_sessions " +
+                                  "FROM attendancesessions asess " +
+                                  "JOIN courses c ON asess.course_id = c.course_id " +
+                                  "WHERE asess.course_id = ? AND c.program_id = ? AND c.semester = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement psTotal = conn.prepareStatement(totalSessionsSql)) {
+            psTotal.setString(1, courseId);
+            psTotal.setInt(2, programId);
+            psTotal.setInt(3, semester);
+            try (ResultSet rsTotal = psTotal.executeQuery()) {
+                if (rsTotal.next()) {
+                    totalSessions = rsTotal.getInt("total_sessions");
+                }
+            }
+        }
+
+        // Step 2: Get present sessions for the specific student in that course, program, and semester
+        String presentSessionsSql = "SELECT COUNT(ar.attendance_id) AS present_sessions " +
+                                    "FROM attendancerecords ar " +
+                                    "JOIN attendancesessions asess ON ar.session_id = asess.session_id " +
+                                    "JOIN student_courses sc ON ar.enrollment_id = sc.enrollment_id " +
+                                    "WHERE sc.student_id = ? AND asess.course_id = ? AND ar.status = 'PRESENT' " +
+                                    "AND sc.program_id = ? AND sc.semester = ?"; // Added program_id and semester filter for student_courses
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement psPresent = conn.prepareStatement(presentSessionsSql)) {
+            psPresent.setInt(1, studentId);
+            psPresent.setString(2, courseId);
+            psPresent.setInt(3, programId); // Bind program_id
+            psPresent.setInt(4, semester);   // Bind semester
+            try (ResultSet rsPresent = psPresent.executeQuery()) {
+                if (rsPresent.next()) {
+                    presentSessions = rsPresent.getInt("present_sessions");
+                }
+            }
+        }
+
+        // Calculate percentage
+        if (totalSessions > 0) {
+            attendancePercentage = ((double) presentSessions / totalSessions) * 100.0;
+        }
+
+        return attendancePercentage;
+    }
+    public Map<String, Object> getAttendanceDetailsForStudentCourse(int studentId, String courseCode, int programId, int semester) throws SQLException {
+        Map<String, Object> details = new HashMap<>();
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        PreparedStatement courseIdPs = null;
+        ResultSet courseIdRs = null;
+
+        int totalClassesHeld = 0;
+        int classesAttended = 0;
+        double percentage = 0.0;
+        int numericCourseId = -1; // To store the looked-up numeric course ID
+
+        try {
+            conn = DBUtil.getConnection();
+
+            // --- Step 1: Get the numeric course_id from the courseCode (e.g., "BCA101") ---
+            String getCourseIdSql = "SELECT course_id FROM courses WHERE course_id = ?"; // Assuming course_id stores codes for lookup
+            // OR if you added a course_code column:
+            // String getCourseIdSql = "SELECT course_id FROM courses WHERE course_code = ?";
+
+            // Given your previous 'c.course_id AS course_code' alias, it's very likely
+            // that your `course_id` column in the `courses` table is actually storing the "codes"
+            // (like 'BCA101') as VARCHAR, and you are using it as both ID and code.
+            // Let's assume for a moment that `courses.course_id` is indeed VARCHAR and stores 'BCA101'
+            // This is crucial. If `courses.course_id` is INT and `courses.course_code` is VARCHAR,
+            // then change the WHERE clause here.
+
+            // Re-confirming your 'courses' table schema is paramount here.
+            // If 'courses.course_id' is an INT (e.g., 1, 2) and you have a 'courses.course_code' VARCHAR (e.g., 'BCA101')
+            // Then this lookup would be:
+            // String getCourseIdSql = "SELECT course_id FROM courses WHERE course_code = ?";
+            // And the parameter below would be `courseCode`.
+
+            // BUT, given `DEBUG AttendanceDAO Query: ... course_id = 'BCA101'`, it implies `course_id` is VARCHAR in `attendancesessions`
+            // and you're directly comparing it. If `attendancesessions.course_id` is VARCHAR, then the join `ON ats.course_id = c.course_id`
+            // implies that `c.course_id` must also be VARCHAR.
+
+            // This is the most confusing part. Let's make an assumption to move forward,
+            // and you should adjust if it's different.
+
+            // ***ASSUMPTION: Your `courses.course_id` column is actually of type VARCHAR
+            // and stores values like 'BCA101', acting as both the ID and the code.***
+            // This makes `c.course_id = ?` directly valid for the `courseCode` string parameter.
+
+            // If this assumption is correct, you do NOT need a lookup step.
+            // The original logic with `c.course_id = ?` and `ps.setString(2, courseId)` would be correct.
+
+            // --- Let's revert to the previous assumption where `courseId` (param) is string code,
+            // --- `c.course_id` is string code, and `ats.course_id` is string code.
+            // --- This aligns with the debug log: `course_id = 'BCA101'`
+
+            // SQL Query for Attendance Summary
+            String sql = "SELECT " +
+                         "    SUM(CASE WHEN ar.status = 'Present' THEN 1 ELSE 0 END) AS classes_attended, " +
+                         "    COUNT(DISTINCT ats.session_id) AS total_classes " +
+                         "FROM " +
+                         "    attendancerecords ar " +
+                         "JOIN " +
+                         "    attendancesessions ats ON ar.session_id = ats.session_id " +
+                         "JOIN " +
+                         "    enrollments e ON ar.enrollment_id = e.enrollment_id " +
+                         "JOIN " +
+                         "    courses c ON ats.course_id = c.course_id " + // This join implicitly assumes c.course_id and ats.course_id are compatible (e.g., both VARCHAR storing codes)
+                         "WHERE " +
+                         "    e.student_id = ? " +
+                         "    AND c.course_id = ? " + // If c.course_id is VARCHAR and stores codes like 'BCA101'
+                         "    AND c.program_id = ? " +
+                         "    AND c.semester = ? " +
+                         "    AND ats.status = 'Completed'";
+
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, studentId);
+            ps.setString(2, courseCode); // Use courseCode as it is, assuming c.course_id is VARCHAR and stores codes
+            ps.setInt(3, programId);
+            ps.setInt(4, semester);
+
+            System.out.println("DEBUG AttendanceDAO Query: " + ps.toString()); // For debugging
+
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                totalClassesHeld = rs.getInt("total_classes");
+                classesAttended = rs.getInt("classes_attended");
+                if (totalClassesHeld > 0) {
+                    percentage = (double) classesAttended / totalClassesHeld * 100.0;
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ SQL Error fetching attendance details (studentId: " + studentId + ", courseId: " + courseCode + "): " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        } finally {
+            if (rs != null) try { rs.close(); } catch (SQLException e) { System.err.println("Error closing ResultSet in AttendanceDAO: " + e.getMessage()); }
+            if (ps != null) try { ps.close(); } catch (SQLException e) { System.err.println("Error closing PreparedStatement in AttendanceDAO: " + e.getMessage()); }
+            if (courseIdRs != null) try { courseIdRs.close(); } catch (SQLException e) { System.err.println("Error closing courseIdRs in AttendanceDAO: " + e.getMessage()); }
+            if (courseIdPs != null) try { courseIdPs.close(); } catch (SQLException e) { System.err.println("Error closing courseIdPs in AttendanceDAO: " + e.getMessage()); }
+            if (conn != null) { try { conn.close(); } catch (SQLException e) { System.err.println("Error closing connection in AttendanceDAO: " + e.getMessage()); } }
+        }
+
+        details.put("totalClasses", totalClassesHeld);
+        details.put("classesAttended", classesAttended);
+        details.put("percentage", percentage);
+        return details;
     }
 }

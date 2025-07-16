@@ -486,63 +486,70 @@ document.addEventListener('DOMContentLoaded', function () {
 	    }
 
     /* ----------  Table load / filter / sort  ---------- */
-    function loadStudentData() {
-        if (studentSearchInput) studentSearchInput.value = '';
-        if (programFilterDropdown) programFilterDropdown.value = "";
 
-        if (studentsTableBody) {
-            studentsTableBody.innerHTML =
-                '<tr><td colspan="7" style="text-align:center;padding:20px;">Loading…</td></tr>';
-        }
+	/* ----------  Table load / filter / sort  ---------- */
+	   function loadStudentData() {
+	       if (studentSearchInput) studentSearchInput.value = '';
+	       if (programFilterDropdown) programFilterDropdown.value = "";
 
-        fetch('GetStudentsServlet', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: '{}'
-            })
-            .then(function(r) {
-                if (!r.ok) throw new Error('HTTP ' + r.status);
-                return r.json();
-            })
-            .then(function(data) {
-                if (!studentsTableBody) return;
-                studentsTableBody.innerHTML = data.length ? '' :
-                    '<tr><td colspan="7" style="text-align:center;padding:20px;">No students found.</td></tr>';
-                data.forEach(function(s) {
-                    var tr = document.createElement('tr');
-                    tr.setAttribute('data-program-id', s.programId);
-                    tr.innerHTML =
-                        '<td>' + s.studentId + '</td><td>' + s.fullName + '</td><td>' + s.programName + '</td>' +
-                        '<td>' + s.semester + '</td><td>' + s.email + '</td><td>' + s.phone + '</td>' +
-                        '<td><button class="btn-action-edit" data-id="' + s.studentId + '">Edit</button>' +
-                        '<button class="btn-action-delete" data-id="' + s.studentId + '">Delete</button></td>';
-                    var del = tr.querySelector('.btn-action-delete');
-                    del.addEventListener('click', function() {
-                        var id = this.dataset.id;
-                        if (!confirm('Delete student ' + id + '?')) return;
-                        fetch('DeleteStudentServlet', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                body: 'studentId=' + encodeURIComponent(id)
-                            })
-                            .then(function(r) { return r.json(); })
-                            .then(function(res) {
-                                if (res.status === 'success') { alert(res.message); tr.remove(); applyTableFilters(); } else alert(res.message || 'Delete failed');
-                            }).catch(function() { alert('Network error'); });
-                    });
-                    studentsTableBody.appendChild(tr);
-                });
-                applyTableFilters();
-                sortTable(0, 'asc');
-            })
-            .catch(function() {
-                if (studentsTableBody) {
-                    studentsTableBody.innerHTML =
-                        '<tr><td colspan="7" style="text-align:center;padding:20px;color:red">Failed to load students.</td></tr>';
-                }
-            });
-    }
+	       if (studentsTableBody) {
+	           studentsTableBody.innerHTML =
+	               '<tr><td colspan="7" style="text-align:center;padding:20px;">Loading…</td></tr>';
+	       }
 
+	       fetch('GetStudentsServlet', {
+	               method: 'POST',
+	               headers: { 'Content-Type': 'application/json' },
+	               body: '{}'
+	           })
+	           .then(function(r) {
+	               if (!r.ok) throw new Error('HTTP ' + r.status);
+	               return r.json();
+	           })
+	           .then(function(responseJson) { // Changed 'data' to 'responseJson' for clarity
+	               if (!studentsTableBody) return;
+
+	               // FIX: Access the 'students' array from the response JSON
+	               const students = responseJson.students; 
+
+	               studentsTableBody.innerHTML = students.length ? '' :
+	                   '<tr><td colspan="7" style="text-align:center;padding:20px;">No students found.</td></tr>';
+	               
+	               students.forEach(function(s) { // Iterate over the 'students' array
+	                   var tr = document.createElement('tr');
+	                   tr.setAttribute('data-program-id', s.programId);
+	                   tr.innerHTML =
+	                       '<td>' + s.studentId + '</td><td>' + s.fullName + '</td><td>' + s.programName + '</td>' +
+	                       '<td>' + s.semester + '</td><td>' + s.email + '</td><td>' + s.phone + '</td>' +
+	                       '<td><button class="btn-action-edit" data-id="' + s.studentId + '">Edit</button>' +
+	                       '<button class="btn-action-delete" data-id="' + s.studentId + '">Delete</button></td>';
+	                   var del = tr.querySelector('.btn-action-delete');
+	                   del.addEventListener('click', function() {
+	                       var id = this.dataset.id;
+	                       if (!confirm('Delete student ' + id + '?')) return;
+	                       fetch('DeleteStudentServlet', {
+	                               method: 'POST',
+	                               headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+	                               body: 'studentId=' + encodeURIComponent(id)
+	                           })
+	                           .then(function(r) { return r.json(); })
+	                           .then(function(res) {
+	                               if (res.status === 'success') { alert(res.message); tr.remove(); applyTableFilters(); } else alert(res.message || 'Delete failed');
+	                           }).catch(function() { alert('Network error'); });
+	                   });
+	                   studentsTableBody.appendChild(tr);
+	               });
+	               applyTableFilters();
+	               sortTable(0, 'asc');
+	           })
+	           .catch(function(error) { // Catch the error object
+	               console.error("Error loading student data:", error); // Log the actual error
+	               if (studentsTableBody) {
+	                   studentsTableBody.innerHTML =
+	                       '<tr><td colspan="7" style="text-align:center;padding:20px;color:red">Failed to load students.</td></tr>';
+	               }
+	           });
+	   }
     function applyTableFilters() {
         var q = (studentSearchInput ? studentSearchInput.value : '').toLowerCase().trim();
         var pId = (programFilterDropdown ? programFilterDropdown.value : '');
@@ -784,157 +791,163 @@ document.addEventListener('DOMContentLoaded', function () {
     /* =====================================================
        ==========  ATTENDANCE VIEW RECORDS LOGIC  ==========
        ===================================================== */
-    const attProgramFilterDropdown = qs('#attProgramFilter');
-    const attSemesterFilterDropdown = qs('#attSemesterFilter');
-    const attSubjectFilterDropdown = qs('#attSubjectFilter');
-    const attDateFilterInput = qs('#attDateFilter');
-    const attStudentSearchInput = qs('#attStudentSearchInput');
-    const resetAttendanceFiltersBtn = qs('#resetAttendanceFiltersBtn');
-    const attendanceRecordsTableBody = qs('#attendanceRecordsTableBody');
+	   const attProgramFilterDropdown = qs('#attProgramFilter');
+	   const attSemesterFilterDropdown = qs('#attSemesterFilter');
+	   const attSubjectFilterDropdown = qs('#attSubjectFilter');
+	   const attDateFilterInput = qs('#attDateFilter');
+	   const attStudentSearchInput = qs('#attStudentSearchInput');
+	   const resetAttendanceFiltersBtn = qs('#resetAttendanceFiltersBtn');
+	   const attendanceRecordsTableBody = qs('#attendanceRecordsTableBody');
 
-    function loadAttendanceViewData() {
-        if (attendanceRecordsTableBody) {
-            attendanceRecordsTableBody.innerHTML =
-                '<tr><td colspan="6" style="text-align:center;padding:20px;">Loading attendance records...</td></tr>';
-        }
+	   function loadAttendanceViewData() {
+	       if (attendanceRecordsTableBody) {
+	           attendanceRecordsTableBody.innerHTML =
+	               '<tr><td colspan="6" style="text-align:center;padding:20px;">Loading attendance records...</td></tr>';
+	       }
 
-        const filters = {
-            programId: attProgramFilterDropdown && attProgramFilterDropdown.value !== "" ? parseInt(attProgramFilterDropdown.value) : -1,
-            semester: attSemesterFilterDropdown && attSemesterFilterDropdown.value !== "" ? parseInt(attSemesterFilterDropdown.value) : -1,
-            subjectId: attSubjectFilterDropdown && attSubjectFilterDropdown.value !== "" ? attSubjectFilterDropdown.value : null,
-            date: attDateFilterInput ? attDateFilterInput.value : null,
-            studentSearch: attStudentSearchInput ? attStudentSearchInput.value.trim() : null
-        };
+	       const filters = {
+	           programId: attProgramFilterDropdown && attProgramFilterDropdown.value !== "" ? parseInt(attProgramFilterDropdown.value) : -1,
+	           semester: attSemesterFilterDropdown && attSemesterFilterDropdown.value !== "" ? parseInt(attSemesterFilterDropdown.value) : -1,
+	           subjectId: attSubjectFilterDropdown && attSubjectFilterDropdown.value !== "" ? attSubjectFilterDropdown.value : null,
+	           date: attDateFilterInput ? attDateFilterInput.value : null,
+	           studentSearch: attStudentSearchInput ? attStudentSearchInput.value.trim() : null
+	       };
 
-        fetch('GetAttendanceRecordsServlet', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(filters)
-            })
-            .then(r => {
-                if (!r.ok) throw new Error('HTTP status ' + r.status);
-                return r.json();
-            })
-            .then(data => {
-                if (!attendanceRecordsTableBody) return;
+	       fetch('GetAttendanceRecordsServlet', {
+	               method: 'POST',
+	               headers: { 'Content-Type': 'application/json' },
+	               body: JSON.stringify(filters)
+	           })
+	           .then(r => {
+	               if (!r.ok) throw new Error('HTTP status ' + r.status);
+	               return r.json();
+	           })
+	           .then(data => {
+	               if (!attendanceRecordsTableBody) return;
 
-                attendanceRecordsTableBody.innerHTML = '';
+	               attendanceRecordsTableBody.innerHTML = '';
 
-                if (data.length === 0) {
-                    attendanceRecordsTableBody.innerHTML =
-                        '<tr><td colspan="6" style="text-align:center;padding:20px;">No attendance records found matching criteria.</td></tr>';
-                    return;
-                }
+	               // FIX: Access the 'records' array from the data object
+	               const records = data.records; 
 
-                data.forEach(record => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${record.studentId}</td>
-                        <td>${record.studentName}</td>
-                        <td>${record.attendanceDate}</td>
-                        <td>${record.subjectName}</td>
-                        <td>${record.attendanceStatus === 'PRESENT' ? '<span class="status-present">Present</span>' : '<span class="status-absent">Absent</span>'}</td>
-                        <td>
-                            <button class="btn-action-edit" data-record-id="${record.recordId}">Edit</button>
-                            <button class="btn-action-delete" data-record-id="${record.recordId}">Delete</button>
-                        </td>
-                    `;
-                    attendanceRecordsTableBody.appendChild(tr);
-                });
-            })
-            .catch(error => {
-                console.error("Error loading attendance data:", error);
-                if (attendanceRecordsTableBody) {
-                    attendanceRecordsTableBody.innerHTML =
-                        '<tr><td colspan="6" style="text-align:center;padding:20px;color:red;">Failed to load attendance records. ' + error.message + '</td></tr>';
-                }
-            });
-    }
+	               if (!records || records.length === 0) { // Check if records array exists and is empty
+	                   attendanceRecordsTableBody.innerHTML =
+	                       '<tr><td colspan="6" style="text-align:center;padding:20px;">No attendance records found matching criteria.</td></tr>';
+	                   return;
+	               }
 
-    // Populate Filters for "View Attendance" - Programs will be ALL, Semesters are static
-    function populateAttendanceViewFilters() {
-        populateAllProgramDropdown('attProgramFilter', 'All Programs'); // Populate with ALL programs
+	               records.forEach(record => { // Iterate over the 'records' array
+	                   const tr = document.createElement('tr');
+	                   tr.innerHTML = `
+	                       <td>${record.studentId}</td>
+	                       <td>${record.studentName}</td>
+	                       <td>${new Date(record.attendanceDate).toLocaleDateString()}</td>
+	                       <td>${record.subjectName}</td>
+	                       <td>${record.attendanceStatus === 'PRESENT' ? '<span class="status-present">Present</span>' : '<span class="status-absent">Absent</span>'}</td>
+	                       <td>
+	                           <button class="btn-action-edit" data-record-id="${record.recordId}">Edit</button>
+	                           <button class="btn-action-delete" data-record-id="${record.recordId}">Delete</button>
+	                       </td>
+	                   `;
+	                   attendanceRecordsTableBody.appendChild(tr);
+	               });
+	           })
+	           .catch(error => {
+	               console.error("Error loading attendance data:", error);
+	               if (attendanceRecordsTableBody) {
+	                   attendanceRecordsTableBody.innerHTML =
+	                       '<tr><td colspan="6" style="text-align:center;padding:20px;color:red;">Failed to load attendance records. ' + error.message + '</td></tr>';
+	               }
+	           });
+	   }
 
-        if (attSemesterFilterDropdown) {
-            attSemesterFilterDropdown.innerHTML = '<option value="">All Semesters</option>';
-            for (let i = 1; i <= 8; i++) { // Assuming up to 8 semesters
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = 'Semester ' + i;
-                attSemesterFilterDropdown.appendChild(option);
-            }
-        }
-    }
+	   // Populate Filters for "View Attendance" - Programs will be ALL, Semesters are static
+	   function populateAttendanceViewFilters() {
+	       populateAllProgramDropdown('attProgramFilter', 'All Programs'); // Populate with ALL programs
 
-	function populateSubjectsForFilter() {
-	    const selectedProgramId = attProgramFilterDropdown.value;
-	    const selectedSemester = attSemesterFilterDropdown.value;
+	       if (attSemesterFilterDropdown) {
+	           attSemesterFilterDropdown.innerHTML = '<option value="">All Semesters</option>';
+	           for (let i = 1; i <= 8; i++) { // Assuming up to 8 semesters
+	               const option = document.createElement('option');
+	               option.value = i;
+	               option.textContent = 'Semester ' + i;
+	               attSemesterFilterDropdown.appendChild(option);
+	           }
+	       }
+	   }
 
-	    if (!selectedProgramId || !selectedSemester) {
-	        disable(attSubjectFilterDropdown, true);
-            fillSelect(attSubjectFilterDropdown, [], 'All Subjects');
-	        return;
-	    }
+	   function populateSubjectsForFilter() {
+	       const selectedProgramId = attProgramFilterDropdown.value;
+	       const selectedSemester = attSemesterFilterDropdown.value;
 
-	    disable(attSubjectFilterDropdown, false);
-	    attSubjectFilterDropdown.innerHTML = '<option value="">Loading Subjects...</option>';
+	       if (!selectedProgramId || !selectedSemester) {
+	           disable(attSubjectFilterDropdown, true);
+	           fillSelect(attSubjectFilterDropdown, [], 'All Subjects');
+	           return;
+	       }
 
-	    fetch('GetCoursesByProgramAndSemesterServlet', {
-	        method: 'POST',
-	        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-	        body: 'programId=' + encodeURIComponent(selectedProgramId) +
-	              '&semester=' + encodeURIComponent(selectedSemester)
-	    })
-	    .then(r => {
-	        if (!r.ok) throw new Error('HTTP status ' + r.status + ': ' + r.statusText);
-	        return r.json();
-	    })
-	    .then(subjects => {
-	        if (attSubjectFilterDropdown) {
-	            const formattedSubjects = subjects.map(s => ({
-	                value: s.courseId,
-	                text: s.courseName
-	            }));
-	            fillSelect(attSubjectFilterDropdown, formattedSubjects, 'All Subjects');
-	        }
-	    })
-	    .catch(error => {
-	        console.error('Error loading subjects for filter:', error);
-	        if (attSubjectFilterDropdown) {
-	            attSubjectFilterDropdown.innerHTML = '<option value="">Error loading subjects</option>';
-	            disable(attSubjectFilterDropdown, true);
-	        }
-	    })
-	    .finally(() => {
-	        loadAttendanceViewData();
-	    });
-	}
+	       disable(attSubjectFilterDropdown, false);
+	       attSubjectFilterDropdown.innerHTML = '<option value="">Loading Subjects...</option>';
 
-    if (attProgramFilterDropdown) {
-        attProgramFilterDropdown.addEventListener('change', populateSubjectsForFilter);
-    }
-	if (attSemesterFilterDropdown) {
-	    attSemesterFilterDropdown.addEventListener('change', populateSubjectsForFilter);
-	}
-    if (attSubjectFilterDropdown) {
-        attSubjectFilterDropdown.addEventListener('change', loadAttendanceViewData);
-    }
-    if (attDateFilterInput) attDateFilterInput.addEventListener('change', loadAttendanceViewData);
-    if (attStudentSearchInput) {
-        attStudentSearchInput.addEventListener('input', debounce(loadAttendanceViewData, 500));
-    }
-    if (resetAttendanceFiltersBtn) {
-        resetAttendanceFiltersBtn.addEventListener('click', function() {
-            if (attProgramFilterDropdown) attProgramFilterDropdown.value = '';
-            if (attSemesterFilterDropdown) attSemesterFilterDropdown.value = '';
-            if (attSubjectFilterDropdown) attSubjectFilterDropdown.value = '';
-            if (attDateFilterInput) attDateFilterInput.value = '';
-            if (attStudentSearchInput) attStudentSearchInput.value = '';
-            disable(attSubjectFilterDropdown, true);
-            loadAttendanceViewData();
-        });
-    }
+	       fetch('GetCoursesByProgramAndSemesterServlet', {
+	           method: 'POST',
+	           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+	           body: 'programId=' + encodeURIComponent(selectedProgramId) +
+	                 '&semester=' + encodeURIComponent(selectedSemester)
+	       })
+	       .then(r => {
+	           if (!r.ok) throw new Error('HTTP status ' + r.status + ': ' + r.statusText);
+	           return r.json();
+	       })
+	       .then(subjects => {
+	           if (attSubjectFilterDropdown) {
+	               const formattedSubjects = subjects.map(s => ({
+	                   value: s.courseId,
+	                   text: s.courseName
+	               }));
+	               fillSelect(attSubjectFilterDropdown, formattedSubjects, 'All Subjects');
+	           }
+	       })
+	       .catch(error => {
+	           console.error('Error loading subjects for filter:', error);
+	           if (attSubjectFilterDropdown) {
+	               attSubjectFilterDropdown.innerHTML = '<option value="">Error loading subjects</option>';
+	               disable(attSubjectFilterDropdown, true);
+	           }
+	       })
+	       .finally(() => {
+	           // loadAttendanceViewData(); // REMOVED: No longer needed here as it's called on program/semester change
+	       });
+	   }
 
+	   if (attProgramFilterDropdown) {
+	       attProgramFilterDropdown.addEventListener('change', function() {
+	           loadAttendanceViewData(); // Load data immediately when program changes
+	           populateSubjectsForFilter(); // Then populate subjects based on the new program
+	       });
+	   }
+	   if (attSemesterFilterDropdown) {
+	       attSemesterFilterDropdown.addEventListener('change', populateSubjectsForFilter);
+	       attSemesterFilterDropdown.addEventListener('change', loadAttendanceViewData); // Load data when semester changes
+	   }
+	   if (attSubjectFilterDropdown) {
+	       attSubjectFilterDropdown.addEventListener('change', loadAttendanceViewData);
+	   }
+	   if (attDateFilterInput) attDateFilterInput.addEventListener('change', loadAttendanceViewData);
+	   if (attStudentSearchInput) {
+	       attStudentSearchInput.addEventListener('input', debounce(loadAttendanceViewData, 500));
+	   }
+	   if (resetAttendanceFiltersBtn) {
+	       resetAttendanceFiltersBtn.addEventListener('click', function() {
+	           if (attProgramFilterDropdown) attProgramFilterDropdown.value = '';
+	           if (attSemesterFilterDropdown) attSemesterFilterDropdown.value = '';
+	           if (attSubjectFilterDropdown) attSubjectFilterDropdown.value = '';
+	           if (attDateFilterInput) attDateFilterInput.value = '';
+	           if (attStudentSearchInput) attStudentSearchInput.value = '';
+	           disable(attSubjectFilterDropdown, true);
+	           loadAttendanceViewData();
+	       });
+	   }
 
     /* =====================================================
        ==========  MARKS ENTRY & VIEW CODE  ================

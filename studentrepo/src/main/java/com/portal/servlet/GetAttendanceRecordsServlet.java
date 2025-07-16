@@ -1,8 +1,9 @@
+// src/main/java/com/portal/servlet/GetAttendanceRecordsServlet.java
 package com.portal.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
+import java.sql.Connection; // Keep import for DBUtil.getConnection() if used elsewhere, but not for DAO constructor
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -25,13 +26,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.portal.AttendanceDAO;
 import com.portal.AttendanceRecord;
-import com.portal.DBUtil;
+import com.portal.DBUtil; // Keep this import as DAOs use it
 import com.portal.User;
 
 @WebServlet("/GetAttendanceRecordsServlet")
 public class GetAttendanceRecordsServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Gson gson;
+    private AttendanceDAO attendanceDAO; // Declare DAO instance
 
     @Override
     public void init() throws ServletException {
@@ -43,8 +45,11 @@ public class GetAttendanceRecordsServlet extends HttpServlet {
                 .registerTypeAdapter(java.time.LocalDate.class, new LocalDateConverter())
                 // Keep this for java.util.Date if still relevant for your filter parsing,
                 // but generally, if you're moving to java.time, you should transition all date handling.
-                .setDateFormat("yyyy-MM-dd") 
+                .setDateFormat("yyyy-MM-dd")
                 .create();
+        
+        // Initialize AttendanceDAO here, it no longer needs a Connection in its constructor
+        attendanceDAO = new AttendanceDAO();
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -66,7 +71,7 @@ public class GetAttendanceRecordsServlet extends HttpServlet {
             return;
         }
 
-        Connection conn = null;
+        // Connection conn = null; // No longer needed here as DAO manages its own connections
         try {
             String requestBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
             System.out.println("DEBUG: GetAttendanceRecordsServlet received request body: " + requestBody);
@@ -114,13 +119,13 @@ public class GetAttendanceRecordsServlet extends HttpServlet {
                 }
             }
 
-            conn = DBUtil.getConnection();
-            AttendanceDAO attendanceDAO = new AttendanceDAO(conn);
-
+            // No longer need to pass connection, DAO gets it internally
             List<AttendanceRecord> attendanceRecords = attendanceDAO.getAttendanceRecords(
-                programId, semester, subjectId, dateFilter, studentSearch); 
+                programId, semester, subjectId, dateFilter, studentSearch);
 
-            out.print(gson.toJson(attendanceRecords)); 
+            jsonResponse.addProperty("status", "success");
+            jsonResponse.add("records", gson.toJsonTree(attendanceRecords)); // Wrap list in a JSON object
+            out.print(gson.toJson(jsonResponse));
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -137,13 +142,8 @@ public class GetAttendanceRecordsServlet extends HttpServlet {
             jsonResponse.addProperty("message", "An unexpected error occurred: " + e.getMessage());
             out.print(gson.toJson(jsonResponse));
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            // No need to close connection here, DBUtil manages the pool
+            out.flush(); // Ensure all buffered output is sent
         }
     }
 }

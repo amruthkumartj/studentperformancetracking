@@ -1,12 +1,14 @@
+// src/main/java/com/portal/servlet/SubmitAttendanceServlet.java
 package com.portal.servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException; // Import for JsonSyntaxException
 import com.portal.AttendanceDAO;
 import com.portal.AttendanceRecord;
 import com.portal.AttendanceSession;
-import com.portal.DBUtil;
+import com.portal.DBUtil; // Keep this import as DAOs use it
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,32 +20,69 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.LocalDate;     // Keep this import
-// import java.time.LocalDateTime; // REMOVE THIS IMPORT if not used elsewhere
-import java.time.Instant;       // ADD THIS IMPORT
-import java.time.ZoneOffset;    // ADD THIS IMPORT for UTC conversion
+import java.time.LocalDate;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors; // For request body collection
 
 @WebServlet("/SubmitAttendanceServlet")
 public class SubmitAttendanceServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Gson gson = new Gson();
+    private AttendanceDAO attendanceDAO; // Declare DAO instance
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        // Initialize AttendanceDAO here, it no longer needs a Connection in its constructor
+        attendanceDAO = new AttendanceDAO();
+    }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json; charset=UTF-8");
         PrintWriter out = response.getWriter();
         JsonObject jsonResponse = new JsonObject();
 
-        Connection conn = null;
-        try {
-            conn = DBUtil.getConnection();
+        HttpSession session = request.getSession(false);
+        // User loggedInUser = null; // Assuming user validation is done in a filter or earlier servlet for this endpoint
+        // if (session != null) {
+        //     loggedInUser = (User) session.getAttribute("user");
+        // }
+
+        // Optional: Add user authentication/authorization check if needed for this servlet
+        // if (loggedInUser == null || (!"faculty".equalsIgnoreCase(loggedInUser.getRole()) && !"admin".equalsIgnoreCase(loggedInUser.getRole()))) {
+        //     jsonResponse.addProperty("status", "error");
+        //     jsonResponse.addProperty("message", "Unauthorized access.");
+        //     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        //     out.print(gson.toJson(jsonResponse));
+        //     return;
+        // }
+
+        try (Connection conn = DBUtil.getConnection()) { // Use try-with-resources for connection
             conn.setAutoCommit(false); // Start transaction
 
-            AttendanceDAO attendanceDAO = new AttendanceDAO(conn);
+            // AttendanceDAO attendanceDAO = new AttendanceDAO(conn); // No longer needed here, initialized in init()
 
-            JsonObject requestData = gson.fromJson(request.getReader(), JsonObject.class);
+            String requestBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+            System.out.println("DEBUG: SubmitAttendanceServlet received request body: " + requestBody);
+
+            JsonObject requestData;
+            try {
+                requestData = gson.fromJson(requestBody, JsonObject.class);
+                if (requestData == null) {
+                    throw new JsonSyntaxException("Request body is empty or malformed JSON.");
+                }
+            } catch (JsonSyntaxException e) {
+                System.err.println("JSON parsing error in SubmitAttendanceServlet: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                jsonResponse.addProperty("status", "error");
+                jsonResponse.addProperty("message", "Invalid JSON format in request: " + e.getMessage());
+                out.print(gson.toJson(jsonResponse));
+                return;
+            }
             
             int sessionIdFromRequest = requestData.get("sessionId").getAsInt();
             JsonArray recordsArray = requestData.getAsJsonArray("records");
@@ -119,37 +158,34 @@ public class SubmitAttendanceServlet extends HttpServlet {
                     conn.rollback();
                     jsonResponse.addProperty("status", "error");
                     jsonResponse.addProperty("message", "Attendance records saved, but failed to update session status.");
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // Set status for partial success/failure
                 }
             } else {
                 conn.rollback();
                 jsonResponse.addProperty("status", "error");
                 jsonResponse.addProperty("message", "Failed to save attendance records.");
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // Set status for failure to save records
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
+            // Rollback is already handled by the try-with-resources if auto-commit was set to false.
+            // If an exception occurs before conn.commit(), the transaction will be rolled back automatically
+            // when the connection is returned to the pool (or closed if not from pool).
+            // However, explicit rollback is good if you have multiple operations within the same transaction.
             jsonResponse.addProperty("status", "error");
             jsonResponse.addProperty("message", "Database error: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // Set status for DB errors
         } catch (Exception e) {
             e.printStackTrace();
             jsonResponse.addProperty("status", "error");
             jsonResponse.addProperty("message", "Error processing request: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // Set status for general processing errors
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true); // Reset auto-commit
-                    conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            // No need for explicit conn.close() or conn.setAutoCommit(true) here
+            // as try-with-resources handles connection closure/return to pool,
+            // and commit/rollback logic is inside the try block.
+            out.flush(); // Ensure all buffered output is sent
         }
         out.print(gson.toJson(jsonResponse));
     }

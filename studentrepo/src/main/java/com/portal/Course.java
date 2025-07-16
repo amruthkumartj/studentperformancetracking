@@ -1,8 +1,9 @@
+// src/main/java/com/portal/Course.java
 package com.portal;
 
 public class Course {
     private String courseId; // Maps to course_id VARCHAR(100)
-    private String courseCode; // Maps to course_code VARCHAR(255)
+    private String courseCode; // Maps to course_code VARCHAR(255) - This was not in my previous version
     private String courseName; // Maps to course_name VARCHAR(255)
     private int semester;     // Maps to semester INT
     private int programId;    // Maps to program_id INT
@@ -50,5 +51,16 @@ public class Course {
 
     public void setProgramId(int programId) {
         this.programId = programId;
+    }
+
+    @Override
+    public String toString() {
+        return "Course{" +
+               "courseId='" + courseId + '\'' +
+               ", courseCode='" + courseCode + '\'' +
+               ", courseName='" + courseName + '\'' +
+               ", semester=" + semester +
+               ", programId=" + programId +
+               '}';
     }
 }

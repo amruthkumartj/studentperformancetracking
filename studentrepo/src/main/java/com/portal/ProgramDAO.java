@@ -1,4 +1,5 @@
-package com.portal; // This should be the same package as your Program.java and Course.java
+// src/main/java/com/portal/ProgramDAO.java
+package com.portal;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,21 +15,32 @@ public class ProgramDAO {
      * @return A List of Program objects.
      * @throws SQLException If a database access error occurs.
      */
-    public List<Program> getAllPrograms() throws SQLException {
-        List<Program> programs = new ArrayList<>();
-        String sql = "SELECT program_id, program_name FROM programs ORDER BY program_name";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-                Program program = new Program();
-                program.setProgramId(rs.getInt("program_id"));
-                program.setProgramName(rs.getString("program_name"));
-                programs.add(program);
-            }
-        }
-        return programs;
-    }
+	   public List<Program> getAllPrograms() throws SQLException {
+	        List<Program> programs = new ArrayList<>();
+	        String sql = "SELECT program_id, program_name FROM programs ORDER BY program_name";
+	        System.out.println("DEBUG ProgramDAO: Attempting to get connection for query: " + sql); // ADD THIS
+	        try (Connection conn = DBUtil.getConnection();
+	             PreparedStatement pstmt = conn.prepareStatement(sql);
+	             ResultSet rs = pstmt.executeQuery()) {
+
+	            System.out.println("DEBUG ProgramDAO: Connection and PreparedStatement successful. Executing query."); // ADD THIS
+
+	            while (rs.next()) {
+	                Program program = new Program();
+	                program.setProgramId(rs.getInt("program_id"));
+	                program.setProgramName(rs.getString("program_name"));
+	                programs.add(program);
+	                System.out.println("DEBUG ProgramDAO: Added program: " + program.getProgramName() + " (ID: " + program.getProgramId() + ")"); // ADD THIS
+	            }
+	            System.out.println("DEBUG ProgramDAO: Finished processing ResultSet. Total programs found: " + programs.size()); // ADD THIS
+	        } catch (SQLException e) {
+	            System.err.println("ERROR ProgramDAO: SQLException in getAllPrograms(): " + e.getMessage()); // ADD THIS
+	            e.printStackTrace(); // Print full stack trace for detailed error
+	            throw e; // Re-throw to ensure calling servlet handles it
+	        }
+	        return programs;
+	    }
+
 
     /**
      * Retrieves a Program object by its ID.
@@ -102,5 +114,34 @@ public class ProgramDAO {
                 return rs.next();
             }
         }
+    }
+
+    /**
+     * Retrieves all unique semesters available for a given program.
+     * This assumes semesters are stored in an Enrollments or Courses table.
+     *
+     * @param programId The ID of the program.
+     * @return A list of unique semester numbers (Integers), sorted.
+     * @throws SQLException if a database access error occurs.
+     */
+    public List<Integer> getSemestersByProgram(int programId) throws SQLException {
+        List<Integer> semesters = new ArrayList<>();
+        // Assuming semesters are linked to courses within a program
+        String sql = "SELECT DISTINCT semester FROM Courses WHERE program_id = ? ORDER BY semester ASC";
+
+        System.out.println("DEBUG DAO: getSemestersByProgram - SQL: " + sql);
+        System.out.println("DEBUG DAO: getSemestersByProgram - Params: programId=" + programId);
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, programId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    semesters.add(rs.getInt("semester"));
+                }
+            }
+        }
+        System.out.println("DEBUG DAO: getSemestersByProgram - Found " + semesters.size() + " semesters for program " + programId + ".");
+        return semesters;
     }
 }

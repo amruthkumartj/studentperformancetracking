@@ -1,3 +1,4 @@
+// src/main/java/com/portal/ProgramCourseDAO.java
 package com.portal;
 
 import java.sql.Connection;
@@ -7,15 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-// IMPORTS ADDED:
-import com.portal.Course; // Assuming ProgramDAO will eventually contain program-specific methods
-
 public class ProgramCourseDAO {
-
-    // NOTE: It is recommended to create a separate ProgramDAO for program-specific
-    // methods like addProgram, programExists, getAllPrograms (returning Program objects),
-    // getProgramById, and getTotalPrograms.
-    // However, for now, if you intend to keep them here, the methods are functional.
 
     /**
      * Adds a new academic program to the Programs table.
@@ -274,5 +267,58 @@ public class ProgramCourseDAO {
             }
         }
         return courseCount;
+    }
+
+    /**
+     * Retrieves a list of distinct semesters available for a given program.
+     * @param programId The ID of the program.
+     * @return A List of Integers representing distinct semesters.
+     * @throws SQLException If a database access error occurs.
+     */
+    public List<Integer> getDistinctSemestersByProgram(int programId) throws SQLException {
+        List<Integer> semesters = new ArrayList<>();
+        String sql = "SELECT DISTINCT semester FROM courses WHERE program_id = ? ORDER BY semester";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, programId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    semesters.add(rs.getInt("semester"));
+                }
+            }
+        }
+        return semesters;
+    }
+
+    /**
+     * Retrieves a list of Course objects for a given program and semester.
+     * This method is crucial for enrolling students in relevant courses.
+     * @param programId The ID of the program.
+     * @param semester The semester.
+     * @return A List of Course objects.
+     * @throws SQLException If a database access error occurs.
+     */
+    public List<Course> getCoursesByProgramAndSemester(int programId, int semester) throws SQLException {
+        List<Course> courses = new ArrayList<>();
+        String sql = "SELECT course_id, course_name, program_id, semester FROM courses WHERE program_id = ? AND semester = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, programId);
+            pstmt.setInt(2, semester);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Course course = new Course();
+                    course.setCourseId(rs.getString("course_id"));
+                    course.setCourseName(rs.getString("course_name"));
+                    course.setProgramId(rs.getInt("program_id"));
+                    course.setSemester(rs.getInt("semester"));
+                    // Note: courseCode is not directly in 'courses' table in your schema,
+                    // so it's not set here. If it's a separate field, you'd need to join
+                    // or fetch it from another table if available.
+                    courses.add(course);
+                }
+            }
+        }
+        return courses;
     }
 }

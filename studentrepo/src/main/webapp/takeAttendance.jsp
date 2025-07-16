@@ -827,35 +827,52 @@
     });
 
     // --- Fetch Students for the Session ---
-       async function fetchStudents() {
-        studentListTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Loading students...</td></tr>';
-        try {
-            const response = await fetch('GetStudentsServlet', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    programId: currentSession.programId,
-                    semester: currentSession.semester // <--- ADD THIS LINE!
-                })
-            });
-            
-            // The rest of your fetchStudents function continues here...
-            // Make sure the `studentsData = await response.json();` line and the subsequent `displayStudents(studentsData);` are there.
-            studentsData = await response.json();
-            if (!Array.isArray(studentsData)) {
-                console.error("Received data is not an array:", studentsData);
-                studentsData = []; // Ensure it's an array to prevent errors
-            }
-            displayStudents(studentsData); // Assuming you have this function to render students
-            showMessage(`Loaded ${studentsData.length} students.`, 'info');
-
-        } catch (error) {
-            console.error("Error fetching students:", error);
-            studentListTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color: var(--danger-color);">Failed to load students. Please refresh.</td></tr>';
-            showMessage('Failed to load students. See console for details.', 'error');
-        }
+    async function fetchStudents() {
+    if (!studentListTableBody) {
+        console.error("Student list table body element not found!");
+        showMessage("Error: UI element for student list not found.", "error");
+        return;
     }
 
+    studentListTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:20px;">Loading students...</td></tr>';
+
+    try {
+        const response = await fetch('GetStudentsServlet', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                programId: currentSession.programId,
+                semester: currentSession.semester
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json(); // Parse the JSON response
+
+        // FIX: Check if data.status is 'success' and data.students exists
+        if (data.status === 'success' && data.students) {
+            studentsData = data.students.map(s => ({
+                studentId: s.studentId,
+                fullName: s.fullName,
+                attendanceStatus: 'P' // Default to Present
+            }));
+            displayStudents(studentsData); // Pass the extracted students array
+        } else {
+            // Handle cases where status is not success or students array is missing
+            studentListTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:20px;color:red;">Failed to load students: ' + (data.message || 'Unknown error') + '</td></tr>';
+            disableAllActions();
+            showMessage('Failed to load students for attendance.', 'error');
+        }
+    } catch (error) {
+        console.error('Error fetching students:', error);
+        studentListTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:20px;color:red;">Network error or server unreachable. Failed to load students.</td></tr>';
+        disableAllActions();
+        showMessage('Network error loading students.', 'error');
+    }
+}
     // --- Display Students in Table (now takes an array for filtering) ---
     function displayStudents(studentsToDisplay) {
             studentListTableBody.innerHTML = '';

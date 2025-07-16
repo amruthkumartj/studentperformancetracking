@@ -1,3 +1,4 @@
+// src/main/java/com/portal/UserDAO.java
 package com.portal;
 
 import java.time.LocalDate;
@@ -5,14 +6,24 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
+
 import org.mindrot.jbcrypt.BCrypt; // Import BCrypt
 
 import com.portal.Course;
 import com.portal.Student;
 import com.portal.User;
+import com.portal.StudentListItem; // Import the new DTO
+import com.portal.StudentPerformance; // Import the new DTO
+import com.portal.CoursePerformance; // Import the new DTO
 
 public class UserDAO {
-/**update**/
+    // Instantiate DAOs for marks and attendance to be used within this DAO
+    // This is a common pattern for DAOs to collaborate.
+    private MarksDAO marksDAO = new MarksDAO();
+    private AttendanceDAO attendanceDAO = new AttendanceDAO();
+    private ProgramCourseDAO programCourseDAO = new ProgramCourseDAO(); // To get course details for performance
+
     /**
      * Registers a new user in the database.
      * Passwords are now hashed using BCrypt.
@@ -211,7 +222,6 @@ public class UserDAO {
                 pendingFaculty.add(user);
             }
         }
-        // REMOVED THE CATCH BLOCK FOR SQLException HERE. Let it propagate!
         return pendingFaculty;
     }
 
@@ -276,13 +286,55 @@ public class UserDAO {
         return false;
     }
 
-    public List<Student> getAllStudents() {
+    /**
+     * Retrieves a list of students for a given program and semester.
+     * This method is now more specific to the student list display.
+     * @param programId The ID of the program.
+     * @param semester The semester.
+     * @return A List of StudentListItem objects.
+     * @throws SQLException If a database access error occurs.
+     */
+    public List<StudentListItem> getStudentsByProgramAndSemesterForList(int programId, int semester) throws SQLException {
+        List<StudentListItem> students = new ArrayList<>();
+        String sql = "SELECT s.student_id, s.student_name, p.program_name, s.sem " +
+                     "FROM students s " +
+                     "JOIN programs p ON s.program_id = p.program_id " +
+                     "WHERE s.program_id = ? AND s.sem = ? " +
+                     "ORDER BY s.student_name ASC";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, programId);
+            pstmt.setInt(2, semester);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    StudentListItem student = new StudentListItem();
+                    student.setStudentId(String.valueOf(rs.getInt("student_id"))); // Convert int to String
+                    student.setStudentName(rs.getString("student_name"));
+                    student.setProgramName(rs.getString("program_name"));
+                    student.setSemester(rs.getInt("sem"));
+                    students.add(student);
+                }
+            }
+        }
+        return students;
+    }
+
+    /**
+     * Retrieves all student records from the database.
+     * This method is used when no specific program or semester filter is applied.
+     * @return A List of Student objects.
+     * @throws SQLException If a database access error occurs.
+     */
+    public List<Student> getAllStudents() throws SQLException {
         List<Student> students = new ArrayList<>();
         String sql = "SELECT s.student_id, s.student_name, s.program_id, p.program_name, s.sem, s.phone, s.email " +
-                     "FROM students s JOIN programs p ON s.program_id = p.program_id";
+                     "FROM students s JOIN programs p ON s.program_id = p.program_id " +
+                     "ORDER BY s.student_name ASC"; // Order by name for consistency
+
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 Student student = new Student();
                 student.setStudentId(rs.getInt("student_id"));
@@ -294,31 +346,203 @@ public class UserDAO {
                 student.setEmail(rs.getString("email"));
                 students.add(student);
             }
-        } catch (SQLException e) {
-            System.err.println("❌ SQL Error fetching all students: " + e.getMessage());
-            e.printStackTrace();
         }
         return students;
     }
 
-    private List<Course> getCoursesByProgramAndSemester(int programId, int semester) throws SQLException {
-        List<Course> courses = new ArrayList<>();
-        String sql = "SELECT course_id, course_name FROM courses WHERE program_id = ? AND semester = ?";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, programId);
-            pstmt.setInt(2, semester);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Course course = new Course();
-                    course.setCourseId(rs.getString("course_id"));
-                    course.setCourseName(rs.getString("course_name"));
-                    courses.add(course);
+    /**
+     * Retrieves detailed performance for a single student.
+     * This method aggregates data from students, courses, marks, and attendance.
+     * @param studentId The ID of the student to retrieve performance for.
+     * @param programId The program ID (for filtering relevant courses/enrollments).
+     * @param semester The semester (for filtering relevant courses/enrollments).
+     * @return A StudentPerformance object if found, null otherwise.
+     * @throws SQLException If a database access error occurs.
+     */
+    public StudentPerformance getStudentPerformance(int studentId, int programId, int semester, String examType) throws SQLException {
+        StudentPerformance studentPerformance = null;
+        Connection conn = null;
+
+        // Define constants for max marks (ADJUST THESE BASED ON YOUR COLLEGE'S RULES)
+        final double MAX_IA_MARKS = 50.0; // Max marks for Internal Assessment 1 and 2
+        final double MAX_SEE_MARKS = 100.0; // Max marks for SEE
+
+        try {
+            conn = DBUtil.getConnection();
+
+            // 1. Get basic student info, program name from enrollment, and semester
+            String studentInfoSql = "SELECT s.student_id, s.student_name, p.program_name, s.sem " + // Added s.sem
+                                    "FROM students s " +
+                                    "JOIN enrollments e ON s.student_id = e.student_id " +
+                                    "JOIN programs p ON e.program_id = p.program_id " +
+                                    "WHERE s.student_id = ? AND e.program_id = ? AND s.sem = ?"; // Use s.sem for student's current semester
+
+            System.out.println("DEBUG UserDAO: getStudentPerformance - studentInfoSql: " + studentInfoSql);
+            System.out.println("DEBUG UserDAO: getStudentPerformance - studentInfo Params: studentId=" + studentId + ", programId=" + programId + ", semester=" + semester);
+
+
+            try (PreparedStatement ps = conn.prepareStatement(studentInfoSql)) {
+                ps.setInt(1, studentId);
+                ps.setInt(2, programId);
+                ps.setInt(3, semester);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        studentPerformance = new StudentPerformance();
+                        studentPerformance.setStudentId(rs.getInt("student_id"));
+                        studentPerformance.setStudentName(rs.getString("student_name"));
+                        studentPerformance.setProgramName(rs.getString("program_name")); // Set program name
+                        studentPerformance.setSemester(rs.getInt("sem")); // Set semester from student record
+                        studentPerformance.setCoursePerformances(new ArrayList<>());
+                    } else {
+                        System.out.println("DEBUG UserDAO: Student not found for ID " + studentId + " in program " + programId + " semester " + semester);
+                        return null; // Student not found
+                    }
+                }
+            }
+
+            if (studentPerformance == null) {
+                return null;
+            }
+
+            // 2. Get courses for this student in the specified program and semester
+            String coursesSql = "SELECT c.course_id, c.course_name, c.course_id AS course_code, sc.enrollment_id " +
+                    "FROM courses c " +
+                    "JOIN student_courses sc ON c.course_id = sc.course_id " +
+                    "WHERE sc.student_id = ? AND c.program_id = ? AND c.semester = ?";
+
+            List<CoursePerformance> coursePerformances = new ArrayList<>();
+            System.out.println("DEBUG UserDAO: getStudentPerformance - coursesSql: " + coursesSql);
+            System.out.println("DEBUG UserDAO: getStudentPerformance - course Params: studentId=" + studentId + ", programId=" + programId + ", semester=" + semester);
+
+            try (PreparedStatement ps = conn.prepareStatement(coursesSql)) {
+                ps.setInt(1, studentId);
+                ps.setInt(2, programId);
+                ps.setInt(3, semester);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String courseId = rs.getString("course_id"); // Use course_id as primary key for marks/attendance
+                        String courseCode = rs.getString("course_code"); // For display
+                        String subjectName = rs.getString("course_name"); // For display
+                        int enrollmentId = rs.getInt("enrollment_id"); // Needed for Marks table
+
+                        // 3. Fetch individual exam marks for this course using MarksDAO
+                        Double ia1Marks = marksDAO.getSpecificMarksForStudentCourse(enrollmentId, courseId, "Internal Assessment 1");
+                        Double ia2Marks = marksDAO.getSpecificMarksForStudentCourse(enrollmentId, courseId, "Internal Assessment 2");
+                        Double seeMarks = marksDAO.getSpecificMarksForStudentCourse(enrollmentId, courseId, "SEE (Semester End Examination)");
+
+                        // Calculate Combined CIE (Average of IA1 and IA2)
+                        Double combinedCieMarks = null;
+                        if (ia1Marks != null && ia2Marks != null) {
+                            combinedCieMarks = (ia1Marks + ia2Marks) / 2.0;
+                        } else if (ia1Marks != null) {
+                            combinedCieMarks = ia1Marks; // If only IA1 exists, use it as combined CIE
+                        } else if (ia2Marks != null) {
+                            combinedCieMarks = ia2Marks; // If only IA2 exists, use it as combined CIE
+                        }
+
+                        // Calculate Overall Total Marks (Combined CIE Avg + SEE)
+                        // Overall Max Marks for CIE (if using average) is MAX_IA_MARKS (e.g., 50)
+                        Double overallTotalMarks = null;
+                        Double overallMaxMarks = null;
+                        Double overallPercentage = null;
+
+                        if (combinedCieMarks != null && seeMarks != null) {
+                            overallTotalMarks = combinedCieMarks + seeMarks;
+                            overallMaxMarks = MAX_IA_MARKS + MAX_SEE_MARKS; // e.g., 50 (CIE avg) + 100 (SEE) = 150
+                            if (overallMaxMarks > 0) {
+                                overallPercentage = (overallTotalMarks / overallMaxMarks) * 100.0;
+                            }
+                        } else if (combinedCieMarks != null) { // Only CIE is available
+                            overallTotalMarks = combinedCieMarks;
+                            overallMaxMarks = MAX_IA_MARKS;
+                             if (overallMaxMarks > 0) {
+                                overallPercentage = (overallTotalMarks / overallMaxMarks) * 100.0;
+                            }
+                        } else if (seeMarks != null) { // Only SEE is available
+                            overallTotalMarks = seeMarks;
+                            overallMaxMarks = MAX_SEE_MARKS;
+                             if (overallMaxMarks > 0) {
+                                overallPercentage = (overallTotalMarks / overallMaxMarks) * 100.0;
+                            }
+                        }
+
+
+                        // 4. Fetch attendance details for this course
+                        Map<String, Object> attendanceDetails = attendanceDAO.getAttendanceDetailsForStudentCourse(
+                            studentId, courseId, programId, semester);
+                        double attendancePercentage = (double) attendanceDetails.getOrDefault("percentage", 0.0);
+                        int totalClassesHeld = (int) attendanceDetails.getOrDefault("totalClasses", 0);
+                        int classesAttended = (int) attendanceDetails.getOrDefault("classesAttended", 0);
+
+                        System.out.println("DEBUG UserDAO: Course: " + subjectName + " (" + courseCode + ")");
+                        System.out.println("DEBUG UserDAO:   IA1: " + ia1Marks + ", IA2: " + ia2Marks + ", SEE: " + seeMarks + ", Combined CIE: " + combinedCieMarks + ", Overall Total: " + overallTotalMarks);
+                        System.out.println("DEBUG UserDAO:   Attendance: " + attendancePercentage + "% (" + classesAttended + "/" + totalClassesHeld + ")");
+
+
+                        // Create CoursePerformance object with all details
+                        CoursePerformance cp = new CoursePerformance(
+                            courseCode, subjectName,
+                            ia1Marks, ia2Marks, seeMarks,
+                            combinedCieMarks,
+                            overallTotalMarks, overallMaxMarks, overallPercentage,
+                            attendancePercentage, totalClassesHeld, classesAttended
+                        );
+                        coursePerformances.add(cp);
+                    }
+                }
+            }
+            studentPerformance.setCoursePerformances(coursePerformances);
+
+            // 5. Calculate overall analysis (based on OVERALL_TOTAL_MARKS from all courses)
+            double totalOverallScoreForAllCourses = 0;
+            double totalPossibleOverallScoreForAllCourses = 0;
+            int analyzedCourseCount = 0;
+
+            for (CoursePerformance cp : coursePerformances) {
+                if (cp.getOverallTotalMarks() != null && cp.getOverallMaxMarks() != null && cp.getOverallMaxMarks() > 0) {
+                    totalOverallScoreForAllCourses += cp.getOverallTotalMarks();
+                    totalPossibleOverallScoreForAllCourses += cp.getOverallMaxMarks();
+                    analyzedCourseCount++;
+                }
+            }
+
+            String overallAnalysis = "N/A";
+            if (analyzedCourseCount > 0 && totalPossibleOverallScoreForAllCourses > 0) {
+                double aggregatePercentage = (totalOverallScoreForAllCourses / totalPossibleOverallScoreForAllCourses) * 100;
+
+                if (aggregatePercentage >= 90) {
+                    overallAnalysis = "Excellent";
+                } else if (aggregatePercentage >= 80) {
+                    overallAnalysis = "Very Good";
+                } else if (aggregatePercentage >= 60) {
+                    overallAnalysis = "Good";
+                } else {
+                    overallAnalysis = "Needs Improvement";
+                }
+            }
+            studentPerformance.setOverallAnalysis(overallAnalysis);
+
+            // Removed `setOverallCieResult` and `setOverallSeeResult` calls as per our previous fix
+            // These individual overall results are now superseded by course-level breakdown
+            // and the aggregate 'overallAnalysis' string.
+
+        } catch (SQLException e) {
+            System.err.println("❌ SQL Error fetching student performance in UserDAO: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    System.err.println("Error closing connection in UserDAO: " + e.getMessage());
                 }
             }
         }
-        return courses;
+        System.out.println("DEBUG UserDAO: getStudentPerformance - Returning performance for student: " + studentId);
+        return studentPerformance;
     }
+
 
     public boolean addStudent(int studentId, String name, int programId, int sem, String phone, String email)
             throws SQLException {
@@ -335,7 +559,7 @@ public class UserDAO {
             studentStmt = conn.prepareStatement(studentSql);
             studentStmt.setInt(1, studentId);
             studentStmt.setString(2, name);
-            studentStmt.setInt(3, programId);
+            studentStmt.setInt(3, programId); // Corrected: changed 'stmt' to 'studentStmt'
             studentStmt.setInt(4, sem);
             studentStmt.setString(5, phone);
             studentStmt.setString(6, email);
@@ -345,7 +569,8 @@ public class UserDAO {
             if (rowsInsertedStudents > 0) {
                 System.out.println("DEBUG: Student record inserted successfully for studentId: " + studentId);
 
-                List<Course> coursesToEnroll = getCoursesByProgramAndSemester(programId, sem);
+                // Use ProgramCourseDAO to get courses
+                List<Course> coursesToEnroll = programCourseDAO.getCoursesByProgramAndSemester(programId, sem); // Using programCourseDAO instance
 
                 if (coursesToEnroll.isEmpty()) {
                     System.out.println("INFO: No courses found for programId " + programId + " and semester " + sem + ". Student " + studentId + " not enrolled in any courses.");
@@ -416,20 +641,24 @@ public class UserDAO {
 
     public boolean deleteStudent(String studentId) throws SQLException {
         Connection conn = null;
+        PreparedStatement deleteMarksStmt = null;
         PreparedStatement deleteAttendanceStmt = null;
+        PreparedStatement deleteEnrollmentsStmt = null;
         PreparedStatement deleteStudentCoursesStmt = null;
         PreparedStatement deleteStudentStmt = null;
         boolean success = false;
 
         try {
             conn = DBUtil.getConnection();
-            conn.setAutoCommit(false);
+            conn.setAutoCommit(false); // Start transaction
 
             int id = Integer.parseInt(studentId);
 
-            String getEnrollmentIdsSql = "SELECT enrollment_id FROM student_courses WHERE student_id = ?";
+            // --- CRITICAL CHANGE: Get ALL relevant enrollment_ids directly from the 'enrollments' table ---
+            // This ensures you capture all enrollments linked to the student before deleting their children.
+            String getEnrollmentIdsFromEnrollmentsSql = "SELECT enrollment_id FROM enrollments WHERE student_id = ?";
             List<Integer> enrollmentIdsToDelete = new ArrayList<>();
-            try(PreparedStatement ps = conn.prepareStatement(getEnrollmentIdsSql)) {
+            try(PreparedStatement ps = conn.prepareStatement(getEnrollmentIdsFromEnrollmentsSql)) {
                 ps.setInt(1, id);
                 try(ResultSet rs = ps.executeQuery()) {
                     while(rs.next()) {
@@ -437,9 +666,24 @@ public class UserDAO {
                     }
                 }
             }
+            System.out.println("DEBUG: Found " + enrollmentIdsToDelete.size() + " enrollment IDs for student " + id + " from 'enrollments' table.");
 
+
+            // Proceed with deletions only if there are enrollments to process (and thus their children)
             if (!enrollmentIdsToDelete.isEmpty()) {
                 String placeholders = String.join(",", java.util.Collections.nCopies(enrollmentIdsToDelete.size(), "?"));
+
+                // 1. Delete from `marks` table (Lowest child level, assuming it links to enrollment_id)
+                String deleteMarksSql = "DELETE FROM marks WHERE enrollment_id IN (" + placeholders + ")";
+                deleteMarksStmt = conn.prepareStatement(deleteMarksSql);
+                for (int i = 0; i < enrollmentIdsToDelete.size(); i++) {
+                    deleteMarksStmt.setInt(i + 1, enrollmentIdsToDelete.get(i));
+                }
+                int marksDeleted = deleteMarksStmt.executeUpdate();
+                System.out.println("DEBUG: Deleted " + marksDeleted + " marks records for student ID: " + id);
+
+                // 2. Delete from `attendancerecords` table (Lowest child level, confirmed by error)
+                // This MUST be done before deleting from 'enrollments'
                 String deleteAttendanceSql = "DELETE FROM attendancerecords WHERE enrollment_id IN (" + placeholders + ")";
                 deleteAttendanceStmt = conn.prepareStatement(deleteAttendanceSql);
                 for (int i = 0; i < enrollmentIdsToDelete.size(); i++) {
@@ -447,14 +691,29 @@ public class UserDAO {
                 }
                 int attendanceDeleted = deleteAttendanceStmt.executeUpdate();
                 System.out.println("DEBUG: Deleted " + attendanceDeleted + " attendance records for student ID: " + id);
+            } else {
+                System.out.println("DEBUG: No enrollments found for student " + id + ". Skipping marks and attendance deletion.");
             }
 
+
+            // 3. Delete from `enrollments` table (Child of `students`, but parent of `marks` and `attendancerecords`)
+            // This can now be deleted because its children (marks, attendance) have been handled
+            String deleteEnrollmentsSql = "DELETE FROM enrollments WHERE student_id = ?";
+            deleteEnrollmentsStmt = conn.prepareStatement(deleteEnrollmentsSql);
+            deleteEnrollmentsStmt.setInt(1, id);
+            int enrollmentsDeleted = deleteEnrollmentsStmt.executeUpdate();
+            System.out.println("DEBUG: Deleted " + enrollmentsDeleted + " enrollment records for student ID: " + id);
+
+
+            // 4. Delete from `student_courses` table (Often a mapping table, delete before `students`)
             String deleteStudentCoursesSql = "DELETE FROM student_courses WHERE student_id = ?";
             deleteStudentCoursesStmt = conn.prepareStatement(deleteStudentCoursesSql);
             deleteStudentCoursesStmt.setInt(1, id);
             int studentCoursesDeleted = deleteStudentCoursesStmt.executeUpdate();
             System.out.println("DEBUG: Deleted " + studentCoursesDeleted + " student_courses records for student ID: " + id);
 
+
+            // 5. Delete from `students` table (The main parent record, always delete last)
             String deleteStudentSql = "DELETE FROM students WHERE student_id = ?";
             deleteStudentStmt = conn.prepareStatement(deleteStudentSql);
             deleteStudentStmt.setInt(1, id);
@@ -486,23 +745,19 @@ public class UserDAO {
             e.printStackTrace();
             throw e;
         } finally {
-            if (deleteAttendanceStmt != null) {
-                try { deleteAttendanceStmt.close(); } catch (SQLException e) { System.err.println("Error closing deleteAttendanceStmt: " + e.getMessage()); }
-            }
-            if (deleteStudentCoursesStmt != null) {
-                try { deleteStudentCoursesStmt.close(); } catch (SQLException e) { System.err.println("Error closing deleteStudentCoursesStmt: " + e.getMessage()); }
-            }
-            if (deleteStudentStmt != null) {
-                try { deleteStudentStmt.close(); } catch (SQLException e) { System.err.println("Error closing deleteStudentStmt: " + e.getMessage()); }
-            }
+            // Ensure all resources are closed, regardless of success or failure
+            if (deleteMarksStmt != null) { try { deleteMarksStmt.close(); } catch (SQLException e) { System.err.println("Error closing deleteMarksStmt: " + e.getMessage()); } }
+            if (deleteAttendanceStmt != null) { try { deleteAttendanceStmt.close(); } catch (SQLException e) { System.err.println("Error closing deleteAttendanceStmt: " + e.getMessage()); } }
+            if (deleteEnrollmentsStmt != null) { try { deleteEnrollmentsStmt.close(); } catch (SQLException e) { System.err.println("Error closing deleteEnrollmentsStmt: " + e.getMessage()); } }
+            if (deleteStudentCoursesStmt != null) { try { deleteStudentCoursesStmt.close(); } catch (SQLException e) { System.err.println("Error closing deleteStudentCoursesStmt: " + e.getMessage()); } }
+            if (deleteStudentStmt != null) { try { deleteStudentStmt.close(); } catch (SQLException e) { System.err.println("Error closing deleteStudentStmt: " + e.getMessage()); } }
             if (conn != null) {
-                try { conn.setAutoCommit(true); } catch (SQLException e) { /* log if needed */ }
+                try { conn.setAutoCommit(true); } catch (SQLException e) { /* log if needed */ } // Reset auto-commit
                 try { conn.close(); } catch (SQLException e) { System.err.println("Error closing connection: " + e.getMessage()); }
             }
         }
         return success;
     }
-
     public boolean emailExists(String email) {
         String sql = "SELECT 1 FROM students WHERE email = ?";
         try (Connection c = DBUtil.getConnection();
@@ -525,5 +780,11 @@ public class UserDAO {
             ex.printStackTrace();
         }
         return false;
+    }
+
+    // This private helper method was previously in UserDAO, now using ProgramCourseDAO
+    private List<Course> getCoursesByProgramAndSemester(int programId, int semester) throws SQLException {
+        // Delegate to ProgramCourseDAO
+        return programCourseDAO.getCoursesByProgramAndSemester(programId, semester);
     }
 }

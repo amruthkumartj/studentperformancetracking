@@ -58,7 +58,7 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li>
-                            <a href="<c:url value='/faculty/view-student-performance.jsp' />">
+                            <a href="<c:url value='viewStudentPerformance.jsp' />">
                                 <i class='bx bx-bar-chart-alt icon'></i>
                                 <span class="text">View Student Performance</span>
                             </a>
@@ -96,7 +96,7 @@
                     </a>
                 </li>
                 <li class="nav-link">
-                    <a href="<c:url value='/profile.jsp' />">
+                    <a href="javascript:void(0);">
                         <i class='bx bx-user icon'></i>
                         <span class="text nav-text">Profile</span>
                     </a>
@@ -437,6 +437,20 @@
               </div>
 
       </section>
+      <section class="home-section" id="profileSection" style="display: none;">
+    <div class="home-content">
+        <h2 class="section-title">Faculty Profile</h2>
+        <div class="profile-card">
+            <div class="avatar-container">
+                <i class='bx bxs-user-circle avatar-icon'></i> </div>
+            <div class="profile-details">
+                <p><strong>Faculty ID:</strong> <span id="profileFacultyId"></span></p>
+                <p><strong>Name:</strong> <span id="profileFacultyName"></span></p>
+                <p><strong>Email:</strong> <span id="profileFacultyEmail"></span></p>
+            </div>
+        </div>
+        </div>
+</section>
 
     </div>
 </div>

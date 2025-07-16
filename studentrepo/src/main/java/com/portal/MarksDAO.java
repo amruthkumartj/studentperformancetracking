@@ -1,3 +1,4 @@
+// src/main/java/com/portal/MarksDAO.java
 package com.portal;
 
 import com.portal.DBUtil;
@@ -55,7 +56,7 @@ public class MarksDAO {
                 } else {
                     student.setMarksObtained(null); // Explicitly set to null if no mark found
                     // For new entries, pre-fill based on filter selections for consistency
-                    student.setExamType(examType); 
+                    student.setExamType(examType);  
                     student.setCourseId(courseId);
                     // Faculty ID will be set on frontend via window.currentFacultyId before submission
                 }
@@ -126,5 +127,72 @@ public class MarksDAO {
             DBUtil.closePreparedStatement(deletePstmt);
             DBUtil.closeConnection(conn);
         }
+    }
+
+    /**
+     * Retrieves marks for a specific student's enrollment in a given course and exam type.
+     * @param enrollmentId The enrollment ID of the student for the course.
+     * @param courseId The ID of the course.
+     * @param examType The type of exam (e.g., "CIE", "SEE").
+     * @return The marks obtained as a Double, or null if no marks are found.
+     * @throws SQLException If a database access error occurs.
+     */
+    public Double getMarksForStudentCourse(int enrollmentId, String courseId, String examType) throws SQLException {
+        String sql = "SELECT marks_obtained FROM marks WHERE enrollment_id = ? AND course_id = ? AND exam_type = ?";
+        Double marks = null;
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, enrollmentId);
+            pstmt.setString(2, courseId);
+            pstmt.setString(3, examType);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    marks = rs.getDouble("marks_obtained");
+                    if (rs.wasNull()) { // Check if the value was actually NULL in the DB
+                        marks = null;
+                    }
+                }
+            }
+        }
+        return marks;
+    }
+    public Double getSpecificMarksForStudentCourse(int enrollmentId, String courseId, String examType) throws SQLException {
+        Double marks = null;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBUtil.getConnection();
+
+            String sql = "SELECT m.marks_obtained FROM marks m " +
+                         "WHERE m.enrollment_id = ? AND m.course_id = ? AND m.exam_type = ?"; // Corrected column name
+
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, enrollmentId);
+            ps.setString(2, courseId);
+            ps.setString(3, examType); // Directly use the provided examType string
+
+            System.out.println("DEBUG MarksDAO Query: " + ps.toString()); // For debugging
+
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                marks = rs.getDouble("marks_obtained");
+                if (rs.wasNull()) { // If the database value for marks_obtained was NULL
+                    marks = null;
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ SQL Error fetching specific marks (enrollmentId: " + enrollmentId + ", courseId: " + courseId + ", examType: " + examType + "): " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        } finally {
+            if (rs != null) try { rs.close(); } catch (SQLException e) { System.err.println("Error closing ResultSet in MarksDAO: " + e.getMessage()); }
+            if (ps != null) try { ps.close(); } catch (SQLException e) { System.err.println("Error closing PreparedStatement in MarksDAO: " + e.getMessage()); }
+            if (conn != null) { try { conn.close(); } catch (SQLException e) { System.err.println("Error closing connection in MarksDAO: " + e.getMessage()); } }
+        }
+        return marks;
     }
 }

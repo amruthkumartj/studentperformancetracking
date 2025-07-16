@@ -1,10 +1,12 @@
+// src/main/java/com/portal/servlet/StartAttendanceSessionServlet.java
 package com.portal.servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException; // Import for JsonSyntaxException
 import com.portal.AttendanceDAO;
 import com.portal.AttendanceSession;
-import com.portal.DBUtil;
+import com.portal.DBUtil; // Keep this import as DAOs use it
 import com.portal.User;
 
 import javax.servlet.ServletException;
@@ -15,17 +17,24 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
+import java.sql.Connection; // Keep import for DBUtil.getConnection() if used elsewhere, but not for DAO constructor directly
 import java.sql.SQLException;
-// import java.time.LocalDateTime; // REMOVE THIS IMPORT as you're no longer using LocalDateTime for session times
-import java.time.Instant; // ADD THIS IMPORT
-import java.time.Duration; // ADD THIS IMPORT for easily adding time
-import java.time.Year;
+import java.time.Instant;
+import java.time.Duration;
+import java.time.Year; // This import might not be strictly needed unless used elsewhere in the servlet
 
 @WebServlet("/StartAttendanceSessionServlet")
 public class StartAttendanceSessionServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Gson gson = new Gson();
+    private AttendanceDAO attendanceDAO; // Declare DAO instance
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        // Initialize AttendanceDAO here, it no longer needs a Connection in its constructor
+        attendanceDAO = new AttendanceDAO();
+    }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json; charset=UTF-8");
@@ -46,12 +55,25 @@ public class StartAttendanceSessionServlet extends HttpServlet {
             return;
         }
 
-        Connection conn = null;
+        // Connection conn = null; // No longer needed here as DAO manages its own connections
         try {
-            conn = DBUtil.getConnection();
-            AttendanceDAO attendanceDAO = new AttendanceDAO(conn);
+            String requestBody = request.getReader().lines().collect(java.util.stream.Collectors.joining(System.lineSeparator()));
+            System.out.println("DEBUG: StartAttendanceSessionServlet received request body: " + requestBody);
 
-            JsonObject requestData = gson.fromJson(request.getReader(), JsonObject.class);
+            JsonObject requestData;
+            try {
+                requestData = gson.fromJson(requestBody, JsonObject.class);
+                if (requestData == null) {
+                    throw new JsonSyntaxException("Request body is empty or malformed JSON.");
+                }
+            } catch (JsonSyntaxException e) {
+                System.err.println("JSON parsing error in StartAttendanceSessionServlet: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                jsonResponse.addProperty("status", "error");
+                jsonResponse.addProperty("message", "Invalid JSON format in request: " + e.getMessage());
+                out.print(gson.toJson(jsonResponse));
+                return;
+            }
             
             String courseIdFromUI = requestData.get("courseId").getAsString();
             String topicFromUI = requestData.get("topic").getAsString();
@@ -101,18 +123,15 @@ public class StartAttendanceSessionServlet extends HttpServlet {
             e.printStackTrace();
             jsonResponse.addProperty("status", "error");
             jsonResponse.addProperty("message", "Database error: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // Set status for DB errors
         } catch (Exception e) {
             e.printStackTrace();
             jsonResponse.addProperty("status", "error");
             jsonResponse.addProperty("message", "Error processing request: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // Set status for general processing errors
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            // No need to close connection here, DBUtil manages the pool
+            out.flush(); // Ensure all buffered output is sent
         }
         out.print(gson.toJson(jsonResponse));
     }
