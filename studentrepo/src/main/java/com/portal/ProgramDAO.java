@@ -127,7 +127,7 @@ public class ProgramDAO {
     public List<Integer> getSemestersByProgram(int programId) throws SQLException {
         List<Integer> semesters = new ArrayList<>();
         // Assuming semesters are linked to courses within a program
-        String sql = "SELECT DISTINCT semester FROM Courses WHERE program_id = ? ORDER BY semester ASC";
+        String sql = "SELECT DISTINCT semester FROM courses WHERE program_id = ? ORDER BY semester ASC";
 
         System.out.println("DEBUG DAO: getSemestersByProgram - SQL: " + sql);
         System.out.println("DEBUG DAO: getSemestersByProgram - Params: programId=" + programId);
