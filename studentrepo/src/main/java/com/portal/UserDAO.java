@@ -1,4 +1,3 @@
-// src/main/java/com/portal/UserDAO.java
 package com.portal;
 
 import java.time.LocalDate;
@@ -10,19 +9,148 @@ import java.util.Map;
 
 import org.mindrot.jbcrypt.BCrypt; // Import BCrypt
 
+// Ensure these imports are correct based on your project structure
+// For example, if your DTOs are in 'com.portal.model', adjust accordingly.
 import com.portal.Course;
 import com.portal.Student;
 import com.portal.User;
-import com.portal.StudentListItem; // Import the new DTO
-import com.portal.StudentPerformance; // Import the new DTO
-import com.portal.CoursePerformance; // Import the new DTO
+import com.portal.StudentListItem;
+import com.portal.StudentPerformance;
+import com.portal.CoursePerformance;
+
+// Assuming DBUtil and PasswordHasher are in 'com.portal.util' or similar
+import com.portal.DBUtil;
+// Removed import for PasswordHasher as it's not needed for checking, only for hashing during registration.
+
 
 public class UserDAO {
     // Instantiate DAOs for marks and attendance to be used within this DAO
     // This is a common pattern for DAOs to collaborate.
-    private MarksDAO marksDAO = new MarksDAO();
-    private AttendanceDAO attendanceDAO = new AttendanceDAO();
-    private ProgramCourseDAO programCourseDAO = new ProgramCourseDAO(); // To get course details for performance
+    private MarksDAO marksDAO = new MarksDAO(); // Ensure MarksDAO is accessible
+    private AttendanceDAO attendanceDAO = new AttendanceDAO(); // Ensure AttendanceDAO is accessible
+    private ProgramCourseDAO programCourseDAO = new ProgramCourseDAO(); // Ensure ProgramCourseDAO is accessible
+
+    // Helper method to check if a string is a valid email format
+    private boolean isValidEmail(String email) {
+        // Simple regex for email validation (can be more robust for production)
+        return email != null && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.(com|in|edu|org|net)$");
+    }
+
+    // Helper method to check if a string is purely numeric
+    private boolean isNumeric(String str) {
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+        try {
+            Long.parseLong(str); // Use Long to handle larger IDs if needed
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Retrieves a User object by their email address.
+     * @param email The email address to search for.
+     * @return A User object if found, null otherwise.
+     * @throws SQLException if a database access error occurs.
+     */
+    public User getUserByEmail(String email) throws SQLException {
+        String sql = "SELECT * FROM users WHERE email = ?";
+        try (Connection conn = DBUtil.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    User user = new User();
+                    user.setId(rs.getInt("user_id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setPasswordHash(rs.getString("pwd_hash"));
+                    user.setRole(rs.getString("role"));
+                    user.setEmail(rs.getString("email"));
+                    user.setApproved(rs.getBoolean("is_approved"));
+                    return user;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Retrieves a User object by their username.
+     * @param username The username to search for.
+     * @return A User object if found, null otherwise.
+     * @throws SQLException if a database access error occurs.
+     */
+    public User getUserByUsername(String username) throws SQLException {
+        String sql = "SELECT user_id, username, email, pwd_hash, role, is_approved FROM users WHERE username = ?";
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new User(
+                        rs.getInt("user_id"),
+                        rs.getString("username"),
+                        rs.getString("pwd_hash"), // Correct: passwordHash is 3rd param in User constructor
+                        rs.getString("role"),
+                        rs.getString("email"),
+                        rs.getBoolean("is_approved")
+                    );
+                }
+            }
+        }
+        return null;
+    }
+    
+    
+    
+    
+ // Add this method to find a user by their email
+  
+
+    // Add this method to update a user's password
+    public boolean updatePassword(String email, String newPassword) {
+        String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+        String sql = "UPDATE users SET pwd_hash = ? WHERE email = ?";
+        try (Connection conn = DBUtil.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, hashedPassword);
+            ps.setString(2, email);
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Retrieves a User object linked to a specific faculty ID.
+     * This assumes the 'faculty' table has a 'user_id' column linking to the 'users' table.
+     * @param facultyId The faculty ID to search for.
+     * @return A User object if found, null otherwise.
+     * @throws SQLException if a database access error occurs.
+     */
+    public User getUserByFacultyId(int facultyId) throws SQLException {
+        String sql = "SELECT u.user_id, u.username, u.email, u.pwd_hash, u.role, u.is_approved " +
+                     "FROM users u JOIN faculty f ON u.user_id = f.user_id WHERE f.faculty_id = ?";
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, facultyId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new User(
+                        rs.getInt("user_id"),
+                        rs.getString("username"),
+                        rs.getString("pwd_hash"), // Correct: passwordHash is 3rd param in User constructor
+                        rs.getString("role"),
+                        rs.getString("email"),
+                        rs.getBoolean("is_approved")
+                    );
+                }
+            }
+        }
+        return null;
+    }
 
     /**
      * Registers a new user in the database.
@@ -30,36 +158,53 @@ public class UserDAO {
      * Faculty users are registered with is_approved = FALSE by default.
      * @param username The username for the new user.
      * @param password The plain-text password for the new user.
-     * @param role The role of the new user ('STUDENT' or 'FACULTY').
+     * @param role The role of the new user ('STUDENT', 'FACULTY', 'ADMIN').
+     * @param email The email address for the new user.
      * @return The generated user_id if successful, or -1 on failure.
+     * @throws IllegalArgumentException if email domain is invalid.
      */
-    public int register(String username, String password, String role) {
+    public int register(String username, String password, String role, String email) throws IllegalArgumentException {
         if (username == null || username.trim().isEmpty()) {
             System.out.println("❌ Registration DAO Error: Attempted to register a null or empty username.");
             return -1;
         }
-
-        if (isUsernameTaken(username)) {
-            System.out.println("⚠️ Username already exists: " + username);
+        if (email == null || email.trim().isEmpty()) {
+            System.out.println("❌ Registration DAO Error: Email cannot be null or empty.");
             return -1;
         }
 
+        // --- NEW: Email Suffix Validation for all roles ---
+        String lowerCaseEmail = email.trim().toLowerCase();
+        if (!(lowerCaseEmail.endsWith(".com") || lowerCaseEmail.endsWith(".in") || lowerCaseEmail.endsWith(".edu"))) {
+            System.err.println("❌ Email validation failed: Email must end with .com, .in, or .edu for " + username);
+            throw new IllegalArgumentException("Invalid email domain. Email must end with .com, .in, or .edu.");
+        }
+        // --- END NEW ---
+
+        // Check if username is already taken (pre-check, actual unique constraint is in DB)
+       
+        // Check if email is already taken in the users table
+        if (emailExistsInUsersTable(email)) {
+            System.out.println("⚠️ Email already exists for another user: " + email);
+            return -2; // Return -2 for email taken
+        }
+
         int userId = -1;
-        // Hash the plain-text password using BCrypt
-        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt()); // Correct for hashing during registration
 
-        // For faculty, is_approved defaults to FALSE. For students, it can be TRUE immediately.
-        // Assuming 'FACULTY' is the role that needs approval, 'STUDENT' is approved by default.
-        boolean isApproved = role.equalsIgnoreCase("STUDENT") || role.equalsIgnoreCase("ADMIN"); // Admin should also be approved by default
+        // For faculty, is_approved defaults to FALSE. For students/admins, it's TRUE immediately.
+        boolean isApproved = role.equalsIgnoreCase("STUDENT") || role.equalsIgnoreCase("ADMIN");
 
-        String insertQuery = "INSERT INTO users (username, pwd_hash, role, is_approved) VALUES (?, ?, ?, ?)";
+        // --- MODIFIED INSERT QUERY: Added 'email' column ---
+        String insertQuery = "INSERT INTO users (username, pwd_hash, role, email, is_approved) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, username.trim());
-            stmt.setString(2, hashedPassword); // Store the hashed password
+            stmt.setString(2, hashedPassword);
             stmt.setString(3, role.toUpperCase());
-            stmt.setBoolean(4, isApproved); // Set the approval status
+            stmt.setString(4, lowerCaseEmail); // Store the validated email
+            stmt.setBoolean(5, isApproved); // Set the approval status
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -69,8 +214,25 @@ public class UserDAO {
                     }
                 }
             }
+        } catch (SQLIntegrityConstraintViolationException e) {
+            // Catch specific exceptions for unique constraints
+            if (e.getMessage().contains("Duplicate entry") || e.getMessage().contains("users.username")) {
+                System.err.println("❌ Registration DAO Error: Username already exists (SQL constraint): " + username);
+                return -3; // Username already exists
+            } else if (e.getMessage().contains("Duplicate entry") || e.getMessage().contains("users.email")) {
+                System.err.println("❌ Registration DAO Error: Email already exists (SQL constraint): " + email);
+                return -2; // Email already exists
+            } else {
+                System.err.println("❌ Error during user registration (SQLIntegrityConstraintViolation): " + e.getMessage());
+                e.printStackTrace();
+                return -1;
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ SQL Error during user registration: " + e.getMessage());
+            e.printStackTrace();
+            return -1;
         } catch (Exception e) {
-            System.err.println("❌ Error during user registration: " + e.getMessage());
+            System.err.println("❌ General Error during user registration: " + e.getMessage());
             e.printStackTrace();
             return -1;
         }
@@ -78,116 +240,156 @@ public class UserDAO {
     }
 
     /**
-     * Validates user credentials and approval status.
-     * Now uses BCrypt to check passwords and includes is_approved status.
-     * Special handling for 'admin' user: their actual role is checked, not the requestedRole from frontend.
-     * @param username The username to validate.
-     * @param password The plain-text password to validate.
-     * @param requestedRole The role requested by the user from the frontend (e.g., 'STUDENT', 'FACULTY').
-     * @return A User object if credentials are valid and user is approved (if faculty), otherwise null.
+     * Checks if an email already exists in the `users` table.
+     * @param email The email to check.
+     * @return true if the email exists, false otherwise.
      */
-    public User validate(String username, String password, String requestedRole) {
-        String actualUsername = username.trim();
-        String actualRequestedRole = requestedRole.trim().toUpperCase();
-
-        System.out.println("DEBUG: UserDAO.validate called for username: '" + actualUsername + "', requestedRole (from frontend): '" + actualRequestedRole + "'");
-
-        String sql = "SELECT user_id, username, role, pwd_hash, is_approved FROM users WHERE username = ?";
-
+    public boolean emailExistsInUsersTable(String email) {
+        String sql = "SELECT 1 FROM users WHERE email = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, actualUsername);
-            System.out.println("DEBUG: Parameter 1 (username) set to: '" + actualUsername + "'");
-
+            stmt.setString(1, email.trim().toLowerCase());
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    System.out.println("DEBUG: User found in database by username.");
-                    String storedHashedPassword = rs.getString("pwd_hash");
-                    String actualStoredRole = rs.getString("role");
-                    boolean isApprovedFromDB = rs.getBoolean("is_approved"); // Correctly fetch is_approved
-
-                    System.out.println("DEBUG: Stored Hash: " + storedHashedPassword);
-                    System.out.println("DEBUG: Actual Stored Role (from DB): " + actualStoredRole);
-                    System.out.println("DEBUG: Is Approved (from DB): " + isApprovedFromDB);
-
-                    if (BCrypt.checkpw(password, storedHashedPassword)) {
-                        System.out.println("DEBUG: Password matches (BCrypt check passed).");
-
-                        if ("ADMIN".equalsIgnoreCase(actualStoredRole)) {
-                            System.out.println("DEBUG: User is an ADMIN. Allowing login regardless of requested role.");
-                            User user = new User();
-                            user.setId(rs.getInt("user_id"));
-                            user.setUsername(rs.getString("username"));
-                            user.setRole(actualStoredRole);
-                            user.setApproved(isApprovedFromDB); // Set the isApproved status
-                            System.out.println("DEBUG: ADMIN user successfully validated and returned.");
-                            return user;
-                        }
-                        else if (actualStoredRole.equalsIgnoreCase(actualRequestedRole)) {
-                            System.out.println("DEBUG: Non-ADMIN user. Requested role matches stored role.");
-                            // For FACULTY, check approval status
-                            if ("FACULTY".equalsIgnoreCase(actualStoredRole) && !isApprovedFromDB) {
-                                System.out.println("⚠️ Faculty user '" + actualUsername + "' is not yet approved. Returning null.");
-                                return null; // Unapproved faculty
-                            }
-
-                            User user = new User();
-                            user.setId(rs.getInt("user_id"));
-                            user.setUsername(rs.getString("username"));
-                            user.setRole(actualStoredRole);
-                            user.setApproved(isApprovedFromDB); // Set the isApproved status
-                            System.out.println("DEBUG: Student or approved Faculty user successfully validated and returned.");
-                            return user;
-                        } else {
-                            System.out.println("❌ Role mismatch for non-ADMIN user: " + actualUsername + ". Stored role: " + actualStoredRole + ", Requested role: " + actualRequestedRole + ". Returning null.");
-                            return null;
-                        }
-                    } else {
-                        System.out.println("❌ Password mismatch for user: " + actualUsername + ". Returning null.");
-                    }
-                } else {
-                    System.out.println("❌ User not found in database for username '" + actualUsername + "'. Returning null.");
-                }
+                return rs.next(); // True if a record is found
             }
         } catch (SQLException e) {
-            System.err.println("❌ SQL Error during user validation: " + e.getMessage());
+            System.err.println("❌ Error checking if email exists in users table: " + e.getMessage());
             e.printStackTrace();
-        } catch (Exception e) {
-            System.err.println("❌ General Error during user validation: " + e.getMessage());
-            e.printStackTrace();
+            return false;
         }
-        System.out.println("DEBUG: End of validate method, returning null (default path).");
-        return null;
+    }
+
+    /**
+     * Validates user login credentials. This method is designed to be flexible and attempts to
+     * identify the user's role and lookup method based on the identifier format,
+     * as the frontend 'role' parameter might be fixed (e.g., always "faculty").
+     *
+     * @param identifier The username, email, or faculty ID provided by the user.
+     * @param password The plain-text password.
+     * @param requestedRole The role requested from the frontend (e.g., "faculty"). This parameter
+     * is kept for signature compatibility but is largely ignored for the initial lookup.
+     * @return A User object if credentials are valid and user is approved (if faculty), null otherwise.
+     * @throws SQLException if a database access error occurs.
+     */
+    public User validate(String identifier, String password, String requestedRole) throws SQLException {
+        User user = null;
+
+        // 1. Try to validate as ADMIN (by username)
+        user = getUserByUsername(identifier);
+        if (user != null && "ADMIN".equalsIgnoreCase(user.getRole())) {
+            if (BCrypt.checkpw(password, user.getPasswordHash())) { // CORRECT BCrypt check
+                System.out.println("Login attempt: Identified as ADMIN via username. Success.");
+                return user; // Valid admin login
+            } else {
+                System.out.println("Login attempt: ADMIN password mismatch.");
+                return null; // Password mismatch for admin
+            }
+        }
+
+        // 2. If not Admin, try to validate as STUDENT or FACULTY by Email
+        if (isValidEmail(identifier)) {
+            user = getUserByEmail(identifier);
+            if (user != null) {
+                if (BCrypt.checkpw(password, user.getPasswordHash())) { // CORRECT BCrypt check
+                    // Check approval for FACULTY
+                    if ("FACULTY".equalsIgnoreCase(user.getRole()) && !user.isApproved()) {
+                        System.out.println("Login attempt: Faculty account pending approval for email " + identifier);
+                        return null; // Valid credentials, but not approved
+                    }
+                    System.out.println("Login attempt: Identified as " + user.getRole() + " via email. Success.");
+                    return user; // Valid student or approved faculty login via email
+                } else {
+                    System.out.println("Login attempt: Email password mismatch for " + identifier);
+                    return null; // Password mismatch
+                }
+            }
+        }
+
+        // 3. If not found by email or not an email, try to validate as FACULTY by Faculty ID (if numeric)
+        if (isNumeric(identifier)) {
+            try {
+                int facultyId = Integer.parseInt(identifier);
+                user = getUserByFacultyId(facultyId);
+                if (user != null && "FACULTY".equalsIgnoreCase(user.getRole())) {
+                    if (BCrypt.checkpw(password, user.getPasswordHash())) { // CORRECT BCrypt check
+                        if (!user.isApproved()) {
+                            System.out.println("Login attempt: Faculty account pending approval for ID " + identifier);
+                            return null; // Valid credentials, but not approved
+                        }
+                        System.out.println("Login attempt: Identified as FACULTY via ID. Success.");
+                        return user; // Valid approved faculty login via ID
+                    } else {
+                        System.out.println("Login attempt: Faculty ID password mismatch for " + identifier);
+                        return null; // Password mismatch
+                    }
+                }
+            } catch (NumberFormatException e) {
+                // Should not happen due to isNumeric check, but good practice
+                System.err.println("Error parsing numeric identifier in UserDAO.validate: " + identifier);
+            }
+        }
+
+        System.out.println("Login attempt: No user found or invalid credentials for identifier: " + identifier);
+        return null; // No matching user found for any role with given identifier and password
     }
 
     /**
      * Retrieves a User object by their user_id.
-     * Assumes 'users' table has columns: user_id, username, role, is_approved.
+     * Assumes 'users' table has columns: user_id, username, role, is_approved, email, pwd_hash.
      * @param userId The ID of the user to retrieve.
      * @return A User object if found, or null otherwise.
      * @throws SQLException if a database access error occurs.
      */
     public User getUserById(int userId) throws SQLException {
-        String sql = "SELECT user_id, username, role, is_approved FROM users WHERE user_id = ?";
+        String sql = "SELECT user_id, username, role, is_approved, email, pwd_hash FROM users WHERE user_id = ?";
         User user = null;
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    user = new User();
-                    user.setId(rs.getInt("user_id"));
-                    user.setUsername(rs.getString("username"));
-                    user.setRole(rs.getString("role"));
-                    user.setApproved(rs.getBoolean("is_approved")); // Set the isApproved status
+                    user = new User(
+                        rs.getInt("user_id"),
+                        rs.getString("username"),
+                        rs.getString("pwd_hash"), // Populate passwordHash
+                        rs.getString("role"),
+                        rs.getString("email"),     // Populate email
+                        rs.getBoolean("is_approved")
+                    );
                 }
             }
         }
         return user;
     }
-    
-    
+
+    /**
+     * Helper method to get user's email from the 'users' table using a faculty_id.
+     * This implies a relationship where faculty_id (from 'faculty' table) links to 'users.user_id'.
+     *
+     * @param facultyId The numeric ID provided by the faculty for login.
+     * @return The email associated with that faculty_id in the users table, or null if not found.
+     */
+    private String getEmailByFacultyId(int facultyId) {
+        // This query assumes 'faculty.user_id' links to 'users.user_id'
+        // and that 'users.email' is the definitive email for login.
+        String sql = "SELECT u.email FROM users u " +
+                     "JOIN faculty f ON u.user_id = f.user_id " +
+                     "WHERE f.faculty_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, facultyId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("email");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ SQL Error getting faculty email by ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public int getUserIdByUsername(String username) throws SQLException {
         String sql = "SELECT user_id FROM users WHERE username = ?";
         try (Connection conn = DBUtil.getConnection();
@@ -205,20 +407,24 @@ public class UserDAO {
     /**
      * Retrieves a list of all faculty users who are currently not approved.
      * @return A List of User objects representing pending faculty.
+     * @throws SQLException If a database access error occurs.
      */
-    public List<User> getPendingFaculty() throws SQLException { // MODIFIED: Added throws SQLException
+    public List<User> getPendingFaculty() throws SQLException {
         List<User> pendingFaculty = new ArrayList<>();
-        String sql = "SELECT user_id, username, role, is_approved FROM users WHERE role = 'FACULTY' AND is_approved = FALSE";
+        String sql = "SELECT user_id, username, role, is_approved, email, pwd_hash FROM users WHERE role = 'FACULTY' AND is_approved = FALSE";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                User user = new User();
-                user.setId(rs.getInt("user_id"));
-                user.setUsername(rs.getString("username"));
-                user.setRole(rs.getString("role"));
-                user.setApproved(rs.getBoolean("is_approved"));
+                User user = new User(
+                    rs.getInt("user_id"),
+                    rs.getString("username"),
+                    rs.getString("pwd_hash"), // Populate passwordHash
+                    rs.getString("role"),
+                    rs.getString("email"),     // Populate email
+                    rs.getBoolean("is_approved")
+                );
                 pendingFaculty.add(user);
             }
         }
@@ -262,17 +468,7 @@ public class UserDAO {
         return null;
     }
 
-    public boolean isUsernameTaken(String username) {
-        String sql = "SELECT 1 FROM users WHERE username = ?";
-        try (Connection c = DBUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, username);
-            return ps.executeQuery().next();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
+    
 
     public boolean studentIdExists(int id) {
         String sql = "SELECT 1 FROM students WHERE student_id = ?";
@@ -356,6 +552,7 @@ public class UserDAO {
      * @param studentId The ID of the student to retrieve performance for.
      * @param programId The program ID (for filtering relevant courses/enrollments).
      * @param semester The semester (for filtering relevant courses/enrollments).
+     * @param examType This parameter is currently not used for filtering, but can be added if needed.
      * @return A StudentPerformance object if found, null otherwise.
      * @throws SQLException If a database access error occurs.
      */
@@ -406,9 +603,9 @@ public class UserDAO {
 
             // 2. Get courses for this student in the specified program and semester
             String coursesSql = "SELECT c.course_id, c.course_name, c.course_id AS course_code, sc.enrollment_id " +
-                    "FROM courses c " +
-                    "JOIN student_courses sc ON c.course_id = sc.course_id " +
-                    "WHERE sc.student_id = ? AND c.program_id = ? AND c.semester = ?";
+                                "FROM courses c " +
+                                "JOIN student_courses sc ON c.course_id = sc.course_id " +
+                                "WHERE sc.student_id = ? AND c.program_id = ? AND c.semester = ?";
 
             List<CoursePerformance> coursePerformances = new ArrayList<>();
             System.out.println("DEBUG UserDAO: getStudentPerformance - coursesSql: " + coursesSql);
@@ -455,13 +652,13 @@ public class UserDAO {
                         } else if (combinedCieMarks != null) { // Only CIE is available
                             overallTotalMarks = combinedCieMarks;
                             overallMaxMarks = MAX_IA_MARKS;
-                             if (overallMaxMarks > 0) {
+                            if (overallMaxMarks > 0) {
                                 overallPercentage = (overallTotalMarks / overallMaxMarks) * 100.0;
                             }
                         } else if (seeMarks != null) { // Only SEE is available
                             overallTotalMarks = seeMarks;
                             overallMaxMarks = MAX_SEE_MARKS;
-                             if (overallMaxMarks > 0) {
+                            if (overallMaxMarks > 0) {
                                 overallPercentage = (overallTotalMarks / overallMaxMarks) * 100.0;
                             }
                         }
@@ -543,7 +740,7 @@ public class UserDAO {
         return studentPerformance;
     }
 
-
+   
     public boolean addStudent(int studentId, String name, int programId, int sem, String phone, String email)
             throws SQLException {
         Connection conn = null;
@@ -559,7 +756,7 @@ public class UserDAO {
             studentStmt = conn.prepareStatement(studentSql);
             studentStmt.setInt(1, studentId);
             studentStmt.setString(2, name);
-            studentStmt.setInt(3, programId); // Corrected: changed 'stmt' to 'studentStmt'
+            studentStmt.setInt(3, programId);
             studentStmt.setInt(4, sem);
             studentStmt.setString(5, phone);
             studentStmt.setString(6, email);
@@ -783,6 +980,9 @@ public class UserDAO {
     }
 
     // This private helper method was previously in UserDAO, now using ProgramCourseDAO
+    // This method is redundant here as it's just delegating. If ProgramCourseDAO is a separate DAO,
+    // then this method should be removed and ProgramCourseDAO.getCoursesByProgramAndSemester should be called directly.
+    // It's fine to keep it if you prefer this encapsulation, but it's not strictly necessary.
     private List<Course> getCoursesByProgramAndSemester(int programId, int semester) throws SQLException {
         // Delegate to ProgramCourseDAO
         return programCourseDAO.getCoursesByProgramAndSemester(programId, semester);

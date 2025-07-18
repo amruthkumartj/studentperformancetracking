@@ -805,7 +805,29 @@ body.dark-mode #customMessageContent.info button { background-color: var(--outli
 .login-card.scrollable::-webkit-scrollbar-thumb:hover {
     background: var(--inverse-primary);
 }
-
+ .otp-input-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px; /* Space between OTP boxes */
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .otp-input {
+        width: 45px; /* Adjust size as needed */
+        height: 45px;
+        text-align: center;
+        font-size: 1.5rem;
+        border: 1px solid #9e9e9e; /* Materialize input border */
+        border-radius: 4px;
+        transition: border-color 0.3s ease;
+        -webkit-appearance: none; /* Remove default browser styling */
+        -moz-appearance: textfield; /* Firefox specific */
+    }
+    .otp-input:focus {
+        border-color: #2196f3; /* Materialize blue focus color */
+        box-shadow: 0 0 0 1px #2196f3; /* Focus glow */
+        outline: none;
+    }
 /* --- Media Queries (Responsive Design) --- */
 @media (max-width: 768px) {
     h3.poppins-title {
@@ -928,54 +950,133 @@ body.dark-mode #customMessageContent.info button { background-color: var(--outli
 
     </div>
 <div id="loginFields">
-<form name="loginForm" id="loginForm" action="LoginServlet" method="post">
-<input type="hidden" id="loginRoleInput" name="role" value="faculty"/>
-<div class="input-field">
-<i class="material-icons prefix">person</i>
-<input id="username" name="username" type="text" class="validate" required/>
-<label for="username">Username</label>
+    <form name="loginForm" id="loginForm" action="LoginServlet" method="post">
+        <input type="hidden" id="loginRoleInput" name="role" value="faculty"/>
+        <div class="input-field">
+            <i class="material-icons prefix">person</i>
+            <input id="username" name="username" type="text" class="validate" required/>
+            <label for="username">Username</label>
+        </div>
+        <div class="input-field">
+            <i class="material-icons prefix">lock</i>
+            <input id="password" name="password" type="password" class="validate" required/>
+            <label for="password">Password</label>
+            <i class="material-icons toggle-pw" id="togglePw">visibility_off</i>
+        </div>
+        <p class="right-align">
+            <a href="#" onclick="showForgotPasswordForm()"><u>Forgot Password?</u></a>
+        </p>
+        <center>
+            <button class="state-layer" id="loginBtn" type="submit">
+                <span id="formButtonLabel" class="label">Login</span>
+            </button><br><br>
+            <h6>Have not registered yet?<a href="#" onclick="switchToRegister()"><u>&nbsp;Register</u></a></h6>
+        </center>
+    </form>
+
+    <div id="forgotPasswordSection" style="display:none;">
+       <fieldset>
+            <legend>Forgot Password</legend>
+
+            <div id="forgotEmailStep">
+                <div class="input-field">
+                    <i class="material-icons prefix">email</i>
+                    <input id="forgotEmail" name="forgotEmail" type="email" class="validate" required/>
+                    <label for="forgotEmail">Enter your Email ID</label>
+                </div>
+                <center>
+                    <button class="state-layer" id="sendOtpBtn" type="button">
+                        <span class="label">Send OTP</span>
+                    </button>
+                    <br><br>
+                    <a href="#" onclick="switchToLogin()">Back to Login</a>
+                </center>
+            </div>
+
+            <div id="forgotOtpStep" style="display:none;">
+                <p class="center-align">Enter the 6-digit OTP sent to your email.</p>
+                <div class="otp-input-container">
+                    <input type="text" maxlength="1" class="otp-input" id="otp1">
+                    <input type="text" maxlength="1" class="otp-input" id="otp2">
+                    <input type="text" maxlength="1" class="otp-input" id="otp3">
+                    <input type="text" maxlength="1" class="otp-input" id="otp4">
+                    <input type="text" maxlength="1" class="otp-input" id="otp5">
+                    <input type="text" maxlength="1" class="otp-input" id="otp6">
+                </div>
+                <center>
+                    <button class="state-layer" id="verifyOtpBtn" type="button">
+                        <span class="label">Submit OTP</span>
+                    </button>
+                    <br><br>
+                    <a href="#" onclick="showForgotPasswordForm()"><u>Resend OTP / Change Email</u></a>
+                </center>
+            </div>
+
+            <div id="setNewPasswordStep" style="display:none;">
+                <div class="input-field">
+                    <i class="material-icons prefix">lock</i>
+                    <input id="newPassword" name="newPassword" type="password" class="validate" required/>
+                    <label for="newPassword">New Password</label>
+                    <i class="material-icons toggle-pw" id="toggleNewPw">visibility_off</i>
+                </div>
+                <div class="input-field">
+                    <i class="material-icons prefix">lock_outline</i>
+                    <input id="confirmNewPassword" name="confirmNewPassword" type="password" class="validate" required/>
+                    <label for="confirmNewPassword">Confirm New Password</label>
+                    <i class="material-icons toggle-pw" id="toggleConfirmNewPw">visibility_off</i>
+                </div>
+                <center>
+                    <button class="state-layer" id="resetPasswordBtn" type="button">
+                        <span class="label">Reset Password</span>
+                    </button>
+                    <br><br>
+                    <a href="#" onclick="switchToLogin()">Back to Login</a>
+                </center>
+            </div>
+       </fieldset> 
+    </div>
+
+    <form name="registerForm" id="registerForm" action="RegisterServlet" method="post" style="display:none;">
+        <input type="hidden" id="registerRoleInput" name="role" value="faculty"/>
+        <fieldset>
+            <legend>Registration Form</legend>
+            <div class="register-input-group">
+                <label for="regUsername">USERID:</label>
+                <input class="control" type="text" id="regUsername" name="regUsername">
+            </div>
+            <div class="register-input-group">
+                <label for="regEmail">EMAIL:</label>
+                <input class="control" type="email" id="regEmail" name="regEmail" placeholder="EMAIL" required> </div>
+            <div class="register-input-group">
+                <label for="regPassword">PASSWORD:</label>
+                <input class="control" type="password" id="regPassword" name="regPassword">
+            </div>
+            <div class="register-input-group">
+                <label for="confirmPassword">CONFIRM PASSWORD:</label>
+                <input class="control" type="password" id="confirmPassword" name="confirmPassword" placeholder="CONFIRM PASSWORD">
+            </div>
+            <div class="register-buttons">
+                <button id="registerBtn" type="submit">REGISTER</button>
+                <button type="reset">CLEAR</button>
+            </div>
+            <center><a href="#" onclick="switchToLogin()">Back to Login</a></center>
+        </fieldset>
+    </form>
 </div>
-<div class="input-field">
-<i class="material-icons prefix">lock</i>
-<input id="password" name="password" type="password" class="validate" required/>
-<label for="password">Password</label>
-<i class="material-icons toggle-pw" id="togglePw">visibility_off</i>
-</div>
-<center>
-<button class="state-layer" id="loginBtn" type="submit">
-<span id="formButtonLabel" class="label">Login</span>
-</button><br><br>
-<h6>Have not registered yet?<a href="#" onclick="switchToRegister()"><u>&nbsp;Register</u></a></h6>
-</center>
-</form>
-</div>
-<form name="registerForm" id="registerForm" action="RegisterServlet" method="post" style="display:none;">
-<input type="hidden" id="registerRoleInput" name="role" value="faculty"/>
-<fieldset>
-<legend>Registration Form</legend>
-<div class="register-input-group">
-<label for="regUsername">USERID:</label>
-<input class="control" type="text" id="regUsername" name="regUsername">
-</div>
-<div class="register-input-group">
-<label for="regEmail">EMAIL:</label>
-<input class="control" type="email" id="regEmail" name="email" placeholder="EMAIL">
-</div>
-<div class="register-input-group">
-<label for="regPassword">PASSWORD:</label>
-<input class="control" type="password" id="regPassword" name="regPassword">
-</div>
-<div class="register-input-group">
-<label for="confirmPassword">CONFIRM PASSWORD:</label>
-<input class="control" type="password" id="confirmPassword" name="confirmPassword" placeholder="CONFIRM PASSWORD">
-</div>
-<div class="register-buttons">
-<button id="registerBtn" type="submit">REGISTER</button>
-<button type="reset">CLEAR</button>
-</div>
-<center><a href="#" onclick="switchToLogin()">Back to Login</a></center>
-</fieldset>
-</form>
+
+<div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; color: white;">
+    <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div><div class="gap-patch">
+                <div class="circle"></div>
+            </div><div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+        </div>
+    </div>
+    <p>Loading...</p>
 </div>
 
 <div id="customMessageOverlay">
@@ -985,314 +1086,377 @@ body.dark-mode #customMessageContent.info button { background-color: var(--outli
         <button id="customMessageOkBtn">OK</button>
     </div>
 </div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 <script>
-/* ── Pretty feedback dialog (success | error | info) ─────────── */
-function showMessage(type, text) {
-  const iconMap = { success: 'check_circle', error: 'error', info: 'info' };
-  const overlay = document.getElementById('customMessageOverlay');
-  const content = document.getElementById('customMessageContent');
-  const iconEl  = document.getElementById('customMessageIcon');
-  const textEl  = document.getElementById('customMessageText');
-  const okBtn   = document.getElementById('customMessageOkBtn');
+    /* ====================================================================
+       UTILITY & UI FUNCTIONS (SHOW MESSAGE, CARD HEIGHT, LOADER)
+    ====================================================================
+    */
 
-  if (!overlay || !content || !iconEl || !textEl || !okBtn) {
-      console.error("Custom message overlay elements not found in DOM!");
-      return; // Exit if elements are missing
-  }
+    function showMessage(type, text) {
+        const iconMap = { success: 'check_circle', error: 'error', info: 'info' };
+        const overlay = document.getElementById('customMessageOverlay');
+        const content = document.getElementById('customMessageContent');
+        const iconEl = document.getElementById('customMessageIcon');
+        const textEl = document.getElementById('customMessageText');
+        const okBtn = document.getElementById('customMessageOkBtn');
 
-  /* Set icon and text */
-  iconEl.textContent = iconMap[type] || 'info';
-  textEl.textContent = text;
+        if (!overlay || !content || !iconEl || !textEl || !okBtn) {
+            console.error("Custom message overlay elements not found in DOM!");
+            return;
+        }
 
-  /* Color-coding: add class 'success' or 'error' to the content box */
-  content.classList.remove('success', 'error', 'info');
-  content.classList.add(type);
+        iconEl.textContent = iconMap[type] || 'info';
+        content.classList.remove('success', 'error', 'info');
+        content.classList.add(type);
+        textEl.textContent = text;
 
-  // Set button color based on type
-  okBtn.style.backgroundColor = getComputedStyle(document.documentElement)
-                                .getPropertyValue(`--${type}`);
+        okBtn.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue(`--${type}`);
+        overlay.classList.add('show');
 
-  // Show the overlay
-  overlay.classList.add('show');
-  console.log(`Custom message overlay shown with type: ${type} and text: "${text}"`);
-
-  // Add event listener to OK button to hide the overlay AND clear URL params
-  // Use addEventListener and remove it to prevent multiple listeners if showMessage is called repeatedly
-  const okButtonListener = () => {
-      overlay.classList.remove('show');
-      console.log("Custom message overlay hidden.");
-
-      // --- CRITICAL CHANGE: Clear URL parameters after message is acknowledged ---
-      // Get the current URL without query parameters
-      const cleanURL = window.location.origin + window.location.pathname;
-      // Replace the current history state with the clean URL without reloading
-      history.replaceState(null, '', cleanURL);
-      console.log("URL parameters cleared in browser history.");
-
-      // Remove this specific event listener to prevent it from firing multiple times
-      okBtn.removeEventListener('click', okButtonListener);
-  };
-  okBtn.addEventListener('click', okButtonListener);
-}
-
-// --- NEW UTILITY FUNCTION to animate card height ---
-function setCardHeight(card) {
-    if (card) {
-        card.style.maxHeight = card.scrollHeight + 'px';
-        console.log("setCardHeight called. Card max-height set to:", card.scrollHeight + 'px');
+        const okButtonListener = () => {
+            overlay.classList.remove('show');
+            const cleanURL = window.location.origin + window.location.pathname;
+            history.replaceState(null, '', cleanURL);
+            okBtn.removeEventListener('click', okButtonListener);
+        };
+        okBtn.addEventListener('click', okButtonListener);
     }
-}
 
-// --- UPDATED to animate and hide title ---
-function switchToRegister () {
-    const loginCard   = document.querySelector('.login-card');
-    const title       = loginCard.querySelector('h6.poppins-title');
-    const loginForm   = document.getElementById('loginForm');
-    const registerForm= document.getElementById('registerForm');
-
-    if (title) title.classList.add('title-hidden');
-    if (loginForm) loginForm.style.display   = 'none';
-    if (registerForm) registerForm.style.display= 'block';
-
-    /* allow inner scrolling + cap height */
-    if (loginCard) {
-        loginCard.classList.add('scrollable');
-        loginCard.style.maxHeight = '85vh';        // keeps the transition alive
-        console.log("switchToRegister: Switched to register view, card set to scrollable.");
+    function setCardHeight(card) {
+        if (card) {
+            card.style.maxHeight = card.scrollHeight + 'px';
+        }
     }
-}
 
-/* --- UPDATED to animate and show title --- */
-function switchToLogin () {
-    const loginCard   = document.querySelector('.login-card');
-    const title       = loginCard.querySelector('h6.poppins-title');
-    const loginForm   = document.getElementById('loginForm');
-    const registerForm= document.getElementById('registerForm');
-
-    if (registerForm) registerForm.style.display = 'none';
-    if (title) title.classList.remove('title-hidden');
-    if (loginForm) loginForm.style.display    = 'block';
-
-    /* restore original behaviour */
-    if (loginCard) {
-        loginCard.classList.remove('scrollable');
-        setCardHeight(loginCard); // This call should now work!
-        console.log("switchToLogin: Switched to login view, card height reset.");
+    function toggleRoleSelector(show) {
+        const roleSelector = document.getElementById('segmentedbutton');
+        if (roleSelector) {
+            roleSelector.style.display = show ? 'flex' : 'none';
+        }
     }
-}
 
-// Modified to be triggered by form's submit event, not button click
-function showLoaderForForm(formElement) {
-    // Only show loader if the form is valid (browser's native validation)
-    if (formElement && formElement.checkValidity()) {
+    function showLoader(message = 'Please wait...') {
         const overlay = document.getElementById("loadingOverlay");
         if (overlay) {
             overlay.style.display = "flex";
-            console.log("Loader shown because form is valid and submitting.");
-        } else {
-            console.warn("Loader overlay element not found!");
         }
-    } else {
-        console.log("Form is not valid, loader not shown. Browser's validation will trigger.");
-    }
-}
-
-// --- Main script logic ---
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOMContentLoaded fired.");
-
-    // --- Element References ---
-    const loginCard = document.querySelector('.login-card');
-    const pwField = document.getElementById('password');
-    const toggle = document.getElementById('togglePw');
-    const facultySegment = document.querySelector('[data-role="faculty"]');
-    const studentSegment = document.querySelector('[data-role="student"]');
-    const loginRoleInput = document.getElementById('loginRoleInput');
-    const registerRoleInput = document.getElementById('registerRoleInput');
-    const loginForm = document.getElementById('loginForm'); // Get the form itself
-    const registerForm = document.getElementById('registerForm'); // Get the register form
-
-    // --- Event Listeners ---
-    if (toggle && pwField) {
-        toggle.addEventListener('click', () => {
-            const showing = pwField.type === 'text';
-            pwField.type = showing ? 'password' : 'text';
-            toggle.textContent = showing ? 'visibility_off' : 'visibility';
-            console.log(`Password visibility toggled to: ${pwField.type}`);
-        });
     }
 
-    // Attach showLoaderForForm to the form's submit event
-    if (loginForm) {
-        loginForm.addEventListener("submit", (event) => {
-            showLoaderForForm(loginForm);
-            // No event.preventDefault() here, allow default form submission for redirect
-        });
-    } else {
-        console.error("Login form element not found!");
-    }
-    if (registerForm) {
-        registerForm.addEventListener("submit", (event) => {
-            showLoaderForForm(registerForm);
-            // No event.preventDefault() here
-        });
-    } else {
-        console.error("Register form element not found!");
-    }
-
-    function setRole(role) {
-        const container = document.getElementById('container');
-        const container2 = document.getElementById('container2');
-        if (container) container.classList.toggle('active', role === 'faculty');
-        if (container2) container2.classList.toggle('active', role === 'student');
-
-        if (loginRoleInput) loginRoleInput.value = role;
-        if (registerRoleInput) registerRoleInput.value = role;
-
-        const dynamicRegUsernameLabel = document.querySelector('#registerForm label[for="regUsername"]');
-        if (dynamicRegUsernameLabel) {
-             dynamicRegUsernameLabel.textContent = (role === 'faculty') ? 'USERNAME:' : 'USERID:';
+    function hideLoader() {
+        const overlay = document.getElementById("loadingOverlay");
+        if (overlay) {
+            overlay.style.display = "none";
         }
-        // This call will now work correctly after setCardHeight is in global scope
-        setTimeout(() => {
-            if (loginCard) setCardHeight(loginCard);
-        }, 0); // Use setTimeout to allow DOM to render potential changes first
-        console.log(`Role set to: ${role}`);
     }
 
-    if (facultySegment) facultySegment.addEventListener('click', () => setRole('faculty'));
-    if (studentSegment) studentSegment.addEventListener('click', () => setRole('student'));
+    /* ====================================================================
+       VIEW SWITCHING LOGIC (LOGIN, REGISTER, FORGOT PASSWORD)
+    ====================================================================
+    */
 
-    // --- URL Parameter Handling ---
-    const p = new URLSearchParams(window.location.search);
-    console.log("URLSearchParams object created:", p);
+    function switchToRegister() {
+        const loginCard = document.querySelector('.login-card');
+        const title = loginCard.querySelector('h6.poppins-title');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const forgotPasswordSection = document.getElementById('forgotPasswordSection');
 
-    const loginStatus = p.get("login");
-    const loginReason = p.get("reason");
+        if (title) title.classList.add('title-hidden');
+        if (loginForm) loginForm.style.display = 'none';
+        if (forgotPasswordSection) forgotPasswordSection.style.display = 'none';
+        if (registerForm) registerForm.style.display = 'block';
 
-    console.log("loginStatus (from URL):", loginStatus);
-    console.log("loginReason (from URL):", loginReason);
-
-    // Only process URL parameters if they exist
-    if (loginStatus || p.get("reg")) { // Check for either login or reg parameters
-        if (loginStatus === "fail") {
-            console.log("Detected login=fail in URL. Processing error message.");
-            let errorMessage = "Login failed!";
-            if (loginReason) {
-                switch (loginReason) {
-                    case "missingfields":
-                        errorMessage = "Please enter both username and password.";
-                        break;
-                    case "invalid":
-                        errorMessage = "Invalid username or password. Please try again.";
-                        break;
-                    default:
-                        errorMessage = "Login failed: " + loginReason.replace(/([A-Z])/g, ' $1').toLowerCase();
-                }
-            }
-            showMessage('error', errorMessage);
-        } else if (loginStatus === "success") {
-            console.log("Detected login=success in URL.");
-            showMessage('success', 'Login successful!');
-        }
-
-        /* registration feedback */
-        const regStatus = p.get("reg");
-        if (regStatus === "success") {
-            console.log("Detected reg=success in URL. Showing success message.");
-            showMessage('success', 'Registration successful!');
-            switchToLogin();
-        } else if (regStatus === "fail") {
-            console.log("Detected reg=fail in URL. Processing error message.");
-            let reason = p.get("reason");
-            let errorMessage = "Registration failed!";
-            if (reason) {
-              switch (reason) {
-                case "missingfields":
-                  errorMessage = "Registration failed! Please fill in all fields.";
-                  break;
-                case "nomatch":
-                  errorMessage = "Registration failed! Passwords do not match.";
-                  break;
-                case "invalidid":
-                  errorMessage = "Registration failed! Invalid format for Student ID (must be a number).";
-                  break;
-                case "studentnotfound":
-                  errorMessage = "Registration failed! Student ID not found or has no name registered.";
-                  break;
-                case "alreadyregistered":
-                  errorMessage = "Registration failed! An account for this student already exists.";
-                  break;
-                case "usernametaken":
-                  errorMessage = "Registration failed! This username is already taken. Please choose another.";
-                  break;
-                case "invalidfacultyusername":
-                  errorMessage = "Registration failed! Faculty username cannot contain any numbers.";
-                  break;
-                case "invalidrole":
-                  errorMessage = "Registration failed! Invalid role selected.";
-                  break;
-                case "dberror":
-                  errorMessage = "Registration failed due to a server error. Please try again later.";
-                  break;
-                default:
-                  errorMessage = "Registration failed! Reason: " +
-                                 reason.replace(/([A-Z])/g, ' $1').toLowerCase();
-              }
-            }
-            showMessage('error', errorMessage);
-          }
-    } else {
-        console.log("No 'login' or 'reg' parameters found in URL on DOMContentLoaded.");
+        toggleRoleSelector(true);
+        loginCard.classList.add('scrollable');
+        loginCard.style.maxHeight = '85vh';
     }
 
+    function switchToLogin() {
+        const loginCard = document.querySelector('.login-card');
+        const title = loginCard.querySelector('h6.poppins-title');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const forgotPasswordSection = document.getElementById('forgotPasswordSection');
 
-    // Initial setup of role and card height
-    // Ensure loginCard exists before attempting to use it
-    if (loginCard) {
-        setRole(document.getElementById('container').classList.contains('active') ? 'faculty' : 'student');
+        if (registerForm) registerForm.style.display = 'none';
+        if (forgotPasswordSection) forgotPasswordSection.style.display = 'none';
+        if (title) title.classList.remove('title-hidden');
+        if (loginForm) loginForm.style.display = 'block';
+
+        toggleRoleSelector(true);
+        loginCard.classList.remove('scrollable');
         setCardHeight(loginCard);
-    } else {
-        console.error("Login card element (.login-card) not found in the DOM!");
-    }
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    const darkModeIcon = document.getElementById('darkModeIcon');
-    const body = document.body;
-
-    // Check for saved theme preference or system preference on load
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    if (savedTheme === 'dark' || (savedTheme === null && prefersDark)) {
-        body.classList.add('dark-mode');
-        if (darkModeIcon) darkModeIcon.textContent = 'wb_sunny'; // Sun icon for light mode
-        console.log("Dark mode activated on load (saved preference or system preference).");
-    } else {
-        if (darkModeIcon) darkModeIcon.textContent = 'brightness_2'; // Moon icon for dark mode
-        console.log("Light mode activated on load.");
     }
 
-    // Toggle function
-    if (darkModeToggle && darkModeIcon) {
-        darkModeToggle.addEventListener('click', () => {
-            if (body.classList.contains('dark-mode')) {
-                body.classList.remove('dark-mode');
-                localStorage.setItem('theme', 'light');
-                darkModeIcon.textContent = 'brightness_2'; // Moon icon for dark mode
-                console.log("Switched to light mode.");
-            } else {
-                body.classList.add('dark-mode');
-                localStorage.setItem('theme', 'dark');
-                darkModeIcon.textContent = 'wb_sunny'; // Sun icon for light mode
-                console.log("Switched to dark mode.");
+    function showForgotPasswordForm() {
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const forgotPasswordSection = document.getElementById('forgotPasswordSection');
+        
+        if (loginForm) loginForm.style.display = 'none';
+        if (registerForm) registerForm.style.display = 'none';
+        if (forgotPasswordSection) forgotPasswordSection.style.display = 'block';
+
+        toggleRoleSelector(false);
+
+        document.getElementById('forgotEmailStep').style.display = 'block';
+        document.getElementById('forgotOtpStep').style.display = 'none';
+        document.getElementById('setNewPasswordStep').style.display = 'none';
+
+        // Clear previous inputs
+        document.getElementById('forgotEmail').value = '';
+        document.querySelectorAll('.otp-input').forEach(input => input.value = '');
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmNewPassword').value = '';
+
+        setCardHeight(document.querySelector('.login-card'));
+    }
+
+    /* ====================================================================
+       FORGOT PASSWORD FEATURE FUNCTIONS (AJAX)
+    ====================================================================
+    */
+
+    function sendOtp() {
+        const emailInput = document.getElementById('forgotEmail');
+        const email = emailInput.value.trim().toLowerCase();
+        
+        // **RESTORED: Email domain validation**
+        if (!email.endsWith('.com') && !email.endsWith('.in') && !email.endsWith('.edu')) {
+            showMessage('error', 'Please enter a valid email ending with .com, .in, or .edu.');
+            return;
+        }
+
+        showLoader('Sending OTP...');
+        fetch('ForgotPasswordServlet', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=sendOTP&email=${encodeURIComponent(email)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            hideLoader();
+            showMessage(data.status, data.message);
+            if (data.status === 'success') {
+                document.getElementById('forgotEmailStep').style.display = 'none';
+                document.getElementById('forgotOtpStep').style.display = 'block';
+                setCardHeight(document.querySelector('.login-card'));
             }
+        })
+        .catch(() => {
+            hideLoader();
+            showMessage('error', 'A network error occurred. Please try again.');
         });
-    } else {
-        console.warn("Dark mode toggle elements not found!");
     }
-});
+
+
+    function verifyOtp() {
+        const otp = Array.from(document.querySelectorAll('.otp-input')).map(i => i.value).join('');
+        if (otp.length !== 6) {
+            showMessage('error', 'Please enter the full 6-digit OTP.');
+            return;
+        }
+        showLoader('Verifying OTP...');
+        fetch('ForgotPasswordServlet', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=verifyOTP&otp=${otp}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            hideLoader();
+            showMessage(data.status, data.message);
+            if (data.status === 'success') {
+                document.getElementById('forgotOtpStep').style.display = 'none';
+                document.getElementById('setNewPasswordStep').style.display = 'block';
+                setCardHeight(document.querySelector('.login-card'));
+            }
+        })
+        .catch(() => {
+            hideLoader();
+            showMessage('error', 'A network error occurred. Please try again.');
+        });
+    }
+
+    function resetPassword() {
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmNewPassword').value;
+
+        if (!newPassword || newPassword.length < 6) {
+            showMessage('error', 'Password must be at least 6 characters long.');
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            showMessage('error', 'New passwords do not match.');
+            return;
+        }
+        showLoader('Resetting Password...');
+        fetch('ForgotPasswordServlet', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=resetPassword&newPassword=${encodeURIComponent(newPassword)}&confirmPassword=${encodeURIComponent(confirmPassword)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            hideLoader();
+            showMessage(data.status, data.message);
+            if (data.status === 'success') {
+                switchToLogin();
+            }
+        })
+        .catch(() => {
+            hideLoader();
+            showMessage('error', 'A network error occurred. Please try again.');
+        });
+    }
+
+
+    /* ====================================================================
+       DOM CONTENT LOADED - MAIN SCRIPT LOGIC
+    ====================================================================
+    */
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginCard = document.querySelector('.login-card');
+        const pwField = document.getElementById('password');
+        const toggle = document.getElementById('togglePw');
+        const loginRoleInput = document.getElementById('loginRoleInput');
+        const registerRoleInput = document.getElementById('registerRoleInput');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const sendOtpButton = document.getElementById('sendOtpBtn');
+        const verifyOtpButton = document.getElementById('verifyOtpBtn');
+        const resetPasswordButton = document.getElementById('resetPasswordBtn');
+        const newPwToggle = document.getElementById('toggleNewPw');
+        const confirmNewPwToggle = document.getElementById('toggleConfirmNewPw');
+        const newPasswordField = document.getElementById('newPassword');
+        const confirmNewPasswordField = document.getElementById('confirmNewPassword');
+        const otpInputs = document.querySelectorAll('.otp-input');
+
+        // --- Event Listeners ---
+        if (toggle && pwField) {
+            toggle.addEventListener('click', () => {
+                pwField.type = pwField.type === 'password' ? 'text' : 'password';
+                toggle.textContent = pwField.type === 'password' ? 'visibility_off' : 'visibility';
+            });
+        }
+        if (newPwToggle && newPasswordField) {
+            newPwToggle.addEventListener('click', () => {
+                newPasswordField.type = newPasswordField.type === 'password' ? 'text' : 'password';
+                newPwToggle.textContent = newPasswordField.type === 'password' ? 'visibility_off' : 'visibility';
+            });
+        }
+        if (confirmNewPwToggle && confirmNewPasswordField) {
+            confirmNewPwToggle.addEventListener('click', () => {
+                confirmNewPasswordField.type = confirmNewPasswordField.type === 'password' ? 'text' : 'password';
+                confirmNewPwToggle.textContent = confirmNewPasswordField.type === 'password' ? 'visibility_off' : 'visibility';
+            });
+        }
+
+        if (loginForm) loginForm.addEventListener("submit", () => showLoader('Logging In...'));
+        if (registerForm) registerForm.addEventListener("submit", () => showLoader('Registering...'));
+
+        if (sendOtpButton) sendOtpButton.addEventListener('click', sendOtp);
+        if (verifyOtpButton) verifyOtpButton.addEventListener('click', verifyOtp);
+        if (resetPasswordButton) resetPasswordButton.addEventListener('click', resetPassword);
+
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', () => {
+                if (input.value.length === 1 && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && input.value.length === 0 && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+
+        function setRole(role) {
+            document.getElementById('container').classList.toggle('active', role === 'faculty');
+            document.getElementById('container2').classList.toggle('active', role === 'student');
+            loginRoleInput.value = role;
+            registerRoleInput.value = role;
+            const dynamicRegUsernameLabel = document.querySelector('#registerForm label[for="regUsername"]');
+            if (dynamicRegUsernameLabel) {
+                dynamicRegUsernameLabel.textContent = (role === 'faculty') ? 'USERNAME:' : 'USERID:';
+            }
+            setTimeout(() => setCardHeight(loginCard), 0);
+        }
+
+        const facultySegment = document.querySelector('[data-role="faculty"]');
+        const studentSegment = document.querySelector('[data-role="student"]');
+        if (facultySegment) facultySegment.addEventListener('click', () => setRole('faculty'));
+        if (studentSegment) studentSegment.addEventListener('click', () => setRole('student'));
+
+        // --- URL Parameter Handling ---
+        const p = new URLSearchParams(window.location.search);
+        const loginStatus = p.get("login");
+        const regStatus = p.get("reg");
+        const forgotStatus = p.get("forgot");
+
+        if (loginStatus === "fail" || regStatus === "fail" || forgotStatus === "fail") {
+            let reason = p.get("reason");
+            let errorMessage = "An error occurred.";
+
+            if (loginStatus) {
+                errorMessage = "Login failed!";
+                switch (reason) {
+                    case "missingfields": errorMessage = "Please enter both username and password."; break;
+                    case "invalid": errorMessage = "Invalid username or password. Please try again."; break;
+                    case "pendingapproval": errorMessage = "Your faculty account is pending admin approval."; break;
+                }
+            } else if (regStatus) {
+                errorMessage = "Registration failed!";
+                switch (reason) {
+                    case "missingfields": errorMessage = "Please fill in all required fields."; break;
+                    case "nomatch": errorMessage = "Passwords do not match."; break;
+                    case "invalidid": errorMessage = "Invalid Student ID format (must be a number)."; break;
+                    case "studentnotfound": errorMessage = "Student ID not found or has not been registered!! \nKindly Contact Your Faculty."; break;
+                    case "alreadyregistered": errorMessage = "An account for this student already exists."; break;
+                    case "usernametaken": errorMessage = "This username is already taken."; break;
+                    case "emailtaken": errorMessage = "This email is already registered."; break;
+                    case "invalidemaildomain": errorMessage = "Invalid email domain. Must be .com, .in, or .edu."; break;
+                    case "invalidfacultyusername": errorMessage = "Faculty username cannot be purely numeric."; break;
+                    case "dberror": errorMessage = "A server error occurred. Please try again later."; break;
+                }
+                switchToRegister();
+            } else if (forgotStatus) {
+                errorMessage = "Password reset failed!";
+                // Add specific forgot password reasons if your servlet provides them
+                showForgotPasswordForm();
+            }
+            showMessage('error', errorMessage);
+        } else if (regStatus === "success") {
+            showMessage('success', 'Registration successful! You can now log in.');
+        }
+
+        // --- Dark Mode ---
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const darkModeIcon = document.getElementById('darkModeIcon');
+        const body = document.body;
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (savedTheme === 'dark' || (savedTheme === null && prefersDark)) {
+            body.classList.add('dark-mode');
+            if (darkModeIcon) darkModeIcon.textContent = 'wb_sunny';
+        } else {
+            if (darkModeIcon) darkModeIcon.textContent = 'brightness_2';
+        }
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
+                darkModeIcon.textContent = body.classList.contains('dark-mode') ? 'wb_sunny' : 'brightness_2';
+            });
+        }
+
+        // Initial setup
+        setRole('faculty');
+        setCardHeight(loginCard);
+    });
 </script>
 <div class="fixed-action-btn">
     <a class="btn-floating btn-large grey darken-3" id="darkModeToggle">

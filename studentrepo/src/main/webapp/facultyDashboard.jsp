@@ -15,6 +15,7 @@
 	<link rel="stylesheet" href="<%= request.getContextPath() %>/css/sidebar.css" />
 
    <script>
+   
     window.currentFacultyId = "<c:out value='${sessionScope.user.id}'/>";
     window.allProgramsData = JSON.parse('<c:out value="${requestScope.allProgramsJson}" escapeXml="false" default="[]" />');
     window.assignedProgramIdsData = JSON.parse('<c:out value="${requestScope.assignedProgramIdsJson}" escapeXml="false" default="[]" />');
@@ -96,11 +97,11 @@
                     </a>
                 </li>
                 <li class="nav-link">
-                    <a href="javascript:void(0);">
-                        <i class='bx bx-user icon'></i>
-                        <span class="text nav-text">Profile</span>
-                    </a>
-                </li>
+    				<a href="javascript:void(0);" id="profileNavLink"> <!-- ADDED ID HERE -->
+        				<i class='bx bx-user icon'></i>
+       					<span class="text nav-text">Profile</span>
+    				</a>
+				</li>
             </ul>
         </div>
 

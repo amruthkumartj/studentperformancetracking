@@ -1,31 +1,33 @@
 // src/main/java/com/portal/Student.java
 package com.portal;
 
-public class Student extends User { // Assuming Student extends User for ID and possibly username
+// REMOVE 'extends User' - Student no longer inherits from User
+// public class Student extends User { // Assuming Student extends User for ID and possibly username
+public class Student implements java.io.Serializable { // Implement Serializable as good practice for DTOs
 
     private int studentId;
+    private int userId; // NEW: Foreign key to link to the User table
     private String fullName;
     private int programId;
     private String programName; // To display program name directly
     private int semester;
-    private String phone; // <--- ADD THIS FIELD
-    private String email; // <--- ADD THIS FIELD
+    private String phone;
+    private String email; // Keep this field if student-specific email is needed, otherwise remove if User.email is sufficient
 
     // Constructors
     public Student() {
-        super(); // Call the default constructor of the superclass (User)
+        // No super() call needed as it no longer extends User
     }
 
-    public Student(int studentId, String fullName, int programId, int semester, String phone, String email) {
-        // You might set the userId/username from parent if student IS a user
-        // For simplicity, assuming studentId maps to userId if extending User.
-        super(studentId, null, "STUDENT", true); // Example: assuming student is always approved, and username might be null or set later
+    // Updated constructor to include userId
+    public Student(int studentId, int userId, String fullName, int programId, int semester, String phone, String email) {
         this.studentId = studentId;
+        this.userId = userId; // Initialize userId
         this.fullName = fullName;
         this.programId = programId;
         this.semester = semester;
-        this.phone = phone; // Initialize phone
-        this.email = email; // Initialize email
+        this.phone = phone;
+        this.email = email;
     }
 
     // Getters and Setters for Student-specific properties
@@ -35,7 +37,15 @@ public class Student extends User { // Assuming Student extends User for ID and 
 
     public void setStudentId(int studentId) {
         this.studentId = studentId;
-        super.setId(studentId); // Assuming studentId is also the user_id if Student extends User
+    }
+
+    // NEW: Getter and Setter for userId
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getFullName() {
@@ -70,7 +80,6 @@ public class Student extends User { // Assuming Student extends User for ID and 
         this.semester = semester;
     }
 
-    // <--- ADD THESE GETTER AND SETTER METHODS FOR PHONE
     public String getPhone() {
         return phone;
     }
@@ -79,7 +88,6 @@ public class Student extends User { // Assuming Student extends User for ID and 
         this.phone = phone;
     }
 
-    // <--- ADD THESE GETTER AND SETTER METHODS FOR EMAIL
     public String getEmail() {
         return email;
     }
@@ -88,11 +96,11 @@ public class Student extends User { // Assuming Student extends User for ID and 
         this.email = email;
     }
 
-    // You may also want to override toString() for easy debugging
     @Override
     public String toString() {
         return "Student{" +
                "studentId=" + studentId +
+               ", userId=" + userId + // Include userId in toString
                ", fullName='" + fullName + '\'' +
                ", programId=" + programId +
                ", programName='" + programName + '\'' +

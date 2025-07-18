@@ -329,7 +329,44 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+	const profileNavLink = qs('#profileNavLink'); // Get the navigation link by its new ID
+	    const profileSection = qs('#profileSection'); // Get the profile content section
+	    const profileFacultyId = qs('#profileFacultyId');
+	    const profileFacultyName = qs('#profileFacultyName');
+	    const profileFacultyEmail = qs('#profileFacultyEmail');
 
+	    // Make sure 'profileSection' is included in your 'topPanels' array
+	    // (This should already be done if you used the previous full code, but double-check)
+	    // var topPanels = [dashSection, studentSection, attendanceSection, marksSection, profileSection];
+
+
+	// Add this event listener block along with other navigation link handlers:
+	// For example, after the 'if (messagesLink) { ... }' block.
+
+	    if (profileNavLink) {
+	        profileNavLink.addEventListener('click', function(e) {
+	            e.preventDefault(); // Prevent default link behavior (page reload)
+	            showOnly(profileSection); // Call the showOnly function to display the profile section
+
+	            // Populate profile details from window variables (set in JSP)
+	            if (profileFacultyId && window.currentFacultyId) {
+	                profileFacultyId.textContent = window.currentFacultyId;
+	            }
+	            if (profileFacultyName && window.currentFacultyName) {
+	                profileFacultyName.textContent = window.currentFacultyName;
+	            }
+	            if (profileFacultyEmail && window.currentFacultyEmail) {
+	                profileFacultyEmail.textContent = window.currentFacultyEmail;
+	            }
+
+	            // Close sidebar on mobile after clicking a navigation link
+	            if (window.innerWidth <= 768) {
+	                sidebar.classList.add('close');
+	                sidebar.classList.remove('open');
+	                sidebarOverlay.style.display = 'none'; // Hide overlay if you have one
+	            }
+	        });
+	    }
     /* ───────── DARK‑MODE TOGGLE ───────── */
     var modeSwitch = qs('.toggle-switch');
     var modeText = qs('.mode-text');
