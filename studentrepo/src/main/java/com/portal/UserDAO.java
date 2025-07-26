@@ -740,7 +740,38 @@ public class UserDAO {
         return studentPerformance;
     }
 
-   
+ // In com/portal/UserDAO.java
+
+    public List<Student> searchStudentsByName(String searchTerm) throws SQLException {
+        List<Student> students = new ArrayList<>();
+        // Use LIKE for partial name matching
+        String sql = "SELECT s.student_id, s.student_name, s.program_id, p.program_name, s.sem, s.phone, s.email " +
+                     "FROM students s JOIN programs p ON s.program_id = p.program_id " +
+                     "WHERE s.student_name LIKE ? ORDER BY s.student_name ASC LIMIT 10"; // Limit to 10 results
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, "%" + searchTerm + "%"); // Wildcards for partial search
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Student student = new Student();
+                    student.setStudentId(rs.getInt("student_id"));
+                    student.setFullName(rs.getString("student_name"));
+                    student.setProgramId(rs.getInt("program_id"));
+                    student.setProgramName(rs.getString("program_name"));
+                    student.setSemester(rs.getInt("sem"));
+                    student.setPhone(rs.getString("phone"));
+                    student.setEmail(rs.getString("email"));
+                    students.add(student);
+                }
+            }
+        }
+        return students;
+    }
+    
+    
     public boolean addStudent(int studentId, String name, int programId, int sem, String phone, String email)
             throws SQLException {
         Connection conn = null;

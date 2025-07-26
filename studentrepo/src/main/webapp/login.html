@@ -95,7 +95,7 @@ html, body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-image: url('https://upload.wikimedia.org/wikipedia/commons/d/d8/NHCE_Campus.jpg');
+    background-image: url('NHCE_Campus.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -835,6 +835,14 @@ body.dark-mode #customMessageContent.info button { background-color: var(--outli
         margin-top: 10px;
         margin-bottom: 15px;
     }
+    /* --- Disable Mobile Tap Highlight --- */
+a,
+button,
+.segment-start,
+.segment-end,
+.toggle-pw {
+    -webkit-tap-highlight-color: transparent;
+}
     .top-left-logo {
         top: 10px;
         left: 10px;

@@ -109,6 +109,16 @@
             h2 { font-size: 1.5rem; }
             .selection-controls { grid-template-columns: 1fr; }
         }
+        /* Container for the BI-style chart */
+.chart-container {
+    max-width: 900px; /* Controls the width of the chart */
+    margin: 30px auto; /* Centers the chart container */
+    padding: 25px;
+    background-color: var(--sidebar-color, #fff); /* Uses your theme color */
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+    border: 1px solid var(--border-color, #eee);
+}
     </style>
 </head>
 <body>
@@ -336,37 +346,154 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const renderStudentChart = (student, examType) => {
+        // --- Create a styled container for the canvas ---
+        const chartWrapper = document.createElement('div');
+        chartWrapper.className = 'chart-container'; // Apply the CSS class
         const canvas = document.createElement('canvas');
-        performanceDisplay.appendChild(canvas);
+        chartWrapper.appendChild(canvas);
+        performanceDisplay.appendChild(chartWrapper);
+
+        // --- Modern Color Palette ---
+        const CHART_COLORS = {
+            ia1: 'rgba(88, 86, 214, 0.8)',  // Indigo
+            ia2: 'rgba(255, 69, 58, 0.8)',   // Red
+            cie: 'rgba(48, 209, 88, 0.8)',   // Green
+            see: 'rgba(0, 122, 255, 0.8)',   // Blue
+            attendanceLine: 'rgba(255, 159, 10, 1)', // Orange
+            attendanceBg: 'rgba(255, 159, 10, 0.2)',
+            grid: 'rgba(142, 142, 147, 0.2)' // Faint Gray for grid lines
+        };
 
         const labels = student.coursePerformances.map(c => `${c.courseCode} (${c.subjectName})`);
         const attendance = student.coursePerformances.map(c => c.attendancePercentage);
-        let chartTitle = `Performance Analytics for ${student.studentName}`;
         let datasets = [];
+        
+        // --- Dynamic Y-Axis for Marks ---
+        let yAxisMax = 100;
+        let yAxisTitle = 'Marks';
 
         if (examType === "Internal Assessment 1") {
-            datasets.push({ label: 'IA 1 Marks (out of 50)', data: student.coursePerformances.map(c => c.ia1Marks), backgroundColor: 'rgba(106, 90, 205, 0.7)' });
+            yAxisMax = 50;
+            yAxisTitle = 'IA 1 Marks (out of 50)';
+            datasets.push({ 
+                label: 'IA 1 Marks', 
+                data: student.coursePerformances.map(c => c.ia1Marks), 
+                backgroundColor: CHART_COLORS.ia1,
+                borderRadius: 6
+            });
         } else if (examType === "Internal Assessment 2") {
-            datasets.push({ label: 'IA 2 Marks (out of 50)', data: student.coursePerformances.map(c => c.ia2Marks), backgroundColor: 'rgba(255, 99, 132, 0.7)' });
+            yAxisMax = 50;
+            yAxisTitle = 'IA 2 Marks (out of 50)';
+            datasets.push({ 
+                label: 'IA 2 Marks', 
+                data: student.coursePerformances.map(c => c.ia2Marks), 
+                backgroundColor: CHART_COLORS.ia2,
+                borderRadius: 6
+            });
         } else if (examType === "SEE") {
-            datasets.push({ label: 'CIE Marks (out of 50)', data: student.coursePerformances.map(c => c.combinedCieMarks), backgroundColor: 'rgba(106, 90, 205, 0.7)' });
-            datasets.push({ label: 'SEE Marks (out of 100)', data: student.coursePerformances.map(c => c.seeMarks), backgroundColor: 'rgba(40, 167, 69, 0.7)' });
+            yAxisMax = 100;
+            yAxisTitle = 'Marks';
+            datasets.push({ 
+                label: 'CIE Marks (out of 50)', 
+                data: student.coursePerformances.map(c => c.combinedCieMarks), 
+                backgroundColor: CHART_COLORS.cie,
+                borderRadius: 4
+            });
+            datasets.push({ 
+                label: 'SEE Marks (out of 100)', 
+                data: student.coursePerformances.map(c => c.seeMarks), 
+                backgroundColor: CHART_COLORS.see,
+                borderRadius: 4
+            });
         }
 
+        // Attendance Line Chart Dataset
         datasets.push({ 
-            type: 'line', label: 'Attendance %', data: attendance,
-            borderColor: 'rgba(255, 159, 64, 1)', backgroundColor: 'rgba(255, 159, 64, 0.2)',
-            yAxisID: 'y1', tension: 0.3
+            type: 'line', 
+            label: 'Attendance %', 
+            data: attendance,
+            borderColor: CHART_COLORS.attendanceLine, 
+            backgroundColor: CHART_COLORS.attendanceBg,
+            yAxisID: 'y1', 
+            tension: 0.4,
+            pointBackgroundColor: CHART_COLORS.attendanceLine,
+            fill: true
         });
 
+        if(studentCharts['main']) studentCharts['main'].destroy();
+
         studentCharts['main'] = new Chart(canvas.getContext('2d'), {
-            type: 'bar', data: { labels, datasets },
+            type: 'bar', 
+            data: { labels, datasets },
             options: {
+                // --- BI-style Enhancements ---
                 responsive: true,
-                plugins: { legend: { position: 'top' }, title: { display: true, text: `Performance for ${student.studentName} - ${examType}`, font: { size: 16 } } },
+                maintainAspectRatio: true,
+                aspectRatio: 2, // Adjust aspect ratio for better visuals
+                interaction: {
+                    mode: 'point',  // Changed from 'index'
+                    intersect: true, // Changed from false
+                
+                },
+                plugins: {
+                    legend: { 
+                        position: 'top',
+                        align: 'end',
+                        labels: {
+                            usePointStyle: true,
+                            boxWidth: 8,
+                            padding: 20,
+                            font: { size: 13, family: "'Poppins', sans-serif" }
+                        }
+                    },
+                    title: { 
+                        display: true, 
+                        text: `Performance Analytics for ${student.studentName} - ${examType}`, 
+                        align: 'start',
+                        padding: { top: 10, bottom: 25 },
+                        font: { size: 18, weight: '600', family: "'Poppins', sans-serif" }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: { size: 14, weight: 'bold' },
+                        bodyFont: { size: 12 },
+                        padding: 10,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) label += ': ';
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y;
+                                    if (context.dataset.type === 'line') label += '%';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
                 scales: {
-                    y: { beginAtZero: true, max: 100, title: { display: true, text: 'Marks' } },
-                    y1: { type: 'linear', display: true, position: 'right', beginAtZero: true, max: 100, title: { display: true, text: 'Attendance (%)' }, grid: { drawOnChartArea: false } }
+                    y: { 
+                        beginAtZero: true, 
+                        max: yAxisMax, 
+                        title: { display: true, text: yAxisTitle },
+                        grid: { color: CHART_COLORS.grid, drawBorder: false },
+                        ticks: { font: { family: "'Poppins', sans-serif" } }
+                    },
+                    y1: { 
+                        type: 'linear', 
+                        display: true, 
+                        position: 'right', 
+                        beginAtZero: true, 
+                        max: 100, 
+                        title: { display: true, text: 'Attendance (%)' }, 
+                        grid: { drawOnChartArea: false }, // No grid lines for the secondary axis
+                        ticks: { font: { family: "'Poppins', sans-serif" } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { family: "'Poppins', sans-serif" } }
+                    }
                 }
             }
         });

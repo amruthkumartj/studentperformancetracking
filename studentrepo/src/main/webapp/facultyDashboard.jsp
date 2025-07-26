@@ -9,41 +9,46 @@
     <title>Faculty Dashboard</title>
 
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 	<link rel="stylesheet" href="<%= request.getContextPath() %>/css/sidebar.css" />
 
    <script>
-   
+    // Pass data from JSP to JavaScript
     window.currentFacultyId = "<c:out value='${sessionScope.user.id}'/>";
     window.allProgramsData = JSON.parse('<c:out value="${requestScope.allProgramsJson}" escapeXml="false" default="[]" />');
     window.assignedProgramIdsData = JSON.parse('<c:out value="${requestScope.assignedProgramIdsJson}" escapeXml="false" default="[]" />');
-</script>
-<script src="<%= request.getContextPath() %>/js/faculty.js"></script>
+   </script>
 
 </head>
-
 <body>
 
 <nav class="sidebar close">
     <header>
-        <div class="image-text">
-            <span class="image"></span>
-            <div class="text logo-text">
-                <span class="profession">Menu</span>
-            </div>
+    <div class="image-text">
+        <span class="image">
+            <i class='bx bxs-school icon'></i>
+        </span>
+
+        <div class="text logo-text">
+            <span class="name">NHCE</span>
+            <span class="profession">Faculty Portal</span>
         </div>
-        <br/>
-        <i class='bx bx-chevron-right toggle'></i>
-    </header>
+    </div>
+
+    <i class='bx bx-chevron-right toggle'></i>
+</header>
 
     <div class="menu-bar">
         <div class="menu">
+            <!-- Main Menu Links -->
             <ul class="menu-links">
-                <li class="search-box">
-                    <i class='bx bx-search icon'></i>
-                    <input type="text" placeholder="Search..." />
+                <!-- NEW: Search button that opens the modal -->
+                <li class="nav-link">
+                    <a href="#" id="openSearchModalBtn">
+                        <i class='bx bx-search icon'></i>
+                        <span class="text nav-text">Search</span>
+                    </a>
                 </li>
                 <li class="nav-link">
                     <a href="javascript:void(0);" id="dashboardNavLink" >
@@ -97,7 +102,7 @@
                     </a>
                 </li>
                 <li class="nav-link">
-    				<a href="javascript:void(0);" id="profileNavLink"> <!-- ADDED ID HERE -->
+    				<a href="javascript:void(0);" id="profileNavLink">
         				<i class='bx bx-user icon'></i>
        					<span class="text nav-text">Profile</span>
     				</a>
@@ -105,11 +110,13 @@
             </ul>
         </div>
 
+        <!-- Correctly placed bottom content -->
         <div class="bottom-content">
-            <ul>
-                <li>
+            <ul class="menu-links">
+                <li class="">
                     <a href="login.html">
                         <i class='bx bx-log-out icon'></i>
+                        
                         <span class="text nav-text">Logout</span>
                     </a>
                 </li>
@@ -126,8 +133,8 @@
             </ul>
         </div>
     </div>
-    <div class="sidebar-overlay"></div>
 </nav>
+
 <section class="home">
         <i class='bx bx-menu mobile-toggle'></i>
 
@@ -137,6 +144,7 @@
     <div class="main-content">
         <div id="dashboardSection">
             <h2 class="text page-title">Welcome, <c:out value="${sessionScope.user.username}" />!</h2>
+
 
             <div class="dashboard-widgets">
                 <div class="card">
@@ -210,7 +218,7 @@
             <div class="feature-card" onclick="showStudentFeature('search')">🔍 Search&nbsp;/&nbsp;Filter</div>
         </div>
 
-        <div id="addStudentCard" class="form-card" style="display:none;">
+         <div id="addStudentCard" class="form-card" style="display:none;">
             <h3 style="color:#007bff;margin-bottom:20px;">Add New Student</h3>
 
             <div id="addStudentMessage" style="display:none;"></div>
@@ -441,17 +449,83 @@
       <section class="home-section" id="profileSection" style="display: none;">
     <div class="home-content">
         <h2 class="section-title">Faculty Profile</h2>
-        <div class="profile-card">
-            <div class="avatar-container">
-                <i class='bx bxs-user-circle avatar-icon'></i> </div>
-            <div class="profile-details">
-                <p><strong>Faculty ID:</strong> <span id="profileFacultyId"></span></p>
-                <p><strong>Name:</strong> <span id="profileFacultyName"></span></p>
-                <p><strong>Email:</strong> <span id="profileFacultyEmail"></span></p>
+
+        <div class="profile-header-card">
+            <div class="profile-header-avatar">
+                <i class='bx bxs-user-circle'></i>
+            </div>
+            <div class="profile-header-info">
+                <h3 id="profileFacultyName" class="faculty-name"></h3>
+                <p class="faculty-id-display">Faculty ID: <span id="profileFacultyId"></span></p>
+            </div>
+            <div class="profile-header-action">
+                <button class="btn-edit-profile">
+                    <i class='bx bx-pencil'></i> Edit Profile
+                </button>
             </div>
         </div>
+
+        <div class="profile-widget-grid">
+
+            <div class="profile-widget">
+                <h4 class="widget-title">Contact Information</h4>
+                <div class="widget-content">
+                    <div class="info-row">
+                        <i class='bx bx-envelope'></i>
+                        <span id="profileFacultyEmail"></span>
+                    </div>
+                    <div class="info-row">
+                        <i class='bx bx-phone'></i>
+                        <span>+91 98765 43210 (Example)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-widget">
+                <h4 class="widget-title">Role & Permissions</h4>
+                <div class="widget-content">
+                    <div class="info-row">
+                        <i class='bx bx-shield-quarter'></i>
+                        <span>Faculty Member</span>
+                    </div>
+                    <div class="info-row">
+                        <i class='bx bx-time-five'></i>
+                        <span>Joined: 20 July 2025</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-widget">
+                <h4 class="widget-title">Account Security</h4>
+                <div class="widget-content">
+                   <button class="btn-secondary">
+                       <i class='bx bx-lock-alt'></i> Change Password
+                   </button>
+                </div>
+            </div>
+
         </div>
+    </div>
 </section>
+
+<div id="searchModal" class="search-modal-overlay" style="display: none;">
+    <div class="search-modal-panel">
+        <div class="search-modal-input-wrapper">
+            <i class='bx bx-search'></i>
+            <input type="text" id="modalSearchInput" placeholder="Search for students or commands (e.g., 'add student')...">
+            <i class='bx bx-x' id="modalClearBtn"></i>
+        </div>
+        <div id="modalSearchResults" class="search-modal-results">
+            <!-- Search results will be dynamically inserted here -->
+        </div>
+    </div>
+</div>
+
+<!-- Load JavaScript at the end of the body -->
+
+<script src="<%= request.getContextPath() %>/js/facultymain.js"></script>
+<script src="<%= request.getContextPath() %>/js/facultystud.js"></script>
+
 
     </div>
 </div>

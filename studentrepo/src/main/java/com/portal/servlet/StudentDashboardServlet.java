@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.portal.DBUtil;
 import com.portal.User;
 
-@WebServlet("/student/dashboard")
+@WebServlet("/studentdashboard")
 public class StudentDashboardServlet extends HttpServlet {
 
     @Override
