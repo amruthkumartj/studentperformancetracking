@@ -40,15 +40,15 @@ public class GetStudentsServlet extends HttpServlet {
 
  // In com/portal/servlet/GetStudentsServlet.java
 
+ // In: GetStudentsServlet.java
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json; charset=UTF-8");
         PrintWriter out = response.getWriter();
         JsonObject jsonResponse = new JsonObject();
-        HttpSession session = request.getSession(false);
-
-        // Authentication Check
-        if (session == null || session.getAttribute("user") == null) {
+        
+        // It's good practice to ensure the user is authenticated
+        if (request.getSession(false) == null || request.getSession(false).getAttribute("user") == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             jsonResponse.addProperty("status", "error");
             jsonResponse.addProperty("message", "Unauthorized access.");
@@ -60,19 +60,26 @@ public class GetStudentsServlet extends HttpServlet {
             String requestBody = request.getReader().lines().collect(java.util.stream.Collectors.joining(System.lineSeparator()));
             JsonObject requestData = gson.fromJson(requestBody, JsonObject.class);
 
-            String searchTerm = null;
-            if (requestData != null && requestData.has("searchTerm")) {
-                searchTerm = requestData.get("searchTerm").getAsString();
-            }
-
-            UserDAO userDAO = new UserDAO();
             List<Student> students;
 
-            // If a search term is provided, filter students by name
-            if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-                students = userDAO.searchStudentsByName(searchTerm); // We will create this new DAO method
-            } else {
-                // Otherwise, get all students as before
+            // ✅ CORRECTED LOGIC
+            // First, check if the request is for taking attendance (has programId and semester)
+            if (requestData != null && requestData.has("programId") && requestData.has("semester")) {
+                int programId = requestData.get("programId").getAsInt();
+                int semester = requestData.get("semester").getAsInt();
+                
+                // Call a new DAO method to get filtered students
+                students = userDAO.getStudentsByProgramAndSemester(programId, semester);
+
+            } 
+            // Second, check if the request is for the search bar (has searchTerm)
+            else if (requestData != null && requestData.has("searchTerm")) {
+                String searchTerm = requestData.get("searchTerm").getAsString();
+                students = userDAO.searchStudentsByName(searchTerm);
+                
+            } 
+            // Fallback to getting all students if the request is empty
+            else {
                 students = userDAO.getAllStudents();
             }
 

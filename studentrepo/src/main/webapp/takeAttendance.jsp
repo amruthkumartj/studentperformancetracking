@@ -48,406 +48,428 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Take Attendance - <%= currentSession.getSubjectName() %></title>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/> <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/> 
+    <style>
+       @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-        :root {
-            --primary-color: #6a5acd; /* SlateBlue */
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
-            --light-color: #f8f9fa;
-            --dark-color: #343a40;
-            --text-color: #495057;
-            --bg-color: #eef5f9;
-            --card-bg-color: rgba(255, 255, 255, 0.6);
-            --border-radius: 12px;
-            --box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-            --backdrop-filter: blur(10px);
-        }
+:root {
+    --primary-color: #6a5acd; /* SlateBlue */
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --text-color: #495057;
+    --bg-color: #eef5f9;
+    --card-bg-color: rgba(255, 255, 255, 0.6);
+    --border-radius: 12px;
+    --box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+    --backdrop-filter: blur(10px);
+}
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 20px;
-            color: var(--text-color);
-        }
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+    padding: 20px;
+    color: var(--text-color);
+}
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 
-        /* --- Header --- */
-        .header-card {
-            background: var(--card-bg-color);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            box-shadow: var(--box-shadow);
-            backdrop-filter: var(--backdrop-filter);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
+/* --- Header --- */
+.header-card {
+    background: var(--card-bg-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--box-shadow);
+    backdrop-filter: var(--backdrop-filter);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
 
-        .header-card h2 {
-            margin: 0;
-            color: var(--primary-color);
-            font-size: 1.8em;
-        }
+.header-card h2 {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 1.8em;
+}
 
-        .timer-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        #countdownTimer {
-            background-color: var(--success-color);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-size: 1.5em;
-            font-weight: 600;
-            min-width: 100px;
-            text-align: center;
-            transition: background-color 0.5s ease;
-        }
+.timer-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
 
-        #countdownTimer.expiring { background-color: var(--warning-color); }
-        #countdownTimer.expired { background-color: var(--danger-color); }
+#countdownTimer {
+    background-color: var(--success-color);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 1.5em;
+    font-weight: 600;
+    min-width: 100px;
+    text-align: center;
+    transition: background-color 0.5s ease;
+}
 
-        /* --- Session Details --- */
-        .session-details-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        
-        .detail-card {
-            background: var(--card-bg-color);
-            border-radius: var(--border-radius);
-            padding: 15px;
-            box-shadow: var(--box-shadow);
-            backdrop-filter: var(--backdrop-filter);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-        }
+#countdownTimer.expiring { background-color: var(--warning-color); }
+#countdownTimer.expired { background-color: var(--danger-color); }
 
-        .detail-card strong {
-            display: block;
-            color: var(--primary-color);
-            margin-bottom: 5px;
-        }
+/* --- Session Details --- */
+.session-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
 
-        /* --- Attendance Actions & Filters --- */
-        .controls-card {
-             background: var(--card-bg-color);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            box-shadow: var(--box-shadow);
-            backdrop-filter: var(--backdrop-filter);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-        }
+.detail-card {
+    background: var(--card-bg-color);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    box-shadow: var(--box-shadow);
+    backdrop-filter: var(--backdrop-filter);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
 
-        .action-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+.detail-card strong {
+    display: block;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
 
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95em;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
+/* --- Attendance Actions & Filters --- */
+.controls-card {
+    background: var(--card-bg-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--box-shadow);
+    backdrop-filter: var(--backdrop-filter);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
 
-        .btn-present { background-color: var(--success-color); color: white; }
-        .btn-present:hover { background-color: #218838; transform: translateY(-2px); }
-        .btn-absent { background-color: var(--warning-color); color: var(--dark-color); }
-        .btn-absent:hover { background-color: #e0a800; transform: translateY(-2px); }
-        .btn-cancel { background-color: var(--danger-color); color: white; }
-        .btn-cancel:hover { background-color: #c82333; transform: translateY(-2px); }
-        .btn-filter { background-color: var(--primary-color); color: white; }
-        .btn-filter:hover { background-color: #5948b1; transform: translateY(-2px); }
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
 
-        .filter-section {
-            display: none; /* Initially hidden */
-            margin-top: 20px;
-        }
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95em;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
 
-        .filter-section input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ced4da;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 1em;
-        }
-        
-        /* --- Student List Table --- */
-        .student-list-card {
-             background: var(--card-bg-color);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            box-shadow: var(--box-shadow);
-            backdrop-filter: var(--backdrop-filter);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            overflow: hidden;
-        }
-        
-        .table-container {
-            width: 100%;
-            max-height: 500px;
-            overflow-y: auto;
-        }
+.btn-present { background-color: var(--success-color); color: white; }
+.btn-present:hover { background-color: #218838; transform: translateY(-2px); }
+.btn-absent { background-color: var(--warning-color); color: var(--dark-color); }
+.btn-absent:hover { background-color: #e0a800; transform: translateY(-2px); }
+.btn-cancel { background-color: var(--danger-color); color: white; }
+.btn-cancel:hover { background-color: #c82333; transform: translateY(-2px); }
+.btn-filter { background-color: var(--primary-color); color: white; }
+.btn-filter:hover { background-color: #5948b1; transform: translateY(-2px); }
 
-        .attendance-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+.filter-section {
+    display: none; /* Initially hidden */
+    margin-top: 20px;
+}
 
-        .attendance-table th, .attendance-table td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
+.filter-section input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1em;
+}
 
-        .attendance-table thead th {
-            position: sticky;
-            top: 0;
-            background: rgba(106, 90, 205, 0.8); /* Semi-transparent primary color */
-            backdrop-filter: blur(5px);
-            color: white;
-            font-weight: 600;
-        }
+/* --- Student List Table --- */
+.student-list-card {
+    background: var(--card-bg-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--box-shadow);
+    backdrop-filter: var(--backdrop-filter);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    overflow: hidden;
+}
 
-        .attendance-table tbody tr {
-            transition: background-color 0.3s ease;
-        }
-        
-        .attendance-table tbody tr:hover {
-            background-color: rgba(106, 90, 205, 0.1);
-        }
+.table-container {
+    width: 100%;
+    max-height: 500px;
+    overflow-y: auto;
+    /* --- SCROLLBAR STYLES (FIREFOX) --- */
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) #eef5f9;
+}
 
-        /* iOS-style switch */
-        .ios-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 28px;
-        }
-        .ios-switch input { display: none; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 28px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 22px; width: 22px;
-            left: 3px; bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider { background-color: var(--success-color); }
-        input:checked + .slider:before { transform: translateX(22px); }
+/* --- SCROLLBAR STYLES (CHROME, SAFARI) --- */
+.table-container::-webkit-scrollbar {
+    width: 8px;
+}
 
-        /* --- Floating Action Button (FAB) for Submit --- */
-        .fab-submit {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            box-shadow: 0 6px 20px rgba(106, 90, 205, 0.4);
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
+.table-container::-webkit-scrollbar-track {
+    background: #eef5f9;
+    border-radius: 10px;
+}
 
-        .fab-submit:hover {
-            transform: scale(1.1);
-            background-color: #5948b1;
-        }
-        
-        /* Basic Message Box */
-        #messageBox {
-            display: none; /* Controlled by JS .show class */
-            padding: 15px;
-            border-radius: var(--border-radius);
-            font-weight: bold;
-            text-align: center;
-            box-shadow: var(--box-shadow);
-            color: white;
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2000;
-            opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        #messageBox.show {
-            display: block;
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-        #messageBox.success { background-color: var(--success-color); }
-        #messageBox.error { background-color: var(--danger-color); }
-        #messageBox.info { background-color: var(--primary-color); }
+.table-container::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 10px;
+    border: 2px solid #eef5f9;
+}
 
-        /* --- Custom Message OVERLAY Styles (for critical alerts) --- */
-        #customMessageOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4); /* This creates the dark, translucent background */
-            backdrop-filter: blur(8px);
-            display: none; /* Initially hide it completely from layout */
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
+.table-container::-webkit-scrollbar-thumb:hover {
+    background-color: #5948b1;
+}
 
-        #customMessageOverlay.show {
-            display: flex;
-            opacity: 1;
-            visibility: visible;
-        }
 
-        /* --- Styles for the ACTUAL MESSAGE BOX INSIDE THE OVERLAY --- */
-        #customMessageContent {
-            background-color: white; /* Make the background white */
-            padding: 30px;
-            border-radius: var(--border-radius); /* Use your existing border-radius variable */
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
-            max-width: 400px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            opacity: 0; /* For animation */
-            transform: translateY(-20px); /* For animation */
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            border: 1px solid rgba(0, 0, 0, 0.1); /* Add a subtle border */
-        }
+.attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-        #customMessageContent.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
+.attendance-table th, .attendance-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
 
-        #customMessageContent .material-icons {
-            font-size: 60px;
-            margin-bottom: 10px;
-        }
+.attendance-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    z-index: 1; /* Lifts header layer */
+}
 
-        #customMessageContent p {
-            font-size: 1.2em;
-            font-weight: 500;
-            color: var(--text-color); /* Inherit default text color */
-            margin: 0;
-        }
+.attendance-table tbody tr {
+    transition: background-color 0.3s ease;
+}
 
-        /* Type-specific styling for the content box (icon and text color) */
-        #customMessageContent.success .material-icons,
-        #customMessageContent.success p {
-            color: var(--success-color); /* Green for success */
-        }
+.attendance-table tbody tr:hover {
+    background-color: rgba(106, 90, 205, 0.1);
+}
 
-        #customMessageContent.error .material-icons,
-        #customMessageContent.error p {
-            color: var(--danger-color); /* Red for error */
-        }
+/* --- iOS-style switch --- */
+.ios-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+.ios-switch input { display: none; }
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 28px;
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px; width: 22px;
+    left: 3px; bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+input:checked + .slider { background-color: var(--success-color); }
+input:checked + .slider:before { transform: translateX(22px); }
 
-        #customMessageContent.info .material-icons,
-        #customMessageContent.info p {
-            color: var(--primary-color); /* Primary color for info */
-        }
+/* --- Floating Action Button (FAB) for Submit --- */
+.fab-submit {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 6px 20px rgba(106, 90, 205, 0.4);
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
 
-        /* Button group for OK/Cancel */
-        .message-buttons {
-            display: flex;
-            justify-content: center; /* Center buttons if there's space */
-            gap: 10px; /* Space between buttons */
-            margin-top: 15px; /* Space from the text above */
-            width: 100%; /* Take full width of parent */
-            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
-        }
+.fab-submit:hover {
+    transform: scale(1.1);
+    background-color: #5948b1;
+}
 
-        #customMessageOkBtn, #customMessageCancelBtn {
-            padding: 10px 25px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex-grow: 1; /* Allow buttons to grow to fill space */
-            min-width: 120px; /* Ensure a minimum width */
-        }
+/* --- Basic Message Box --- */
+#messageBox {
+    display: none;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    font-weight: bold;
+    text-align: center;
+    box-shadow: var(--box-shadow);
+    color: white;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+#messageBox.show {
+    display: block;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+#messageBox.success { background-color: var(--success-color); }
+#messageBox.error { background-color: var(--danger-color); }
+#messageBox.info { background-color: var(--primary-color); }
 
-        #customMessageOkBtn {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        #customMessageOkBtn:hover {
-            background-color: #5948b1;
-        }
+/* --- Custom Message OVERLAY Styles --- */
+#customMessageOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
 
-        #customMessageCancelBtn {
-            background-color: #ccc; /* Default grey for cancel */
-            color: var(--dark-color);
-        }
-        #customMessageCancelBtn:hover {
-            background-color: #bbb;
-        }
+#customMessageOverlay.show {
+    display: flex;
+    opacity: 1;
+    visibility: visible;
+}
 
-        /* Adjust button colors based on message type if desired for OK button */
-        #customMessageContent.error #customMessageOkBtn {
-            background-color: var(--danger-color);
-        }
-        #customMessageContent.error #customMessageOkBtn:hover {
-            background-color: #c82333;
-        }
-        #customMessageContent.success #customMessageOkBtn {
-            background-color: var(--success-color);
-        }
-        #customMessageContent.success #customMessageOkBtn:hover {
-            background-color: #218838;
-        }
+#customMessageContent {
+    background-color: white;
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+#customMessageContent.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#customMessageContent .material-icons {
+    font-size: 60px;
+    margin-bottom: 10px;
+}
+
+#customMessageContent p {
+    font-size: 1.2em;
+    font-weight: 500;
+    color: var(--text-color);
+    margin: 0;
+}
+
+#customMessageContent.success .material-icons,
+#customMessageContent.success p {
+    color: var(--success-color);
+}
+
+#customMessageContent.error .material-icons,
+#customMessageContent.error p {
+    color: var(--danger-color);
+}
+
+#customMessageContent.info .material-icons,
+#customMessageContent.info p {
+    color: var(--primary-color);
+}
+
+/* --- Message Box Buttons --- */
+.message-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+#customMessageOkBtn, #customMessageCancelBtn {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-grow: 1;
+    min-width: 120px;
+}
+
+#customMessageOkBtn {
+    background-color: var(--primary-color);
+    color: white;
+}
+#customMessageOkBtn:hover {
+    background-color: #5948b1;
+}
+
+#customMessageCancelBtn {
+    background-color: #ccc;
+    color: var(--dark-color);
+}
+#customMessageCancelBtn:hover {
+    background-color: #bbb;
+}
+
+#customMessageContent.error #customMessageOkBtn {
+    background-color: var(--danger-color);
+}
+#customMessageContent.error #customMessageOkBtn:hover {
+    background-color: #c82333;
+}
+#customMessageContent.success #customMessageOkBtn {
+    background-color: var(--success-color);
+}
+#customMessageContent.success #customMessageOkBtn:hover {
+    background-color: #218838;
+}
 
     </style>
 </head>
@@ -827,15 +849,15 @@
     });
 
     // --- Fetch Students for the Session ---
-    async function fetchStudents() {
+// --- Fetch Students for the Session ---
+// REVISED FOR DEBUGGING
+async function fetchStudents() {
     if (!studentListTableBody) {
         console.error("Student list table body element not found!");
-        showMessage("Error: UI element for student list not found.", "error");
         return;
     }
-
     studentListTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:20px;">Loading students...</td></tr>';
-
+    
     try {
         const response = await fetch('GetStudentsServlet', {
             method: 'POST',
@@ -846,31 +868,48 @@
             })
         });
 
+        console.log("Response received from server:", response);
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        // Let's get the raw text first to see what it is
+        const responseText = await response.text();
+        console.log("Raw response text from server:", responseText);
 
-        const data = await response.json(); // Parse the JSON response
+        // Now, let's try to parse it
+        const data = JSON.parse(responseText);
+        console.log("Parsed JSON data:", data);
 
-        // FIX: Check if data.status is 'success' and data.students exists
-        if (data.status === 'success' && data.students) {
+        // Check for a nested array (assuming the key is 'students')
+        // **IMPORTANT**: If your key is different, change `data.students` here
+        if (data && Array.isArray(data.students)) { 
             studentsData = data.students.map(s => ({
                 studentId: s.studentId,
                 fullName: s.fullName,
-                attendanceStatus: 'P' // Default to Present
+                attendanceStatus: 'P' 
             }));
-            displayStudents(studentsData); // Pass the extracted students array
+            displayStudents(studentsData);
+        } else if (Array.isArray(data)) { // Fallback for raw array
+             studentsData = data.map(s => ({
+                studentId: s.studentId,
+                fullName: s.fullName,
+                attendanceStatus: 'P' 
+            }));
+            displayStudents(studentsData);
         } else {
-            // Handle cases where status is not success or students array is missing
-            studentListTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:20px;color:red;">Failed to load students: ' + (data.message || 'Unknown error') + '</td></tr>';
-            disableAllActions();
-            showMessage('Failed to load students for attendance.', 'error');
+            const serverMessage = data.message || 'Data is not an array or a recognized object.';
+            throw new Error(serverMessage);
         }
     } catch (error) {
-        console.error('Error fetching students:', error);
-        studentListTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:20px;color:red;">Network error or server unreachable. Failed to load students.</td></tr>';
+        // This will log the full error object, which is more helpful
+        console.error('An error occurred in fetchStudents:', error); 
+        
+        const errorMessage = 'Failed to load students: ' + (error.message || 'Unknown error');
+        studentListTableBody.innerHTML = `<tr><td colspan="3" style="text-align:center;padding:20px;color:red;">${errorMessage}</td></tr>`;
         disableAllActions();
-        showMessage('Network error loading students.', 'error');
+        showMessage('Failed to load students for attendance.', 'error');
     }
 }
     // --- Display Students in Table (now takes an array for filtering) ---

@@ -10,6 +10,7 @@ public class AttendanceRecord {
     private int studentId;
     private String attendanceStatus; // "P" or "A"
     private LocalDateTime markingTime; // Represents the exact timestamp of marking
+    private int enrollmentId;
 
     // --- NEW FIELDS ADDED FOR DISPLAY ---
     private String studentName; // To display student's name in the table
@@ -81,7 +82,14 @@ public class AttendanceRecord {
     public String getSubjectName() {
         return subjectName;
     }
+    
 
+
+
+   
+    public int getEnrollmentId() {
+        return enrollmentId;
+    }
     public void setSubjectName(String subjectName) {
         this.subjectName = subjectName;
     }

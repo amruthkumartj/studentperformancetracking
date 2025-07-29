@@ -989,7 +989,11 @@ function qs(selector) { return document.querySelector(selector); }
                     marksInput.type = 'number';
                     marksInput.className = 'form-control marks-input';
                     marksInput.min = '0';
-                    marksInput.max = '100';
+                    if (examType === "SEE (Semester End Examination)") {
+                        marksInput.max = '80';
+                    } else {
+                        marksInput.max = '50';
+                    }
                     marksInput.placeholder = 'Enter marks';
                     // Use marksObtained from DTO, set empty string for null
                     marksInput.value = student.marksObtained !== null ? student.marksObtained : ''; 
@@ -1057,9 +1061,9 @@ function qs(selector) { return document.querySelector(selector); }
 
                             if (value !== '') {
                                 const parsedMarks = parseFloat(value);
-                                if (isNaN(parsedMarks) || parsedMarks < 0 || parsedMarks > 100) {
-                                    marksInput.style.borderColor = 'var(--danger-color)';
-                                    showMessage(marksEntryMessage, `<i class="bx bx-error-circle"></i> Invalid marks for student ID ${student.studentId}. Marks must be between 0 and 100.`, false);
+                                const maxMarks = (examType === "SEE (Semester End Examination)") ? 80 : 50;
+                                if (isNaN(parsedMarks) || parsedMarks < 0 || parsedMarks > maxMarks) {
+                                    showMessage(marksEntryMessage, `<i class="bx bx-error-circle"></i> Invalid marks for student ID ${student.studentId}. Marks must be between 0 and \${maxMarks}.`, false);
                                     return;
                                 }
                                 marksToSave = parsedMarks;
@@ -1186,12 +1190,13 @@ function qs(selector) { return document.querySelector(selector); }
                     if (isNaN(marks) || marks < 0 || marks > 100) {
                         isValid = false;
                         marksInput.style.borderColor = 'var(--danger-color)'; // Highlight invalid input
-                        showMessage(marksEntryMessage, `<i class="bx bx-error-circle"></i> Invalid marks for student ID ${studentId}. Marks must be between 0 and 100.`, false);
-                        // Do not return here. Set isValid to false and let the loop continue
-                        // so all invalid inputs can be highlighted. The check below will prevent submission.
-                    } else {
-                        marksInput.style.borderColor = ''; // Reset border
-                    }
+                        const maxMarks = (examType === "SEE (Semester End Examination)") ? 80 : 50;
+                        if (isNaN(parsedMarks) || parsedMarks < 0 || parsedMarks > maxMarks) {
+                            showMessage(marksEntryMessage, `<i class="bx bx-error-circle"></i> Invalid marks for student ID ${student.studentId}. Marks must be between 0 and \${maxMarks}.`, false);
+                            } else {
+                            	marksInput.style.borderColor = ''; // Reset border
+                            }
+                    	}
                 }
 
                 // Push all entries for batch UPSERT/DELETE

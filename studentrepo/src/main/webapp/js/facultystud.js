@@ -584,18 +584,23 @@
 	            startAttendanceSessionBtn.disabled = true;
 	            if (cancelTakeAttendanceBtn) cancelTakeAttendanceBtn.disabled = true;
 
-	            var attendanceData = {
-	                courseId: selectedCourseId,
-	                topic: selectedTopic,
-	                facultyId: facultyId,
-	                clientDateTime: dateTime
-	            };
+				var attendanceData = {
+				    // ✅ ADD THESE TWO LINES
+				    programId: parseInt(progSel.value, 10),
+				    semester: parseInt(semSel.value, 10),
+				    
+				    // Your existing lines
+				    courseId: selectedCourseId,
+				    topic: selectedTopic,
+				    facultyId: facultyId,
+				    clientDateTime: dateTime
+				};
 
-	            fetch('StartAttendanceSessionServlet', {
-	                    method: 'POST',
-	                    headers: { 'Content-Type': 'application/json' },
-	                    body: JSON.stringify(attendanceData)
-	                })
+				fetch('StartAttendanceSessionServlet', {
+				    method: 'POST',
+				    headers: { 'Content-Type': 'application/json' },
+				    body: JSON.stringify(attendanceData)
+				})
 	                .then(function(response) {
 	                    if (!response.ok) {
 	                        return response.json().catch(function() {

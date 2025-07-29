@@ -1,70 +1,62 @@
 package com.portal.servlet;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.portal.DBUtil;
 import com.portal.User;
+import com.portal.UserDAO;
+import com.portal.StudentDashboardDTO;
 
 @WebServlet("/studentdashboard")
 public class StudentDashboardServlet extends HttpServlet {
+
+    private UserDAO userDAO;
+
+    @Override
+    public void init() {
+        userDAO = new UserDAO();
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        // 1. Authentication Check
         User u = (User) req.getSession().getAttribute("user");
         if (u == null || !"STUDENT".equals(u.getRole())) {
             resp.sendRedirect(req.getContextPath() + "/login.html");
             return;
         }
 
-        String sql = """
-            SELECT c.course_code, c.course_name,
-                   m.assessment, m.score, m.max_score,
-                   ROUND((m.score/m.max_score)*100,2) AS percent,
-                   att.present_days, att.total_days
-            FROM courses c
-            JOIN enrollments e ON e.course_id = c.course_id
-            LEFT JOIN (
-                 SELECT course_id, assessment, score, max_score
-                 FROM marks WHERE student_id = ?
-            ) m ON m.course_id = c.course_id
-            LEFT JOIN (
-                 SELECT course_id,
-                        SUM(status='PRESENT') AS present_days,
-                        COUNT(*) AS total_days
-                 FROM attendance
-                 WHERE student_id = ?
-                 GROUP BY course_id
-            ) att ON att.course_id = c.course_id
-            WHERE e.student_id = ?;
-        """;
+        try {
+            // 2. Fetch all dashboard data using the new, optimized DAO method
+            StudentDashboardDTO dashboardDTO = userDAO.getStudentDashboardInfo(u.getId());
+            
+            // Check if data was found for the student
+            if (dashboardDTO.getStudentName() == null) {
+                 // This can happen if a user with role STUDENT exists but has no entry in the students table
+                System.err.println("No student data found for user_id: " + u.getId());
+                // You might want to redirect to an error page or show a message
+                resp.sendRedirect(req.getContextPath() + "/login.html?error=nodata");
+                return;
+            }
 
-        try (Connection con = DBUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+            // 3. Set the single DTO object as a request attribute
+            req.setAttribute("dashboard", dashboardDTO);
 
-            ps.setInt(1, u.getId());
-            ps.setInt(2, u.getId());
-            ps.setInt(3, u.getId());
-            ResultSet rs = ps.executeQuery();
-
-            req.setAttribute("rs", rs);
+            // 4. Forward to the JSP page
             req.getRequestDispatcher("/studentDashboard.jsp").forward(req, resp);
 
         } catch (SQLException ex) {
-            throw new ServletException(ex);
+            System.err.println("Database error in StudentDashboardServlet: " + ex.getMessage());
+            ex.printStackTrace();
+            // In a real application, you'd forward to a user-friendly error page
+            throw new ServletException("Error retrieving student data.", ex);
         }
     }
 }
-/*
- * */

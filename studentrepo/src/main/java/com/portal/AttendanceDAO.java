@@ -200,10 +200,9 @@ public class AttendanceDAO {
         return records;
     }
 
-    public boolean updateAttendanceSessionStatus(int sessionId, String status) throws SQLException {
+    public boolean updateAttendanceSessionStatus(Connection conn, int sessionId, String status) throws SQLException { // Add conn parameter
         String sql = "UPDATE attendancesessions SET status = ? WHERE session_id = ?";
-        try (Connection conn = DBUtil.getConnection(); // Get connection from pool
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) { // Use the passed conn
             ps.setString(1, status);
             ps.setInt(2, sessionId);
             int rowsAffected = ps.executeUpdate();
@@ -269,39 +268,45 @@ public class AttendanceDAO {
         return null;
     }
 
-    public int getOrCreateEnrollment(int studentId, int academicYear, int programId) throws SQLException {
+    public int getOrCreateEnrollment(Connection conn, int studentId, int academicYear, int programId) throws SQLException {
+        // Step 1: First, try to SELECT the existing enrollment on the given connection.
         String selectSql = "SELECT enrollment_id FROM enrollments WHERE student_id = ? AND academic_year = ? AND program_id = ?";
-        try (Connection conn = DBUtil.getConnection(); // Get connection from pool
-             PreparedStatement ps = conn.prepareStatement(selectSql)) {
-            ps.setInt(1, studentId);
-            ps.setInt(2, academicYear);
-            ps.setInt(3, programId);
-            try (ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement psSelect = conn.prepareStatement(selectSql)) {
+            psSelect.setInt(1, studentId);
+            psSelect.setInt(2, academicYear);
+            psSelect.setInt(3, programId);
+            try (ResultSet rs = psSelect.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt("enrollment_id");
+                    return rs.getInt("enrollment_id"); // Found it, return the existing ID.
                 }
             }
         }
 
+        // Step 2: If the SELECT returned nothing, then INSERT a new record on the same connection.
         String insertSql = "INSERT INTO enrollments (student_id, academic_year, program_id) VALUES (?, ?, ?)";
-        try (Connection conn = DBUtil.getConnection(); // Get connection from pool
-             PreparedStatement ps = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setInt(1, studentId);
-            ps.setInt(2, academicYear);
-            ps.setInt(3, programId);
-            int rowsAffected = ps.executeUpdate();
+        try (PreparedStatement psInsert = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
+            psInsert.setInt(1, studentId);
+            psInsert.setInt(2, academicYear);
+            psInsert.setInt(3, programId);
+            int rowsAffected = psInsert.executeUpdate();
             if (rowsAffected > 0) {
-                try (ResultSet rs = ps.getGeneratedKeys()) {
+                try (ResultSet rs = psInsert.getGeneratedKeys()) {
                     if (rs.next()) {
-                        return rs.getInt(1);
+                        return rs.getInt(1); // Success! Return the newly generated ID.
                     }
                 }
             }
         }
-        throw new SQLException("Failed to get or create enrollment for student " + studentId + " and program " + programId);
+        
+        // If we reach here, the insert failed for a reason other than the record existing.
+        throw new SQLException("Failed to get or create enrollment for student " + studentId);
     }
 
+    /**
+     * ✅ CORRECTED: This method now accepts a Connection to participate in the servlet's transaction.
+     */
     public boolean addMultipleAttendanceRecordsToAttendanceTable(
+            Connection conn, // <-- Takes the connection as a parameter
             List<AttendanceRecord> attendanceRecords,
             String courseId,
             LocalDate attendanceDate,
@@ -309,11 +314,16 @@ public class AttendanceDAO {
             int programId,
             int sessionId
     ) throws SQLException {
-        String sql = "INSERT INTO attendancerecords (enrollment_id, attendance_date, status, session_id) VALUES (?, ?, ?, ?)";
-        try (Connection conn = DBUtil.getConnection(); // Get connection from pool
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        
+        String sql = "INSERT INTO attendancerecords (enrollment_id, attendance_date, status, session_id) " +
+                     "VALUES (?, ?, ?, ?) " +
+                     "ON DUPLICATE KEY UPDATE status = VALUES(status)";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            
             for (AttendanceRecord record : attendanceRecords) {
-                int enrollmentId = getOrCreateEnrollment(record.getStudentId(), academicYear, programId);
+                // Pass the connection to the helper method
+                int enrollmentId = getOrCreateEnrollment(conn, record.getStudentId(), academicYear, programId);
 
                 ps.setInt(1, enrollmentId);
                 ps.setDate(2, java.sql.Date.valueOf(attendanceDate));
@@ -321,8 +331,6 @@ public class AttendanceDAO {
                 String statusForDb;
                 if ("P".equalsIgnoreCase(record.getAttendanceStatus())) {
                     statusForDb = "PRESENT";
-                } else if ("A".equalsIgnoreCase(record.getAttendanceStatus())) {
-                    statusForDb = "ABSENT";
                 } else {
                     statusForDb = "ABSENT"; // Default to ABSENT
                 }
@@ -330,11 +338,13 @@ public class AttendanceDAO {
                 ps.setInt(4, sessionId);
                 ps.addBatch();
             }
-            int[] rowsAffected = ps.executeBatch();
-            for (int count : rowsAffected) {
-                if (count == 0) return false;
-            }
+            
+            ps.executeBatch();
             return true;
+
+        } catch (SQLException e) {
+            System.err.println("Error in addMultipleAttendanceRecordsToAttendanceTable: " + e.getMessage());
+            throw e;
         }
     }
 

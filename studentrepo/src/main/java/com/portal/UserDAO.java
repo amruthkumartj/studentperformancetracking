@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -273,66 +274,92 @@ public class UserDAO {
      */
     public User validate(String identifier, String password, String requestedRole) throws SQLException {
         User user = null;
+        String sql;
+        
+        // Convert identifier to lowercase for a case-insensitive "admin" check
+        String trimmedIdentifier = identifier.trim();
 
-        // 1. Try to validate as ADMIN (by username)
-        user = getUserByUsername(identifier);
-        if (user != null && "ADMIN".equalsIgnoreCase(user.getRole())) {
-            if (BCrypt.checkpw(password, user.getPasswordHash())) { // CORRECT BCrypt check
-                System.out.println("Login attempt: Identified as ADMIN via username. Success.");
-                return user; // Valid admin login
+        // ==================================================================
+        //  SPECIAL CASE: Handle Admin Login by Username
+        // ==================================================================
+        if ("admin".equalsIgnoreCase(trimmedIdentifier)) {
+            sql = "SELECT user_id, username, email, pwd_hash, role, is_approved FROM users WHERE username = ?";
+            
+            try (Connection con = DBUtil.getConnection();
+                 PreparedStatement ps = con.prepareStatement(sql)) {
+                
+                ps.setString(1, trimmedIdentifier); // Use the original identifier to match case in DB if needed, though check is case-insensitive
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        user = new User(
+                            rs.getInt("user_id"),
+                            rs.getString("username"),
+                            rs.getString("pwd_hash"),
+                            rs.getString("role"),
+                            rs.getString("email"),
+                            rs.getBoolean("is_approved")
+                        );
+                    }
+                }
+            }
+        } 
+        // ==================================================================
+        //  DEFAULT CASE: Handle Student/Faculty Login by Email and Role
+        // ==================================================================
+        else {
+            // This query strictly checks for an identifier (email) AND the requested role.
+            sql = "SELECT user_id, username, email, pwd_hash, role, is_approved FROM users WHERE email = ? AND role = ?";
+
+            if (requestedRole == null || requestedRole.trim().isEmpty()) {
+                System.err.println("Login failed: Role was not provided for a non-admin user.");
+                return null;
+            }
+
+            try (Connection con = DBUtil.getConnection();
+                 PreparedStatement ps = con.prepareStatement(sql)) {
+                
+                ps.setString(1, trimmedIdentifier); // The identifier is an email in this case
+                ps.setString(2, requestedRole.trim().toUpperCase());
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        user = new User(
+                            rs.getInt("user_id"),
+                            rs.getString("username"),
+                            rs.getString("pwd_hash"),
+                            rs.getString("role"),
+                            rs.getString("email"),
+                            rs.getBoolean("is_approved")
+                        );
+                    }
+                }
+            }
+        }
+
+        // ==================================================================
+        //  FINAL CHECK: Validate Password and Approval Status
+        // ==================================================================
+        if (user != null) {
+            // 1. Check if the password matches
+            if (BCrypt.checkpw(password, user.getPasswordHash())) {
+                // 2. For FACULTY users, check if their account is approved
+                if ("FACULTY".equalsIgnoreCase(user.getRole()) && !user.isApproved()) {
+                    System.out.println("Login failed: Faculty account is pending approval for " + trimmedIdentifier);
+                    return null; // Correct password, but account not approved.
+                }
+                // 3. Login is successful for Admin, Student, or an approved Faculty
+                return user;
             } else {
-                System.out.println("Login attempt: ADMIN password mismatch.");
-                return null; // Password mismatch for admin
+                System.out.println("Login failed: Password mismatch for " + trimmedIdentifier);
             }
+        } else {
+            System.out.println("Login failed: No user found for the provided credentials and role.");
         }
 
-        // 2. If not Admin, try to validate as STUDENT or FACULTY by Email
-        if (isValidEmail(identifier)) {
-            user = getUserByEmail(identifier);
-            if (user != null) {
-                if (BCrypt.checkpw(password, user.getPasswordHash())) { // CORRECT BCrypt check
-                    // Check approval for FACULTY
-                    if ("FACULTY".equalsIgnoreCase(user.getRole()) && !user.isApproved()) {
-                        System.out.println("Login attempt: Faculty account pending approval for email " + identifier);
-                        return null; // Valid credentials, but not approved
-                    }
-                    System.out.println("Login attempt: Identified as " + user.getRole() + " via email. Success.");
-                    return user; // Valid student or approved faculty login via email
-                } else {
-                    System.out.println("Login attempt: Email password mismatch for " + identifier);
-                    return null; // Password mismatch
-                }
-            }
-        }
-
-        // 3. If not found by email or not an email, try to validate as FACULTY by Faculty ID (if numeric)
-        if (isNumeric(identifier)) {
-            try {
-                int facultyId = Integer.parseInt(identifier);
-                user = getUserByFacultyId(facultyId);
-                if (user != null && "FACULTY".equalsIgnoreCase(user.getRole())) {
-                    if (BCrypt.checkpw(password, user.getPasswordHash())) { // CORRECT BCrypt check
-                        if (!user.isApproved()) {
-                            System.out.println("Login attempt: Faculty account pending approval for ID " + identifier);
-                            return null; // Valid credentials, but not approved
-                        }
-                        System.out.println("Login attempt: Identified as FACULTY via ID. Success.");
-                        return user; // Valid approved faculty login via ID
-                    } else {
-                        System.out.println("Login attempt: Faculty ID password mismatch for " + identifier);
-                        return null; // Password mismatch
-                    }
-                }
-            } catch (NumberFormatException e) {
-                // Should not happen due to isNumeric check, but good practice
-                System.err.println("Error parsing numeric identifier in UserDAO.validate: " + identifier);
-            }
-        }
-
-        System.out.println("Login attempt: No user found or invalid credentials for identifier: " + identifier);
-        return null; // No matching user found for any role with given identifier and password
+        // Return null if no user was found or if the password check failed.
+        return null;
     }
-
     /**
      * Retrieves a User object by their user_id.
      * Assumes 'users' table has columns: user_id, username, role, is_approved, email, pwd_hash.
@@ -490,25 +517,34 @@ public class UserDAO {
      * @return A List of StudentListItem objects.
      * @throws SQLException If a database access error occurs.
      */
-    public List<StudentListItem> getStudentsByProgramAndSemesterForList(int programId, int semester) throws SQLException {
-        List<StudentListItem> students = new ArrayList<>();
-        String sql = "SELECT s.student_id, s.student_name, p.program_name, s.sem " +
-                     "FROM students s " +
-                     "JOIN programs p ON s.program_id = p.program_id " +
-                     "WHERE s.program_id = ? AND s.sem = ? " +
-                     "ORDER BY s.student_name ASC";
+ // In your UserDAO.java or relevant DAO file
+
+ // In your UserDAO.java file
+
+    public List<Student> getStudentsByProgramAndSemester(int programId, int semester) throws SQLException {
+        List<Student> students = new ArrayList<>();
+        
+        // ✅ CORRECTED SQL: Using 'sem' for the semester and 'student_name' for sorting.
+        String sql = "SELECT * FROM students WHERE program_id = ? AND sem = ? ORDER BY student_name ASC";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
             pstmt.setInt(1, programId);
             pstmt.setInt(2, semester);
+            
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    StudentListItem student = new StudentListItem();
-                    student.setStudentId(String.valueOf(rs.getInt("student_id"))); // Convert int to String
-                    student.setStudentName(rs.getString("student_name"));
-                    student.setProgramName(rs.getString("program_name"));
-                    student.setSemester(rs.getInt("sem"));
+                    Student student = new Student();
+                    
+                    // ✅ CORRECTED: Using the correct column names from your database table
+                    student.setStudentId(rs.getInt("student_id"));
+                    student.setFullName(rs.getString("student_name")); // Use 'student_name' here
+                    student.setProgramId(rs.getInt("program_id"));
+                    student.setSemester(rs.getInt("sem")); // Use 'sem' here
+                    student.setEmail(rs.getString("email"));
+                    student.setPhone(rs.getString("phone"));
+
                     students.add(student);
                 }
             }
@@ -547,200 +583,114 @@ public class UserDAO {
     }
 
     /**
-     * Retrieves detailed performance for a single student.
-     * This method aggregates data from students, courses, marks, and attendance.
+     * Retrieves detailed performance for a single student using an efficient, single query.
+     * This method is robust and ensures all marks and attendance data are fetched reliably.
      * @param studentId The ID of the student to retrieve performance for.
-     * @param programId The program ID (for filtering relevant courses/enrollments).
-     * @param semester The semester (for filtering relevant courses/enrollments).
-     * @param examType This parameter is currently not used for filtering, but can be added if needed.
-     * @return A StudentPerformance object if found, null otherwise.
+     * @param programId The program ID of the student.
+     * @param semester The semester of the student.
+     * @param examType This parameter is not used as all data is fetched at once.
+     * @return A StudentPerformance object populated with all course data.
      * @throws SQLException If a database access error occurs.
      */
+  
     public StudentPerformance getStudentPerformance(int studentId, int programId, int semester, String examType) throws SQLException {
-        StudentPerformance studentPerformance = null;
-        Connection conn = null;
+        StudentPerformance studentPerformance = new StudentPerformance();
+        
+        // This query is now aligned with the corrected logic from getStudentDashboardInfo
+        String sql = """
+            SELECT
+                s.student_id,
+                s.student_name,
+                p.program_name,
+                s.sem,
+                c.course_id,
+                c.course_name,
+                -- Subquery for present days
+                (SELECT COUNT(ar.attendance_id)
+                 FROM attendancerecords ar
+                 JOIN student_courses sc_att ON ar.enrollment_id = sc_att.enrollment_id
+                 WHERE sc_att.student_id = s.student_id AND ar.status = 'PRESENT'
+                   AND ar.session_id IN (SELECT ats.session_id FROM attendancesessions ats WHERE ats.course_id = c.course_id)
+                ) AS present_days,
+                -- Subquery for total completed classes
+                (SELECT COUNT(ats.session_id)
+                 FROM attendancesessions ats
+                 WHERE ats.course_id = c.course_id AND ats.status = 'Completed'
+                ) AS total_days,
+                -- Subqueries for each mark type
+                (SELECT m.marks_obtained FROM marks m JOIN student_courses sc_m ON m.enrollment_id = sc_m.enrollment_id WHERE sc_m.student_id = s.student_id AND m.course_id = c.course_id AND m.exam_type = 'Internal Assessment 1') AS cie1,
+                (SELECT m.marks_obtained FROM marks m JOIN student_courses sc_m ON m.enrollment_id = sc_m.enrollment_id WHERE sc_m.student_id = s.student_id AND m.course_id = c.course_id AND m.exam_type = 'Internal Assessment 2') AS cie2,
+                (SELECT m.marks_obtained FROM marks m JOIN student_courses sc_m ON m.enrollment_id = sc_m.enrollment_id WHERE sc_m.student_id = s.student_id AND m.course_id = c.course_id AND m.exam_type = 'SEE (Semester End Examination)') AS see
+            FROM students s
+            JOIN programs p ON s.program_id = p.program_id
+            JOIN student_courses sc ON s.student_id = sc.student_id
+            JOIN courses c ON sc.course_id = c.course_id
+            WHERE s.student_id = ? AND s.program_id = ? AND s.sem = ?
+            ORDER BY c.course_name;
+        """;
 
-        // Define constants for max marks (ADJUST THESE BASED ON YOUR COLLEGE'S RULES)
-        final double MAX_IA_MARKS = 50.0; // Max marks for Internal Assessment 1 and 2
-        final double MAX_SEE_MARKS = 100.0; // Max marks for SEE
+        List<CoursePerformance> coursePerformances = new ArrayList<>();
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        try {
-            conn = DBUtil.getConnection();
+            ps.setInt(1, studentId);
+            ps.setInt(2, programId);
+            ps.setInt(3, semester);
 
-            // 1. Get basic student info, program name from enrollment, and semester
-            String studentInfoSql = "SELECT s.student_id, s.student_name, p.program_name, s.sem " + // Added s.sem
-                                    "FROM students s " +
-                                    "JOIN enrollments e ON s.student_id = e.student_id " +
-                                    "JOIN programs p ON e.program_id = p.program_id " +
-                                    "WHERE s.student_id = ? AND e.program_id = ? AND s.sem = ?"; // Use s.sem for student's current semester
-
-            System.out.println("DEBUG UserDAO: getStudentPerformance - studentInfoSql: " + studentInfoSql);
-            System.out.println("DEBUG UserDAO: getStudentPerformance - studentInfo Params: studentId=" + studentId + ", programId=" + programId + ", semester=" + semester);
-
-
-            try (PreparedStatement ps = conn.prepareStatement(studentInfoSql)) {
-                ps.setInt(1, studentId);
-                ps.setInt(2, programId);
-                ps.setInt(3, semester);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        studentPerformance = new StudentPerformance();
+            try (ResultSet rs = ps.executeQuery()) {
+                boolean firstRow = true;
+                while (rs.next()) {
+                    // Set the main student details only once from the first row
+                    if (firstRow) {
                         studentPerformance.setStudentId(rs.getInt("student_id"));
                         studentPerformance.setStudentName(rs.getString("student_name"));
-                        studentPerformance.setProgramName(rs.getString("program_name")); // Set program name
-                        studentPerformance.setSemester(rs.getInt("sem")); // Set semester from student record
-                        studentPerformance.setCoursePerformances(new ArrayList<>());
-                    } else {
-                        System.out.println("DEBUG UserDAO: Student not found for ID " + studentId + " in program " + programId + " semester " + semester);
-                        return null; // Student not found
+                        studentPerformance.setProgramName(rs.getString("program_name"));
+                        studentPerformance.setSemester(rs.getInt("sem"));
+                        firstRow = false;
                     }
-                }
-            }
 
-            if (studentPerformance == null) {
-                return null;
-            }
-
-            // 2. Get courses for this student in the specified program and semester
-            String coursesSql = "SELECT c.course_id, c.course_name, c.course_id AS course_code, sc.enrollment_id " +
-                                "FROM courses c " +
-                                "JOIN student_courses sc ON c.course_id = sc.course_id " +
-                                "WHERE sc.student_id = ? AND c.program_id = ? AND c.semester = ?";
-
-            List<CoursePerformance> coursePerformances = new ArrayList<>();
-            System.out.println("DEBUG UserDAO: getStudentPerformance - coursesSql: " + coursesSql);
-            System.out.println("DEBUG UserDAO: getStudentPerformance - course Params: studentId=" + studentId + ", programId=" + programId + ", semester=" + semester);
-
-            try (PreparedStatement ps = conn.prepareStatement(coursesSql)) {
-                ps.setInt(1, studentId);
-                ps.setInt(2, programId);
-                ps.setInt(3, semester);
-                try (ResultSet rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        String courseId = rs.getString("course_id"); // Use course_id as primary key for marks/attendance
-                        String courseCode = rs.getString("course_code"); // For display
-                        String subjectName = rs.getString("course_name"); // For display
-                        int enrollmentId = rs.getInt("enrollment_id"); // Needed for Marks table
-
-                        // 3. Fetch individual exam marks for this course using MarksDAO
-                        Double ia1Marks = marksDAO.getSpecificMarksForStudentCourse(enrollmentId, courseId, "Internal Assessment 1");
-                        Double ia2Marks = marksDAO.getSpecificMarksForStudentCourse(enrollmentId, courseId, "Internal Assessment 2");
-                        Double seeMarks = marksDAO.getSpecificMarksForStudentCourse(enrollmentId, courseId, "SEE (Semester End Examination)");
-
-                        // Calculate Combined CIE (Average of IA1 and IA2)
-                        Double combinedCieMarks = null;
-                        if (ia1Marks != null && ia2Marks != null) {
-                            combinedCieMarks = (ia1Marks + ia2Marks) / 2.0;
-                        } else if (ia1Marks != null) {
-                            combinedCieMarks = ia1Marks; // If only IA1 exists, use it as combined CIE
-                        } else if (ia2Marks != null) {
-                            combinedCieMarks = ia2Marks; // If only IA2 exists, use it as combined CIE
-                        }
-
-                        // Calculate Overall Total Marks (Combined CIE Avg + SEE)
-                        // Overall Max Marks for CIE (if using average) is MAX_IA_MARKS (e.g., 50)
-                        Double overallTotalMarks = null;
-                        Double overallMaxMarks = null;
-                        Double overallPercentage = null;
-
-                        if (combinedCieMarks != null && seeMarks != null) {
-                            overallTotalMarks = combinedCieMarks + seeMarks;
-                            overallMaxMarks = MAX_IA_MARKS + MAX_SEE_MARKS; // e.g., 50 (CIE avg) + 100 (SEE) = 150
-                            if (overallMaxMarks > 0) {
-                                overallPercentage = (overallTotalMarks / overallMaxMarks) * 100.0;
-                            }
-                        } else if (combinedCieMarks != null) { // Only CIE is available
-                            overallTotalMarks = combinedCieMarks;
-                            overallMaxMarks = MAX_IA_MARKS;
-                            if (overallMaxMarks > 0) {
-                                overallPercentage = (overallTotalMarks / overallMaxMarks) * 100.0;
-                            }
-                        } else if (seeMarks != null) { // Only SEE is available
-                            overallTotalMarks = seeMarks;
-                            overallMaxMarks = MAX_SEE_MARKS;
-                            if (overallMaxMarks > 0) {
-                                overallPercentage = (overallTotalMarks / overallMaxMarks) * 100.0;
-                            }
-                        }
-
-
-                        // 4. Fetch attendance details for this course
-                        Map<String, Object> attendanceDetails = attendanceDAO.getAttendanceDetailsForStudentCourse(
-                            studentId, courseId, programId, semester);
-                        double attendancePercentage = (double) attendanceDetails.getOrDefault("percentage", 0.0);
-                        int totalClassesHeld = (int) attendanceDetails.getOrDefault("totalClasses", 0);
-                        int classesAttended = (int) attendanceDetails.getOrDefault("classesAttended", 0);
-
-                        System.out.println("DEBUG UserDAO: Course: " + subjectName + " (" + courseCode + ")");
-                        System.out.println("DEBUG UserDAO:   IA1: " + ia1Marks + ", IA2: " + ia2Marks + ", SEE: " + seeMarks + ", Combined CIE: " + combinedCieMarks + ", Overall Total: " + overallTotalMarks);
-                        System.out.println("DEBUG UserDAO:   Attendance: " + attendancePercentage + "% (" + classesAttended + "/" + totalClassesHeld + ")");
-
-
-                        // Create CoursePerformance object with all details
-                        CoursePerformance cp = new CoursePerformance(
-                            courseCode, subjectName,
-                            ia1Marks, ia2Marks, seeMarks,
-                            combinedCieMarks,
-                            overallTotalMarks, overallMaxMarks, overallPercentage,
-                            attendancePercentage, totalClassesHeld, classesAttended
-                        );
-                        coursePerformances.add(cp);
-                    }
-                }
-            }
-            studentPerformance.setCoursePerformances(coursePerformances);
-
-            // 5. Calculate overall analysis (based on OVERALL_TOTAL_MARKS from all courses)
-            double totalOverallScoreForAllCourses = 0;
-            double totalPossibleOverallScoreForAllCourses = 0;
-            int analyzedCourseCount = 0;
-
-            for (CoursePerformance cp : coursePerformances) {
-                if (cp.getOverallTotalMarks() != null && cp.getOverallMaxMarks() != null && cp.getOverallMaxMarks() > 0) {
-                    totalOverallScoreForAllCourses += cp.getOverallTotalMarks();
-                    totalPossibleOverallScoreForAllCourses += cp.getOverallMaxMarks();
-                    analyzedCourseCount++;
-                }
-            }
-
-            String overallAnalysis = "N/A";
-            if (analyzedCourseCount > 0 && totalPossibleOverallScoreForAllCourses > 0) {
-                double aggregatePercentage = (totalOverallScoreForAllCourses / totalPossibleOverallScoreForAllCourses) * 100;
-
-                if (aggregatePercentage >= 90) {
-                    overallAnalysis = "Excellent";
-                } else if (aggregatePercentage >= 80) {
-                    overallAnalysis = "Very Good";
-                } else if (aggregatePercentage >= 60) {
-                    overallAnalysis = "Good";
-                } else {
-                    overallAnalysis = "Needs Improvement";
-                }
-            }
-            studentPerformance.setOverallAnalysis(overallAnalysis);
-
-            // Removed `setOverallCieResult` and `setOverallSeeResult` calls as per our previous fix
-            // These individual overall results are now superseded by course-level breakdown
-            // and the aggregate 'overallAnalysis' string.
-
-        } catch (SQLException e) {
-            System.err.println("❌ SQL Error fetching student performance in UserDAO: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                    System.err.println("Error closing connection in UserDAO: " + e.getMessage());
+                    // Create a CoursePerformance object for each course using the corrected constructor
+                    CoursePerformance cp = new CoursePerformance(
+                        rs.getString("course_id"),
+                        rs.getString("course_name"),
+                        rs.getObject("cie1") != null ? rs.getDouble("cie1") : null,
+                        rs.getObject("cie2") != null ? rs.getDouble("cie2") : null,
+                        rs.getObject("see") != null ? rs.getDouble("see") : null,
+                        rs.getInt("total_days"),
+                        rs.getInt("present_days")
+                    );
+                    coursePerformances.add(cp);
                 }
             }
         }
-        System.out.println("DEBUG UserDAO: getStudentPerformance - Returning performance for student: " + studentId);
+        studentPerformance.setCoursePerformances(coursePerformances);
+
+        // Calculate final overall analysis
+        double totalOverallScoreForAllCourses = 0;
+        double totalPossibleOverallScoreForAllCourses = 0;
+        int analyzedCourseCount = 0;
+
+        for (CoursePerformance cp : coursePerformances) {
+            if (cp.getFinalTotalMarks() != null && cp.getFinalMaxMarks() != null && cp.getFinalMaxMarks() > 0) {
+                totalOverallScoreForAllCourses += cp.getFinalTotalMarks();
+                totalPossibleOverallScoreForAllCourses += cp.getFinalMaxMarks();
+                analyzedCourseCount++;
+            }
+        }
+
+        String overallAnalysis = "N/A";
+        if (analyzedCourseCount > 0 && totalPossibleOverallScoreForAllCourses > 0) {
+            double aggregatePercentage = (totalOverallScoreForAllCourses / totalPossibleOverallScoreForAllCourses) * 100;
+            if (aggregatePercentage >= 90) overallAnalysis = "Excellent";
+            else if (aggregatePercentage >= 80) overallAnalysis = "Very Good";
+            else if (aggregatePercentage >= 60) overallAnalysis = "Good";
+            else overallAnalysis = "Needs Improvement";
+        }
+        studentPerformance.setOverallAnalysis(overallAnalysis);
+
         return studentPerformance;
     }
 
- // In com/portal/UserDAO.java
 
     public List<Student> searchStudentsByName(String searchTerm) throws SQLException {
         List<Student> students = new ArrayList<>();
@@ -1009,7 +959,92 @@ public class UserDAO {
         }
         return false;
     }
+    public StudentDashboardDTO getStudentDashboardInfo(int userId) throws SQLException {
+        StudentDashboardDTO dashboardDTO = new StudentDashboardDTO();
+        
+        // This query has been corrected to join the 'marks' table to the correct enrollment table.
+        String sql = """
+            SELECT
+                sd.student_id, sd.student_name, sd.current_semester,
+                c.course_id, c.course_name, c.semester,
+                -- Subquery for present days (this logic is correct)
+                (SELECT COUNT(ar.attendance_id)
+                 FROM attendancerecords ar
+                 JOIN enrollments e ON ar.enrollment_id = e.enrollment_id
+                 WHERE e.student_id = sd.student_id AND ar.status = 'PRESENT'
+                   AND ar.session_id IN (SELECT ats.session_id FROM attendancesessions ats WHERE ats.course_id = c.course_id)
+                ) AS present_days,
+                -- Subquery for total completed classes (this logic is correct)
+                (SELECT COUNT(ats.session_id)
+                 FROM attendancesessions ats
+                 WHERE ats.course_id = c.course_id AND ats.status = 'Completed'
+                ) AS total_days,
+                -- CORRECTED: Marks subqueries now join to 'student_courses' which is the correct table
+                (SELECT m.marks_obtained
+                 FROM marks m
+                 JOIN student_courses sc_m ON m.enrollment_id = sc_m.enrollment_id
+                 WHERE sc_m.student_id = sd.student_id AND m.course_id = c.course_id AND m.exam_type = 'Internal Assessment 1'
+                ) AS cie1,
+                (SELECT m.marks_obtained
+                 FROM marks m
+                 JOIN student_courses sc_m ON m.enrollment_id = sc_m.enrollment_id
+                 WHERE sc_m.student_id = sd.student_id AND m.course_id = c.course_id AND m.exam_type = 'Internal Assessment 2'
+                ) AS cie2,
+                (SELECT m.marks_obtained
+                 FROM marks m
+                 JOIN student_courses sc_m ON m.enrollment_id = sc_m.enrollment_id
+                 WHERE sc_m.student_id = sd.student_id AND m.course_id = c.course_id AND m.exam_type = 'SEE (Semester End Examination)'
+                ) AS see
+            FROM
+                (
+                    SELECT s.student_id, s.student_name, s.sem AS current_semester
+                    FROM students s
+                    JOIN users u ON s.email = u.email
+                    WHERE u.user_id = ?
+                ) sd
+            JOIN student_courses sc ON sd.student_id = sc.student_id
+            JOIN courses c ON sc.course_id = c.course_id
+            ORDER BY c.semester, c.course_name;
+        """;
 
+        Map<Integer, List<CoursePerformance>> performanceMap = new HashMap<>();
+        long totalPresentAllCourses = 0;
+        long totalConductedAllCourses = 0;
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                boolean firstRow = true;
+                while (rs.next()) {
+                    if (firstRow) {
+                        dashboardDTO.setStudentId(rs.getInt("student_id"));
+                        dashboardDTO.setStudentName(rs.getString("student_name"));
+                        dashboardDTO.setCurrentSemester(rs.getInt("current_semester"));
+                        firstRow = false;
+                    }
+                    int semester = rs.getInt("semester");
+                    
+                    CoursePerformance cp = new CoursePerformance(
+                        rs.getString("course_id"),
+                        rs.getString("course_name"),
+                        rs.getObject("cie1") != null ? rs.getDouble("cie1") : null,
+                        rs.getObject("cie2") != null ? rs.getDouble("cie2") : null,
+                        rs.getObject("see") != null ? rs.getDouble("see") : null,
+                        rs.getInt("total_days"),
+                        rs.getInt("present_days")
+                    );
+                    performanceMap.computeIfAbsent(semester, k -> new ArrayList<>()).add(cp);
+                    
+                    totalPresentAllCourses += rs.getLong("present_days");
+                    totalConductedAllCourses += rs.getLong("total_days");
+                }
+            }
+        }
+        dashboardDTO.setPerformanceBySemester(performanceMap);
+        dashboardDTO.setOverallAttendance(new OverallAttendanceDTO(totalPresentAllCourses, totalConductedAllCourses));
+        return dashboardDTO;
+    }
     // This private helper method was previously in UserDAO, now using ProgramCourseDAO
     // This method is redundant here as it's just delegating. If ProgramCourseDAO is a separate DAO,
     // then this method should be removed and ProgramCourseDAO.getCoursesByProgramAndSemester should be called directly.
