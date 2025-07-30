@@ -146,9 +146,28 @@
         .content-scroll-wrapper::-webkit-scrollbar { display: none; }
         .nav-grid { grid-template-columns: 1fr; }
         .view.is-exiting { padding: 16px; }
-        .marks-table { font-size: 14px; }
+            .marks-table { font-size: 14px; }
         .marks-table th, .marks-table td { padding: 10px; }
-    } /* --- FIX for UI BUG --- */
+        .marks-table {
+font-size: 12px; 
+}
+.marks-table th, .marks-table td {
+padding: 8px 6px; / Reduced padding /
+}
+.marks-table thead th:last-child,
+.marks-table tbody td:last-child {
+white-space: nowrap; / Prevent wrapping of percentage /
+text-align: right; / Align percentage to the right */
+}
+         /* ✨ NEW STYLES FOR SCROLLABLE TABLE ✨ */
+    .table-scroll-wrapper {
+        overflow-x: auto; /* This is the key property! */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+    
+ 
+    } 
+    /* --- FIX for UI BUG --- */
     .widget .exam-content { display: none; }
     .widget .exam-content.is-visible { display: block; }
     .attendance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
@@ -324,6 +343,7 @@
 
                                 <!-- CIE-1 Content -->
                                 <div class="exam-content is-visible" data-exam-type="cie1">
+                                <div class="table-scroll-wrapper">
                                     <table class="marks-table">
                                         <thead><tr><th>Course</th><th>Marks Obtained</th><th>Total Marks</th><th>Percentage</th></tr></thead>
                                         <tbody>
@@ -337,10 +357,12 @@
                                             </c:forEach>
                                         </tbody>
                                     </table>
+                                  </div>
                                 </div>
 
                                 <!-- CIE-2 Content -->
                                 <div class="exam-content" data-exam-type="cie2">
+                                <div class="table-scroll-wrapper">
                                     <table class="marks-table">
                                         <thead><tr><th>Course</th><th>Marks Obtained</th><th>Total Marks</th><th>Percentage</th></tr></thead>
                                         <tbody>
@@ -354,10 +376,12 @@
                                             </c:forEach>
                                         </tbody>
                                     </table>
+                                    </div>
                                 </div>
 
                                 <!-- SEE (Final) Content -->
                                 <div class="exam-content" data-exam-type="see">
+                                <div class="table-scroll-wrapper">
                                     <table class="marks-table">
                                         <thead><tr><th>Course</th><th>Combined CIE</th><th>SEE Marks</th><th>Total</th><th>Percentage</th></tr></thead>
                                         <tbody>
@@ -374,6 +398,7 @@
                                     </table>
                                 </div>
                             </div>
+                        </div>
                         </div>
                     </c:forEach>
                 </div>
