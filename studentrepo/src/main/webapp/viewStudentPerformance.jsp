@@ -163,14 +163,40 @@
 .analysis-box.warning i { color: var(--warning-color); }
 .analysis-box.danger { border-color: var(--danger-color); background-color: rgba(220, 53, 69, 0.1); }
 .analysis-box.danger i { color: var(--danger-color); }
+/* --- NEW: Clear Button for Text Input --- */
+        #clearStudentIdBtn {
+            position: absolute;
+            right: 12px;
+            top: 41%;
+            transform: translateY(50%);
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        #clearStudentIdBtn:hover {
+            opacity: 1;
+        }
+        .reset-button {
+    background: var(--text-color);
+}
+
+.reset-button:hover:not(:disabled) {
+    background: var(--dark-color);
+}
     </style>
 </head>
 <body>
 
     <div class="container">
-        <a href="<%= request.getContextPath() %>/facultydashboard" class="styled-button back-button">
+       <!-- REPLACE THIS: -->
+        <!-- <a href="<%= request.getContextPath() %>/facultydashboard" class="styled-button back-button"> ... </a> -->
+
+        <!-- WITH THIS: -->
+        <button id="analyticsBackButton" class="styled-button back-button">
             <i class='bx bx-arrow-back'></i> Back
-        </a>
+        </button>
 
         <div id="messageBox"></div>
 
@@ -203,13 +229,19 @@
                         <label for="examTypeSelect">Exam Type</label>
                         <select id="examTypeSelect" class="styled-select" disabled><option value="">Select Semester</option></select>
                     </div>
-                    <div class="input-group">
+                   <div class="input-group" style="position: relative;">
                         <label for="studentIdInput">Student ID (Optional)</label>
                         <input type="text" id="studentIdInput" class="styled-input" placeholder="e.g., 210905" disabled>
+                        <i class='bx bx-x' id="clearStudentIdBtn" style="display: none;"></i>
                     </div>
                     <div class="input-group">
                         <button id="searchButton" class="styled-button" disabled><i class='bx bx-search'></i> Search</button>
                     </div>
+                    <div class="input-group">
+    					<button id="resetButton" class="styled-button reset-button" disabled>
+        				<i class='bx bx-reset'></i> Reset
+    					</button>
+					</div>
                 </div>
             </div>
         </div>
@@ -238,6 +270,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     const qs = (selector) => document.querySelector(selector);
     const qsa = (selector) => document.querySelectorAll(selector);
+    
+    const facultyAnalysisBox = qs('#facultyAnalysisBox'); 
+    const analyticsBackButton = qs('#analyticsBackButton'); 
+    const resetButton = qs('#resetButton');
 
     const programSelect = qs('#programSelect');
     const semesterSelect = qs('#semesterSelect');
@@ -254,6 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const specificStudentBtn = qs('#specificStudentBtn');
     const overallStudentBtn = qs('#overallStudentBtn');
     const studentSummary = qs('#studentSummary');
+    const clearStudentIdBtn = qs('#clearStudentIdBtn');
 
     let studentCharts = {};
     let currentStudentData = null;
@@ -262,6 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { value: "Internal Assessment 2", text: "Internal Assessment 2" },
         { value: "SEE", text: "SEE (Semester End Exam)" }
     ];
+
 
     const showMessage = (message, type = 'info') => {
         messageBox.textContent = message;
@@ -280,15 +318,30 @@ document.addEventListener('DOMContentLoaded', () => {
             selectEl.disabled = true;
         }
     };
+    const resetFilters = () => {
+        programSelect.selectedIndex = 0;
+        populateDropdown(semesterSelect, [], 'Select Program');
+        populateDropdown(examTypeSelect, [], 'Select Semester');
+        studentIdInput.value = '';
+        studentIdInput.dispatchEvent(new Event('input')); // To hide the 'x'
+        clearResults();
+        updateControlStates();
+        showMessage('Filters have been reset.', 'info');
+    };
     
     const updateControlStates = () => {
         const isProgram = !!programSelect.value;
         const isSemester = !!semesterSelect.value;
         const isExam = !!examTypeSelect.value;
+        const isStudentId = !!studentIdInput.value;
+
         semesterSelect.disabled = !isProgram;
         examTypeSelect.disabled = !isSemester;
         studentIdInput.disabled = !isSemester;
         searchButton.disabled = !(isProgram && isSemester && isExam);
+
+        // This is the new line to control the reset button
+        resetButton.disabled = !(isProgram || isSemester || isExam || isStudentId);
     };
 
     const clearResults = () => {
@@ -402,7 +455,7 @@ const renderStudentSummary = (student, examType) => {
             if (totalMaxMarks > 0) {
                 const percentage = (totalMarks / totalMaxMarks) * 100;
                 const result = (percentage >= 40) ? '<span style="color: var(--success-color);">Pass</span>' : '<span style="color: var(--danger-color);">Fail</span>';
-                performanceHTML = `<div><strong>Overall ${examType} Result:</strong> ${result} (${percentage.toFixed(2)}%)</div>`;
+                performanceHTML = `<div><strong>Overall ${examType} Result:</strong><b> ${result} </b>(${percentage.toFixed(2)}%)</div>`;
             } else {
                 performanceHTML = `<div><strong>Overall ${examType} Result:</strong> N/A</div>`;
             }
@@ -441,8 +494,8 @@ const renderStudentSummary = (student, examType) => {
             }
             
             performanceHTML = `
-                <div><strong>Overall CIE Performance:</strong> ${cieRemark}</div>
-                <div><strong>Overall Final Performance:</strong> ${seeRemark}</div>
+                <div><strong>Overall CIE Performance:</strong><b> ${cieRemark}</b></div>
+                <div><strong>Overall Final Performance:</strong><b> ${seeRemark}</b></div>
             `;
         }
         
@@ -653,7 +706,15 @@ const renderStudentSummary = (student, examType) => {
         currentStudentData = { student, examType };
         viewModeToggle.classList.remove('is-hidden');
         const view = qs('input[name="viewMode"]:checked').value;
-        view === 'visual' ? renderStudentChart(student, examType) : renderStudentTable(student, examType);
+
+        // Call the correct render function based on the toggle
+        if (view === 'visual') {
+            renderStudentChart(student, examType);
+        } else {
+            renderStudentTable(student, examType);
+        }
+        // This was missing before, so the analysis box only showed on chart view
+        renderPerformanceAnalysis(student, examType);
     };
 
     const handleSearch = async () => {
@@ -675,9 +736,16 @@ const renderStudentSummary = (student, examType) => {
         if (data && data.status === 'success') {
             if (data.students) { // Case for list of students
                 renderStudentList(data.students);
+                facultyAnalysisBox.style.display = 'none';
+            
+                
+                
+            
             } else if (data.student) { // Case for a single student
                 renderStudentSummary(data.student, payload.examType);
                 renderSingleStudent(data.student, payload.examType);
+                facultyAnalysisBox.style.display = 'block';
+                
             } else {
                 performanceDisplay.innerHTML = '<p>No data found for the selected criteria.</p>';
             }
@@ -689,7 +757,68 @@ const renderStudentSummary = (student, examType) => {
     specificStudentBtn.addEventListener('click', () => {
         initialChoiceView.classList.add('is-hidden');
         specificPerformanceView.classList.remove('is-hidden');
+        // FIX: Clear the analysis box when switching to this view
+        if (facultyAnalysisBox) {
+            facultyAnalysisBox.innerHTML = '';
+           	
+        }
+        
     });
+
+    // Listener for the new Back Button
+let backClickCount = 0;
+let backClickTimer = null;
+
+if (analyticsBackButton) {
+    analyticsBackButton.addEventListener('click', () => {
+        backClickCount++;
+
+        // Reset the click count after 1.5 seconds
+        clearTimeout(backClickTimer);
+        backClickTimer = setTimeout(() => {
+            backClickCount = 0;
+        }, 1500);
+
+        // If results are visible, go back to the filters
+        if (!resultsCard.classList.contains('is-hidden')) {
+            resultsCard.classList.add('is-hidden');
+            facultyAnalysisBox.innerHTML = '';
+            facultyAnalysisBox.style.display = 'none';
+            studentIdInput.value = '';
+
+            // Only call handleSearch on the first click
+            if (backClickCount === 1) {
+                handleSearch(1);
+            }
+            return;
+        }
+
+        // If filters are visible, go back to the initial choice
+        if (!specificPerformanceView.classList.contains('is-hidden')) {
+            specificPerformanceView.classList.add('is-hidden');
+            initialChoiceView.classList.remove('is-hidden');
+            return;
+        }
+
+        // Otherwise, go back to the main faculty dashboard
+        window.location.href = '<%= request.getContextPath() %>/facultydashboard';
+    });
+}
+
+
+    // Listeners for the Clear Student ID Button
+    if (studentIdInput && clearStudentIdBtn) {
+    	studentIdInput.addEventListener('input', () => {
+    	    clearStudentIdBtn.style.display = studentIdInput.value ? 'block' : 'none';
+    	    updateControlStates(); // This ensures the reset button enables/disables correctly
+    	});
+
+        clearStudentIdBtn.addEventListener('click', () => {
+            studentIdInput.value = '';
+            clearStudentIdBtn.style.display = 'none';
+            studentIdInput.focus();
+        });
+    }
 
     overallStudentBtn.addEventListener('click', () => {
         showMessage('Overall performance analytics for all students will be implemented soon!', 'info');
@@ -724,12 +853,15 @@ const renderStudentSummary = (student, examType) => {
     });
 
     // --- RESTORED: This handles the click on the "View Performance" button ---
-    resultsCard.addEventListener('click', (e) => {
+   resultsCard.addEventListener('click', (e) => {
         if (e.target.classList.contains('view-single')) {
             studentIdInput.value = e.target.dataset.studentId;
+            clearStudentIdBtn.style.display = 'block'; // Manually show the X button
             handleSearch();
         }
     });
+   resetButton.addEventListener('click', resetFilters);
+
 
     loadPrograms();
     updateControlStates();
