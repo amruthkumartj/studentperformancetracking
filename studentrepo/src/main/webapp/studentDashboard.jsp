@@ -282,42 +282,43 @@ text-align: right; / Align percentage to the right */
                 </div>
             </div>
 
-            <div id="attendance-view" class="view">
-                <div class="view-header">
-                    <button class="back-button action-btn"><i class='bx bx-arrow-back'></i></button>
-                    <h2>Attendance</h2>
-                     <div class="semester-filter-wrapper">
-                        <label for="attendance-semester-filter">Semester:</label>
-                        <select id="attendance-semester-filter" class="semester-filter" data-view-target="attendance-view">
-                            <c:forEach var="entry" items="${dashboard.performanceBySemester}">
-                                <option value="${entry.key}" ${entry.key == dashboard.currentSemester ? 'selected' : ''}>
-                                    Semester ${entry.key}
-                                </option>
-                            </c:forEach>
-                        </select>
-                    </div>
-                </div>
-                
-                <c:forEach var="entry" items="${dashboard.performanceBySemester}">
-                    <div class="semester-content" data-view="attendance-view" data-semester="${entry.key}">
-                        <div class="attendance-grid">
-                            <c:forEach var="perf" items="${entry.value}">
-                                 <div class="attendance-card">
-                                     <h4><c:out value="${perf.subjectName}"/></h4>
-                                     <div class="attendance-bar-container">
-                                        <div class="attendance-bar" data-percentage="<fmt:formatNumber value='${perf.attendancePercentage}' maxFractionDigits='2'/>"></div>
-                                     </div>
-                                     <div class="attendance-meta">
-                                        <span><c:out value="${perf.classesAttended}"/> / <c:out value="${perf.totalClassesHeld}"/> classes</span>
-                                        <span><fmt:formatNumber value="${perf.attendancePercentage}" maxFractionDigits="0"/>%</span>
-                                     </div>
-                                 </div>
-                            </c:forEach>
-                        </div>
-                    </div>
+          <div id="attendance-view" class="view">
+    <div class="view-header">
+        <button class="back-button action-btn"><i class='bx bx-arrow-back'></i></button>
+        <h2>Attendance</h2>
+    </div>
+
+    <div class="semester-filter-wrapper">
+        <label for="attendance-semester-filter">Semester:</label>
+        <select id="attendance-semester-filter" class="semester-filter" data-view-target="attendance-view">
+            <c:forEach var="entry" items="${dashboard.performanceBySemester}">
+                <option value="${entry.key}" ${entry.key == dashboard.currentSemester ? 'selected' : ''}>
+                    Semester ${entry.key}
+                </option>
+            </c:forEach>
+        </select>
+    </div>
+
+    <c:forEach var="entry" items="${dashboard.performanceBySemester}">
+        <div class="semester-content" data-view="attendance-view" data-semester="${entry.key}">
+            <div class="attendance-grid">
+                <c:forEach var="perf" items="${entry.value}">
+                     <div class="attendance-card">
+                         <h4><c:out value="${perf.subjectName}"/></h4>
+                         <div class="attendance-bar-container">
+                            <div class="attendance-bar" data-percentage="<fmt:formatNumber value='${perf.attendancePercentage}' maxFractionDigits='2'/>"></div>
+                         </div>
+                         <div class="attendance-meta">
+                            <span><c:out value="${perf.classesAttended}"/> / <c:out value="${perf.totalClassesHeld}"/> classes</span>
+                            <span><fmt:formatNumber value="${perf.attendancePercentage}" maxFractionDigits="0"/>%</span>
+                         </div>
+                     </div>
                 </c:forEach>
             </div>
-  <!-- ======================= MARKS VIEW (REBUILT) ======================= -->
+        </div>
+    </c:forEach>
+</div>
+
                <!-- ======================= MARKS VIEW (REBUILT) ======================= -->
                <div id="marks-view" class="view">
     <div class="view-header">
