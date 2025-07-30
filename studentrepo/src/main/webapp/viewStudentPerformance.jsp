@@ -119,6 +119,50 @@
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
     border: 1px solid var(--border-color, #eee);
 }
+/* --- NEW: Faculty Analysis Box --- */
+.analysis-box {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    border-left: 5px solid;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeInUp 0.5s 0.2s forwards;
+}
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.analysis-box i {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+}
+.analysis-box p {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+.analysis-box p strong {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Color Variants */
+.analysis-box.success { border-color: var(--success-color); background-color: rgba(40, 167, 69, 0.1); }
+.analysis-box.success i { color: var(--success-color); }
+.analysis-box.info { border-color: var(--primary-color); background-color: var(--primary-color-light); }
+.analysis-box.info i { color: var(--primary-color); }
+.analysis-box.warning { border-color: var(--warning-color); background-color: rgba(255, 193, 7, 0.1); }
+.analysis-box.warning i { color: var(--warning-color); }
+.analysis-box.danger { border-color: var(--danger-color); background-color: rgba(220, 53, 69, 0.1); }
+.analysis-box.danger i { color: var(--danger-color); }
     </style>
 </head>
 <body>
@@ -186,6 +230,7 @@
                     <p>Fetching Analytics...</p>
                 </div>
             </div>
+            <div id="facultyAnalysisBox"></div>
         </div>
     </div>
 
@@ -314,110 +359,144 @@ document.addEventListener('DOMContentLoaded', () => {
         performanceDisplay.innerHTML = tableHTML;
     };
 
-    const renderStudentSummary = (student, examType) => {
-        const { studentId, studentName, programName, semester, coursePerformances, overallAnalysis } = student;
-        const totalCourses = coursePerformances.length;
-        let overallCie = 0, overallSee = 0;
+ // ==================================================================
+    //  REPLACE THIS ENTIRE FUNCTION
+    // ==================================================================
+const renderStudentSummary = (student, examType) => {
+        const { studentId, studentName, programName, semester, coursePerformances } = student;
 
-        if (totalCourses > 0) {
-            const sumCie = coursePerformances.reduce((acc, course) => acc + (course.combinedCieMarks || 0), 0);
-            const sumSee = coursePerformances.reduce((acc, course) => acc + (course.seeMarks || 0), 0);
-            overallCie = (sumCie / totalCourses);
-            overallSee = (sumSee / totalCourses);
-        }
-        
+        // Helper function to get a performance remark based on percentage
+        const getPerformanceRemark = (percentage) => {
+            if (percentage === 100) return '<span style="color: #00c853;">Legendary</span>';
+            if (percentage >= 90) return '<span style="color: #00e676;">Excellent</span>';
+            if (percentage >= 80) return '<span style="color: #64dd17;">Great</span>';
+            if (percentage >= 70) return '<span style="color: #aeea00;">Very Good</span>';
+            if (percentage >= 60) return '<span style="color: #ffd600;">Good</span>';
+            if (percentage >= 50) return '<span style="color: #ffab00;">Could Be Better</span>';
+            if (percentage >= 40) return '<span style="color: #ff6d00;">Pass</span>';
+            return '<span style="color: #d50000;">Fail</span>';
+        };
+
         let summaryHTML = `
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.75rem 1.5rem;">
                 <div><strong>ID:</strong> ${studentId} (${studentName})</div>
                 <div><strong>Program:</strong> ${programName}</div>
                 <div><strong>Semester:</strong> ${semester}</div>
-                <div><strong>Overall Performance:</strong> <span style="font-weight: bold; color: var(--primary-color);">${overallAnalysis || 'N/A'}</span></div>`;
+            </div>`;
 
-        if (examType.startsWith("Internal")) {
-             summaryHTML += `<div><strong>Overall CIE Result:</strong> ${overallCie.toFixed(2)} (Average Score)</div>`;
-        } else if (examType === "SEE") {
-             summaryHTML += `<div><strong>Overall CIE Result:</strong> ${overallCie.toFixed(2)} (Average Score)</div>`;
-             summaryHTML += `<div><strong>Overall SEE Result:</strong> ${overallSee.toFixed(2)} (Average Score)</div>`;
+        let performanceHTML = '';
+
+        // --- Logic for Individual CIE Views (CIE-1 or CIE-2) ---
+        if (examType === 'Internal Assessment 1' || examType === 'Internal Assessment 2') {
+            let totalMarks = 0;
+            let totalMaxMarks = 0;
+            const marksKey = (examType === 'Internal Assessment 1') ? 'ia1Marks' : 'ia2Marks';
+
+            coursePerformances.forEach(c => {
+                if (c[marksKey] != null) {
+                    totalMarks += c[marksKey];
+                    totalMaxMarks += 50; // Max marks for each CIE is 50
+                }
+            });
+
+            if (totalMaxMarks > 0) {
+                const percentage = (totalMarks / totalMaxMarks) * 100;
+                const result = (percentage >= 40) ? '<span style="color: var(--success-color);">Pass</span>' : '<span style="color: var(--danger-color);">Fail</span>';
+                performanceHTML = `<div><strong>Overall ${examType} Result:</strong> ${result} (${percentage.toFixed(2)}%)</div>`;
+            } else {
+                performanceHTML = `<div><strong>Overall ${examType} Result:</strong> N/A</div>`;
+            }
+        }
+        // --- Logic for Final SEE View ---
+        else if (examType === 'SEE') {
+            let totalCieObtained = 0;
+            let totalCieMax = 0;
+            let totalFinalObtained = 0;
+            let totalFinalMax = 0;
+
+            coursePerformances.forEach(c => {
+                // Calculate for Overall CIE
+                if (c.ia1Marks != null && c.ia2Marks != null) {
+                    totalCieObtained += c.ia1Marks + c.ia2Marks;
+                    totalCieMax += 100; // 50 for each CIE
+                }
+                // Calculate for Overall Final/SEE
+                const combinedCieForFinal = (c.ia1Marks != null && c.ia2Marks != null) ? (c.ia1Marks + c.ia2Marks) / 5 : null;
+                if (combinedCieForFinal != null && c.seeMarks != null) {
+                    totalFinalObtained += combinedCieForFinal + c.seeMarks;
+                    totalFinalMax += 100; // 20 from CIE + 80 from SEE
+                }
+            });
+
+            let cieRemark = "N/A";
+            if (totalCieMax > 0) {
+                const ciePercentage = (totalCieObtained / totalCieMax) * 100;
+                cieRemark = getPerformanceRemark(ciePercentage);
+            }
+
+            let seeRemark = "N/A";
+            if (totalFinalMax > 0) {
+                const seePercentage = (totalFinalObtained / totalFinalMax) * 100;
+                seeRemark = getPerformanceRemark(seePercentage);
+            }
+            
+            performanceHTML = `
+                <div><strong>Overall CIE Performance:</strong> ${cieRemark}</div>
+                <div><strong>Overall Final Performance:</strong> ${seeRemark}</div>
+            `;
         }
         
-        summaryHTML += `</div>`;
-        studentSummary.innerHTML = summaryHTML;
+        // Append the performance summary to the main summary
+        studentSummary.innerHTML = summaryHTML.slice(0, -6) + performanceHTML + `</div>`; // Injects performance before closing div
         studentSummary.classList.remove('is-hidden');
     };
 
+    // ==================================================================
+    //  REPLACE THIS ENTIRE FUNCTION
+    // ==================================================================
     const renderStudentChart = (student, examType) => {
-        // --- Create a styled container for the canvas ---
         const chartWrapper = document.createElement('div');
-        chartWrapper.className = 'chart-container'; // Apply the CSS class
+        chartWrapper.className = 'chart-container';
         const canvas = document.createElement('canvas');
         chartWrapper.appendChild(canvas);
+        performanceDisplay.innerHTML = '';
         performanceDisplay.appendChild(chartWrapper);
 
-        // --- Modern Color Palette ---
         const CHART_COLORS = {
-            ia1: 'rgba(88, 86, 214, 0.8)',  // Indigo
-            ia2: 'rgba(255, 69, 58, 0.8)',   // Red
-            cie: 'rgba(48, 209, 88, 0.8)',   // Green
-            see: 'rgba(0, 122, 255, 0.8)',   // Blue
-            attendanceLine: 'rgba(255, 159, 10, 1)', // Orange
+            ia1: 'rgba(88, 86, 214, 0.8)',
+            ia2: 'rgba(255, 69, 58, 0.8)',
+            cie: 'rgba(48, 209, 88, 0.8)',
+            see: 'rgba(0, 122, 255, 0.8)',
+            attendanceLine: 'rgba(255, 159, 10, 1)',
             attendanceBg: 'rgba(255, 159, 10, 0.2)',
-            grid: 'rgba(142, 142, 147, 0.2)' // Faint Gray for grid lines
+            grid: 'rgba(142, 142, 147, 0.2)'
         };
 
         const labels = student.coursePerformances.map(c => `${c.courseCode} (${c.subjectName})`);
-        const attendance = student.coursePerformances.map(c => c.attendancePercentage);
+        const attendance = student.coursePerformances.map(c => (c.totalClassesHeld > 0) ? (c.classesAttended / c.totalClassesHeld) * 100 : 0);
         let datasets = [];
-        
-        // --- Dynamic Y-Axis for Marks ---
         let yAxisMax = 100;
         let yAxisTitle = 'Marks';
 
         if (examType === "Internal Assessment 1") {
             yAxisMax = 50;
             yAxisTitle = 'IA 1 Marks (out of 50)';
-            datasets.push({ 
-                label: 'IA 1 Marks', 
-                data: student.coursePerformances.map(c => c.ia1Marks), 
-                backgroundColor: CHART_COLORS.ia1,
-                borderRadius: 6
-            });
+            datasets.push({ label: 'IA 1 Marks', data: student.coursePerformances.map(c => c.ia1Marks), backgroundColor: CHART_COLORS.ia1, borderRadius: 6 });
         } else if (examType === "Internal Assessment 2") {
             yAxisMax = 50;
             yAxisTitle = 'IA 2 Marks (out of 50)';
-            datasets.push({ 
-                label: 'IA 2 Marks', 
-                data: student.coursePerformances.map(c => c.ia2Marks), 
-                backgroundColor: CHART_COLORS.ia2,
-                borderRadius: 6
-            });
-        } else if (examType === "SEE") {
+            datasets.push({ label: 'IA 2 Marks', data: student.coursePerformances.map(c => c.ia2Marks), backgroundColor: CHART_COLORS.ia2, borderRadius: 6 });
+        } else if (examType === "SEE") { // CORRECTED CHECK
             yAxisMax = 100;
             yAxisTitle = 'Marks';
-            datasets.push({ 
-                label: 'CIE Marks (out of 50)', 
-                data: student.coursePerformances.map(c => c.combinedCieMarks), 
-                backgroundColor: CHART_COLORS.cie,
-                borderRadius: 4
-            });
-            datasets.push({ 
-                label: 'SEE Marks (out of 100)', 
-                data: student.coursePerformances.map(c => c.seeMarks), 
-                backgroundColor: CHART_COLORS.see,
-                borderRadius: 4
-            });
+            datasets.push({ label: 'CIE Marks (Avg)', data: student.coursePerformances.map(c => (c.ia1Marks != null && c.ia2Marks != null) ? (c.ia1Marks + c.ia2Marks) / 2 : null), backgroundColor: CHART_COLORS.cie, borderRadius: 4 });
+            datasets.push({ label: 'SEE Marks (out of 80)', data: student.coursePerformances.map(c => c.seeMarks), backgroundColor: CHART_COLORS.see, borderRadius: 4 });
         }
 
-        // Attendance Line Chart Dataset
         datasets.push({ 
-            type: 'line', 
-            label: 'Attendance %', 
-            data: attendance,
-            borderColor: CHART_COLORS.attendanceLine, 
-            backgroundColor: CHART_COLORS.attendanceBg,
-            yAxisID: 'y1', 
-            tension: 0.4,
-            pointBackgroundColor: CHART_COLORS.attendanceLine,
-            fill: true
+            type: 'line', label: 'Attendance %', data: attendance,
+            borderColor: CHART_COLORS.attendanceLine, backgroundColor: CHART_COLORS.attendanceBg,
+            yAxisID: 'y1', tension: 0.4, pointBackgroundColor: CHART_COLORS.attendanceLine, fill: true
         });
 
         if(studentCharts['main']) studentCharts['main'].destroy();
@@ -426,105 +505,149 @@ document.addEventListener('DOMContentLoaded', () => {
             type: 'bar', 
             data: { labels, datasets },
             options: {
-                // --- BI-style Enhancements ---
-                responsive: true,
-                maintainAspectRatio: true,
-                aspectRatio: 2, // Adjust aspect ratio for better visuals
-                interaction: {
-                    mode: 'point',  // Changed from 'index'
-                    intersect: true, // Changed from false
-                
-                },
+                responsive: true, maintainAspectRatio: true,
                 plugins: {
-                    legend: { 
-                        position: 'top',
-                        align: 'end',
-                        labels: {
-                            usePointStyle: true,
-                            boxWidth: 8,
-                            padding: 20,
-                            font: { size: 13, family: "'Poppins', sans-serif" }
-                        }
-                    },
-                    title: { 
-                        display: true, 
-                        text: `Performance Analytics for ${student.studentName} - ${examType}`, 
-                        align: 'start',
-                        padding: { top: 10, bottom: 25 },
-                        font: { size: 18, weight: '600', family: "'Poppins', sans-serif" }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        titleFont: { size: 14, weight: 'bold' },
-                        bodyFont: { size: 12 },
-                        padding: 10,
-                        cornerRadius: 8,
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) label += ': ';
-                                if (context.parsed.y !== null) {
-                                    label += context.parsed.y;
-                                    if (context.dataset.type === 'line') label += '%';
-                                }
-                                return label;
-                            }
-                        }
-                    }
+                    legend: { position: 'top', align: 'end' },
+                    title: { display: true, text: `Performance Analytics for ${student.studentName} - ${examType}`, align: 'start', font: { size: 18, weight: '600' } }
                 },
                 scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        max: yAxisMax, 
-                        title: { display: true, text: yAxisTitle },
-                        grid: { color: CHART_COLORS.grid, drawBorder: false },
-                        ticks: { font: { family: "'Poppins', sans-serif" } }
-                    },
-                    y1: { 
-                        type: 'linear', 
-                        display: true, 
-                        position: 'right', 
-                        beginAtZero: true, 
-                        max: 100, 
-                        title: { display: true, text: 'Attendance (%)' }, 
-                        grid: { drawOnChartArea: false }, // No grid lines for the secondary axis
-                        ticks: { font: { family: "'Poppins', sans-serif" } }
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: { font: { family: "'Poppins', sans-serif" } }
-                    }
+                    y: { beginAtZero: true, max: yAxisMax, title: { display: true, text: yAxisTitle }, grid: { color: CHART_COLORS.grid } },
+                    y1: { type: 'linear', display: true, position: 'right', beginAtZero: true, max: 100, title: { display: true, text: 'Attendance (%)' }, grid: { drawOnChartArea: false } },
+                    x: { grid: { display: false } }
                 }
             }
         });
     };
     
+    // ==================================================================
+    //  REPLACE THIS ENTIRE FUNCTION
+    // ==================================================================
     const renderStudentTable = (student, examType) => {
-        const isSeeExam = examType === 'SEE';
-        const isIAExam = examType.startsWith('Internal');
         let headers = [];
+        let tableHTML = '';
 
-        if (isIAExam) headers = ['Course', 'Name', 'Max Marks', 'Obtained Marks', 'Attendance %'];
-        else if (isSeeExam) headers = ['Course', 'Name', 'CIE (50)', 'SEE (100)', 'Total (150)', 'Percentage', 'Attendance %'];
+        if (examType === 'Internal Assessment 1' || examType === 'Internal Assessment 2') {
+            headers = ['Course', 'Name', 'Max Marks', 'Obtained Marks', 'Attendance %'];
+            tableHTML = `<div class="table-responsive"><table class="styled-table">
+                <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+            
+            student.coursePerformances.forEach(c => {
+                const marksField = (examType === 'Internal Assessment 1') ? c.ia1Marks : c.ia2Marks;
+                const attendancePercentage = (c.totalClassesHeld > 0) ? (c.classesAttended / c.totalClassesHeld) * 100 : 0;
+                tableHTML += `<tr>
+                    <td>${c.courseCode}</td>
+                    <td>${c.subjectName}</td>
+                    <td>50</td>
+                    <td>${marksField ?? 'N/A'}</td>
+                    <td>${attendancePercentage.toFixed(2)}%</td>
+                </tr>`;
+            });
 
-        let tableHTML = `<div class="table-responsive"><table class="styled-table">
-            <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+        } else if (examType === 'SEE') { // CORRECTED CHECK
+            headers = ['Course', 'Name', 'Combined CIE', 'SEE Marks', 'Total', 'Percentage', 'Attendance %'];
+            tableHTML = `<div class="table-responsive"><table class="styled-table">
+                <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>`;
 
-        student.coursePerformances.forEach(c => {
-            tableHTML += `<tr><td>${c.courseCode}</td><td>${c.subjectName}</td>`;
-            if (isIAExam) {
-                const marksField = examType === 'Internal Assessment 1' ? c.ia1Marks : c.ia2Marks;
-                tableHTML += `<td>50</td><td>${marksField ?? 'N/A'}</td><td>${c.attendancePercentage?.toFixed(2) ?? 'N/A'}%</td>`;
-            } else if (isSeeExam) {
-                tableHTML += `<td>${c.combinedCieMarks?.toFixed(2) ?? 'N/A'}</td><td>${c.seeMarks ?? 'N/A'}</td>
-                              <td>${c.overallTotalMarks?.toFixed(2) ?? 'N/A'}</td><td>${c.overallPercentage?.toFixed(2) ?? 'N/A'}%</td>
-                              <td>${c.attendancePercentage?.toFixed(2) ?? 'N/A'}%</td>`;
-            }
-            tableHTML += `</tr>`;
-        });
+            student.coursePerformances.forEach(c => {
+                const attendancePercentage = (c.totalClassesHeld > 0) ? (c.classesAttended / c.totalClassesHeld) * 100 : 0;
+                const combinedCieMarks = (c.ia1Marks != null && c.ia2Marks != null) ? (c.ia1Marks + c.ia2Marks) / 2 : null;
+                const combinedCieForFinal = (c.ia1Marks != null && c.ia2Marks != null) ? (c.ia1Marks + c.ia2Marks) / 5 : null;
+                const finalTotalMarks = (combinedCieForFinal != null && c.seeMarks != null) ? combinedCieForFinal + c.seeMarks : null;
+                const finalPercentage = (finalTotalMarks != null) ? (finalTotalMarks / 100) * 100 : null;
+
+                tableHTML += `<tr>
+                    <td>${c.courseCode}</td>
+                    <td>${c.subjectName}</td>
+                    <td>${combinedCieMarks?.toFixed(1) ?? 'N/A'} / 50</td>
+                    <td>${c.seeMarks ?? 'N/A'} / 80</td>
+                    <td>${finalTotalMarks?.toFixed(1) ?? 'N/A'} / 100</td>
+                    <td>${finalPercentage?.toFixed(2) ?? 'N/A'}%</td>
+                    <td>${attendancePercentage.toFixed(2)}%</td>
+                </tr>`;
+            });
+        }
+        
         tableHTML += '</tbody></table></div>';
         performanceDisplay.innerHTML = tableHTML;
+        renderPerformanceAnalysis(student, examType);
     };
+
+    // ==================================================================
+    //  ADD THIS NEW FUNCTION AT THE END OF YOUR SCRIPT
+    // ==================================================================
+    const renderPerformanceAnalysis = (student, examType) => {
+        const analysisBox = qs('#facultyAnalysisBox');
+        if (!student || !student.coursePerformances || student.coursePerformances.length === 0) {
+            analysisBox.innerHTML = '';
+            return;
+        }
+
+        let totalMarks = 0, totalMaxMarks = 0, totalAttended = 0, totalHeld = 0;
+        const marksKey = (examType === 'Internal Assessment 1') ? 'ia1Marks' : 'ia2Marks';
+
+        student.coursePerformances.forEach(c => {
+            if (examType.startsWith('Internal')) {
+                if (c[marksKey] != null) {
+                    totalMarks += c[marksKey];
+                    totalMaxMarks += 50;
+                }
+            }
+            totalAttended += c.classesAttended || 0;
+            totalHeld += c.totalClassesHeld || 0;
+        });
+
+        const marksPercentage = (totalMaxMarks > 0) ? (totalMarks / totalMaxMarks) * 100 : 0;
+        const attendancePercentage = (totalHeld > 0) ? (totalAttended / totalHeld) * 100 : 0;
+
+        let message = '';
+        let type = 'info';
+        let icon = 'bx-info-circle';
+
+        if (examType === 'SEE') {
+            const finalPercentage = student.coursePerformances.reduce((acc, c) => {
+                const combinedCieForFinal = (c.ia1Marks != null && c.ia2Marks != null) ? (c.ia1Marks + c.ia2Marks) / 5 : null;
+                const finalTotalMarks = (combinedCieForFinal != null && c.seeMarks != null) ? combinedCieForFinal + c.seeMarks : null;
+                return acc + (finalTotalMarks || 0);
+            }, 0) / student.coursePerformances.length;
+
+            if (finalPercentage >= 40) {
+                type = 'success';
+                icon = 'bx-party';
+                message = `<strong>Congratulations on Passing!</strong> A strong performance in the final exams. Keep up the excellent work and momentum for the next semester.`;
+            } else {
+                type = 'warning';
+                icon = 'bx-bulb';
+                message = `<strong>Result Pending Improvement.</strong> The final exam scores indicate some challenges. Let's review the key subjects and prepare a strategy for the supplementary exams.`;
+            }
+        } else { // Handle CIE-1 and CIE-2
+            const isGoodMarks = marksPercentage >= 60;
+            const isGoodAttendance = attendancePercentage >= 75;
+            const isLowAttendance = attendancePercentage < 50;
+
+            if (isGoodMarks && isGoodAttendance) {
+                type = 'success'; icon = 'bx-like';
+                message = `<strong>Excellent Balance!</strong> The student demonstrates strong academic performance and consistent attendance. A great foundation for success.`;
+            } else if (isGoodMarks && !isGoodAttendance) {
+                type = 'info'; icon = 'bx-user-voice';
+                message = `<strong>Academically Strong, but Attendance is a Concern.</strong> The student scores well but is missing classes. Regular attendance is key to maintaining high performance.`;
+            } else if (!isGoodMarks && isGoodAttendance) {
+                type = 'warning'; icon = 'bx-book-open';
+                message = `<strong>Highly Attentive, Needs Academic Focus.</strong> The student is regular to class but struggling with scores. Suggest focusing on study techniques and clearing doubts.`;
+            } else { // Low marks and low attendance
+                if(isLowAttendance) {
+                    type = 'danger'; icon = 'bx-error-alt';
+                    message = `<strong>Critical Concern.</strong> Both attendance and marks are very low. This indicates a significant lack of engagement. Immediate intervention is recommended.`;
+                } else {
+                    type = 'warning'; icon = 'bx-error-circle';
+                    message = `<strong>Needs Improvement on Both Fronts.</strong> Attendance is below the required 75%, and marks are not up to the standard. A discussion about focus and discipline is needed.`;
+                }
+            }
+        }
+        
+        analysisBox.className = `analysis-box ${type}`;
+        analysisBox.innerHTML = `<i class='bx ${icon}'></i><p>${message}</p>`;
+    };
+    
     
     const renderSingleStudent = (student, examType) => {
         currentStudentData = { student, examType };

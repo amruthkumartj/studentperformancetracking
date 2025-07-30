@@ -605,19 +605,19 @@ public class UserDAO {
                 s.sem,
                 c.course_id,
                 c.course_name,
-                -- Subquery for present days
+                -- CORRECTED: This subquery now correctly fetches the present count
                 (SELECT COUNT(ar.attendance_id)
                  FROM attendancerecords ar
-                 JOIN student_courses sc_att ON ar.enrollment_id = sc_att.enrollment_id
-                 WHERE sc_att.student_id = s.student_id AND ar.status = 'PRESENT'
+                 JOIN enrollments e_att ON ar.enrollment_id = e_att.enrollment_id
+                 WHERE e_att.student_id = s.student_id AND ar.status = 'PRESENT'
                    AND ar.session_id IN (SELECT ats.session_id FROM attendancesessions ats WHERE ats.course_id = c.course_id)
                 ) AS present_days,
-                -- Subquery for total completed classes
+                -- This subquery for total classes is correct
                 (SELECT COUNT(ats.session_id)
                  FROM attendancesessions ats
                  WHERE ats.course_id = c.course_id AND ats.status = 'Completed'
                 ) AS total_days,
-                -- Subqueries for each mark type
+                -- These subqueries for marks are correct
                 (SELECT m.marks_obtained FROM marks m JOIN student_courses sc_m ON m.enrollment_id = sc_m.enrollment_id WHERE sc_m.student_id = s.student_id AND m.course_id = c.course_id AND m.exam_type = 'Internal Assessment 1') AS cie1,
                 (SELECT m.marks_obtained FROM marks m JOIN student_courses sc_m ON m.enrollment_id = sc_m.enrollment_id WHERE sc_m.student_id = s.student_id AND m.course_id = c.course_id AND m.exam_type = 'Internal Assessment 2') AS cie2,
                 (SELECT m.marks_obtained FROM marks m JOIN student_courses sc_m ON m.enrollment_id = sc_m.enrollment_id WHERE sc_m.student_id = s.student_id AND m.course_id = c.course_id AND m.exam_type = 'SEE (Semester End Examination)') AS see
@@ -640,7 +640,6 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 boolean firstRow = true;
                 while (rs.next()) {
-                    // Set the main student details only once from the first row
                     if (firstRow) {
                         studentPerformance.setStudentId(rs.getInt("student_id"));
                         studentPerformance.setStudentName(rs.getString("student_name"));
@@ -649,7 +648,6 @@ public class UserDAO {
                         firstRow = false;
                     }
 
-                    // Create a CoursePerformance object for each course using the corrected constructor
                     CoursePerformance cp = new CoursePerformance(
                         rs.getString("course_id"),
                         rs.getString("course_name"),
