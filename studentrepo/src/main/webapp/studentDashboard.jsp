@@ -182,6 +182,7 @@ text-align: right; / Align percentage to the right */
     .exam-filter-container { display: flex; gap: 8px; padding: 6px; background-color: var(--hover-bg); border-radius: var(--radius-small); margin-bottom: 24px; }
     .exam-filter-btn { flex: 1; padding: 10px; border: none; background-color: transparent; color: var(--text-secondary); font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 14px; border-radius: 6px; cursor: pointer; }
     .exam-filter-btn.active { background-color: var(--card-bg); color: var(--text-primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    
 </style>
 </head>
 <body class="dark-mode">
@@ -318,19 +319,21 @@ text-align: right; / Align percentage to the right */
             </div>
   <!-- ======================= MARKS VIEW (REBUILT) ======================= -->
                <!-- ======================= MARKS VIEW (REBUILT) ======================= -->
-                <div id="marks-view" class="view">
-                    <div class="view-header">
-                        <button class="back-button action-btn"><i class='bx bx-arrow-back'></i></button>
-                        <h2>Marks & Grades</h2>
-                        <div class="semester-filter-wrapper">
-                            <label for="marks-semester-filter">Semester:</label>
-                            <select id="marks-semester-filter" class="semester-filter" data-view-target="marks-view">
-                               <c:forEach var="entry" items="${dashboard.performanceBySemester}">
-                                    <option value="${entry.key}" ${entry.key == dashboard.currentSemester ? 'selected' : ''}>Semester ${entry.key}</option>
-                                </c:forEach>
-                            </select>
-                        </div>
-                    </div>
+               <div id="marks-view" class="view">
+    <div class="view-header">
+        <button class="back-button action-btn"><i class='bx bx-arrow-back'></i></button>
+        <h2>Marks & Grades</h2>
+    </div>
+
+    <div class="semester-filter-wrapper">
+        <label for="marks-semester-filter">Semester:</label>
+        <select id="marks-semester-filter" class="semester-filter" data-view-target="marks-view">
+           <c:forEach var="entry" items="${dashboard.performanceBySemester}">
+                <option value="${entry.key}" ${entry.key == dashboard.currentSemester ? 'selected' : ''}>Semester ${entry.key}</option>
+            </c:forEach>
+        </select>
+    </div><br><br>
+ 
 
                     <c:forEach var="entry" items="${dashboard.performanceBySemester}">
                         <div class="semester-content" data-view="marks-view" data-semester="${entry.key}">
