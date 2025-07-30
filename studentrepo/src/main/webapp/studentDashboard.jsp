@@ -220,7 +220,7 @@ text-align: right; / Align percentage to the right */
             <div id="dashboard-home" class="view is-active">
                  <div class="welcome-header">
                     <h1>Welcome, <c:out value="${dashboard.studentName}"/>!</h1>
-                    <p>Here's a summary of your academic progress.</p>
+                    
                 </div>
                 <div class="home-layout-grid">
                     <div class="home-col-left">
