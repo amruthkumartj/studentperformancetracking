@@ -111,6 +111,9 @@ public class FacultyDashboardServlet extends HttpServlet {
             // NEW/VERIFIED: Set JSON strings as attributes for client-side JavaScript
             req.setAttribute("allProgramsJson", allProgramsJson);
             req.setAttribute("assignedProgramIdsJson", assignedProgramIdsJson);
+            Map<String, String> profileDetails = facultyDAO.getFacultyProfileDetails(userId);
+            // Pass these details to the JSP page
+            req.setAttribute("profileDetails", profileDetails);
 
             req.getRequestDispatcher("/facultyDashboard.jsp").forward(req, resp);
 

@@ -29,7 +29,8 @@ public class DBUtil {
         } else {
             // Fallback to local configuration
             System.out.println("⚠️ Aiven environment variables not set. Configuring HikariCP for local DB.");
-            config.setJdbcUrl("jdbc:mysql://localhost:3306/stud?useSSL=false&serverTimezone=UTC");
+         // In DBUtil.java
+            config.setJdbcUrl("jdbc:mysql://localhost:3306/stud?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8");
             config.setUsername("root");
             config.setPassword("root");
         }

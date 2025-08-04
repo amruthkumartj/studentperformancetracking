@@ -49,6 +49,9 @@ public class UserDAO {
             return false;
         }
     }
+    
+    
+    
 
     /**
      * Retrieves a User object by their email address.
@@ -124,6 +127,8 @@ public class UserDAO {
         }
     }
 
+    
+    
     /**
      * Retrieves a User object linked to a specific faculty ID.
      * This assumes the 'faculty' table has a 'user_id' column linking to the 'users' table.
@@ -963,7 +968,7 @@ public class UserDAO {
         // This query has been corrected to join the 'marks' table to the correct enrollment table.
         String sql = """
             SELECT
-                sd.student_id, sd.student_name, sd.current_semester,
+                sd.student_id, sd.student_name, sd.current_semester, sd.program_id,
                 c.course_id, c.course_name, c.semester,
                 -- Subquery for present days (this logic is correct)
                 (SELECT COUNT(ar.attendance_id)
@@ -995,7 +1000,7 @@ public class UserDAO {
                 ) AS see
             FROM
                 (
-                    SELECT s.student_id, s.student_name, s.sem AS current_semester
+                    SELECT s.student_id, s.student_name, s.program_id, s.sem AS current_semester
                     FROM students s
                     JOIN users u ON s.email = u.email
                     WHERE u.user_id = ?
@@ -1019,6 +1024,7 @@ public class UserDAO {
                         dashboardDTO.setStudentId(rs.getInt("student_id"));
                         dashboardDTO.setStudentName(rs.getString("student_name"));
                         dashboardDTO.setCurrentSemester(rs.getInt("current_semester"));
+                        dashboardDTO.setProgramId(rs.getInt("program_id")); // <-- ADDED THIS LINE
                         firstRow = false;
                     }
                     int semester = rs.getInt("semester");

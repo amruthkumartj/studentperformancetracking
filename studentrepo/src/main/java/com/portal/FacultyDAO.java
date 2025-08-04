@@ -8,7 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FacultyDAO {
 
@@ -39,7 +41,42 @@ public class FacultyDAO {
             return false;
         }
     }
+    
+    
+    
+ // In FacultyDAO.java
+ // Make sure to import java.util.Map and java.util.HashMap
 
+ // In FacultyDAO.java
+
+ // In your FacultyDAO.java file, replace the entire method with this one.
+
+    public Map<String, String> getFacultyProfileDetails(int userId) {
+        Map<String, String> profileDetails = new HashMap<>();
+        
+        // === FINAL FIX: Removed "f.phone" from the SQL query as the column does not exist ===
+        String sql = "SELECT u.username, u.email, f.faculty_id " +
+                     "FROM users u JOIN faculty f ON u.user_id = f.user_id " +
+                     "WHERE u.user_id = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, userId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    profileDetails.put("username", rs.getString("username"));
+                    profileDetails.put("email", rs.getString("email"));
+                    profileDetails.put("facultyId", String.valueOf(rs.getInt("faculty_id")));
+                    // We do not fetch a phone number here because it doesn't exist in the table.
+                    // The JavaScript will handle displaying "Not Set".
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return profileDetails;
+    }
     /**
      * Counts the number of courses associated with programs assigned to a specific faculty member.
      * This assumes:

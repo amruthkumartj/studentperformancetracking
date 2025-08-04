@@ -46,6 +46,12 @@ public class LoginServlet extends HttpServlet {
             user = dao.validate(identifier.trim(), password.trim(), requestedRole.trim());
 
             if (user != null) {
+            	System.out.println("--- LOGIN SUCCESSFUL: DEBUGGING USER SESSION DATA ---");
+                System.out.println("User ID from User object: " + user.getId());
+                System.out.println("Username from User object: " + user.getUsername());
+                System.out.println("Email from User object: " + user.getEmail());
+                System.out.println("Role from User object: " + user.getRole());
+                System.out.println("----------------------------------------------------");
                 /* 3 ── Success: create session + redirect to dashboard */
                 HttpSession session = req.getSession(true);
                 session.setAttribute("user", user); // Store the full User object

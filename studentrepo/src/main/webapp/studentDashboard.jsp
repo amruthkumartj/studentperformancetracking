@@ -182,7 +182,210 @@ text-align: right; / Align percentage to the right */
     .exam-filter-container { display: flex; gap: 8px; padding: 6px; background-color: var(--hover-bg); border-radius: var(--radius-small); margin-bottom: 24px; }
     .exam-filter-btn { flex: 1; padding: 10px; border: none; background-color: transparent; color: var(--text-secondary); font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 14px; border-radius: 6px; cursor: pointer; }
     .exam-filter-btn.active { background-color: var(--card-bg); color: var(--text-primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    
+    /* Add this to your existing styles */
+/* Ensure this is present and correct */
+.view {
+    /* Existing styles, if any */
+    display: none; 
+    flex-direction: column;
+    /* This transition is crucial for the back button to work */
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+/* Also ensure your is-exiting class is defined */
+.view.is-exiting { 
+    display: flex !important; 
+    animation: fadeOut 0.3s forwards ease; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    padding: 24px;
+}
+/* In studentDashboard.jsp, inside the <style> tag */
+
+/* --- Styles for Event Details Modal --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.modal-overlay.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+.modal-content {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-large);
+    box-shadow: var(--shadow-strong);
+    width: 90%;
+    max-width: 550px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+.modal-overlay.is-visible .modal-content {
+    transform: scale(1);
+}
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.modal-header h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+.modal-close-btn {
+    font-size: 28px;
+}
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+.modal-body::-webkit-scrollbar { width: 5px; }
+.modal-body::-webkit-scrollbar-thumb { background-color: rgba(128, 128, 128, 0.3); border-radius: 3px; }
+.modal-body .event-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+.meta-item i {
+    font-size: 20px;
+    color: var(--text-primary);
+}
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+.modal-footer .btn {
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: 500;
+}
+.btn-register {
+    background-color: var(--accent-blue);
+    color: #fff;
+}
+.btn-register:hover {
+    filter: brightness(1.1);
+}
+/* In studentDashboard.jsp, add this inside the <style> tag */
+
+/* --- Improved Modal Button Styles --- */
+.modal-header .modal-close-btn {
+    border-radius: 50%; /* Makes the header close button circular */
+    color: var(--text-secondary);
+}
+.modal-header .modal-close-btn:hover {
+    background-color: var(--hover-bg);
+    color: var(--text-primary);
+}
+.modal-footer .modal-close-btn {
+    /* Styles the footer button to be a proper secondary button */
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: var(--radius-small);
+    background-color: var(--hover-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+.modal-footer .modal-close-btn:hover {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+}
+/* In studentDashboard.jsp, add this inside the <style> tag */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    padding: 10px 20px;
+    font-size: 15px;
+    border-radius: var(--radius-small); /* Creates the rounded rectangular shape */
+    transition: all 0.2s ease;
+    text-decoration: none;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+.btn-register {
+    background-color: var(--accent-blue);
+    color: #fff;
+}
+.btn-register:hover {
+    filter: brightness(1.1);
+    transform: scale(1.03);
+}
+/* In studentDashboard.jsp, add this inside the <style> tag */
+
+/* --- Final Modal Text and Design Styles --- */
+.meta-item {
+    display: flex;
+    flex-direction: column; /* Stack label and value vertically */
+    align-items: flex-start;
+    gap: 4px;
+    font-size: 14px;
+}
+.meta-item .meta-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.meta-item .meta-value {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+/* Special design for the "Register by" date */
+#modal-event-reg-date-item .meta-value {
+    font-weight: 600;
+    color: var(--accent-orange);
+}
+#modal-event-description {
+    white-space: pre-wrap; /* This is the magic property */
+    word-wrap: break-word; /* Ensures long words don't overflow */
+}
 </style>
 </head>
 <body class="dark-mode">
@@ -228,9 +431,9 @@ text-align: right; / Align percentage to the right */
                         <div class="widget">
                             <div class="widget-header"><i class='bx bxs-star'></i><span>Today's Highlights</span></div>
                             <ul class="data-list">
-                                <li class="data-list-item">
+                                <li class="data-list-item" id="next-class-item">
                                     <div class="icon" style="background-color: var(--accent-orange);"><i class='bx bx-time-five'></i></div>
-                                    <div class="content"><h4>Next Class: AI & ML</h4><p class="meta">12:00 PM - 1:00 PM</p></div>
+                                    <div class="content"><h4>Next Class: <span id="next-class-subject">N/A</span></h4><p class="meta" id="next-class-time">No class scheduled</p></div>
                                 </li>
                                 <li class="data-list-item">
                                     <div class="icon" style="background-color: var(--accent-green);"><i class='bx bxs-pie-chart-alt-2'></i></div>
@@ -255,12 +458,13 @@ text-align: right; / Align percentage to the right */
                         </div>
                     </div>
                     <div class="home-col-right">
-                        <div class="widget">
-                            <div class="widget-header"><i class='bx bxs-calendar-star'></i><span>Upcoming Events</span></div>
-                             <ul class="data-list">
-                                <li class="data-list-item"><div class="icon" style="background: var(--accent-green);"><i class='bx bx-calendar-event'></i></div><div class="content"><h4>Innovate 2.0 Hackathon</h4></div><span class="trailing">Aug 15</span></li>
-                                <li class="data-list-item"><div class="icon" style="background: var(--accent-red);"><i class='bx bxs-flame'></i></div><div class="content"><h4>Sports Day</h4></div><span class="trailing">Sep 01</span></li>
-                            </ul>
+            			<div class="widget">
+                			<div class="widget-header"><i class='bx bxs-calendar-star'></i><span>Upcoming Events</span></div>
+                				<ul class="data-list" id="upcoming-events-list">
+                    			<div style="text-align: center; color: var(--text-secondary); padding: 10px;" id="events-placeholder">
+                        		<p>No upcoming events.</p>
+                    			</div>
+                				</ul>
                         </div>
                     </div>
                 </div>
@@ -320,7 +524,6 @@ text-align: right; / Align percentage to the right */
     </c:forEach>
 </div>
 
-               <!-- ======================= MARKS VIEW (REBUILT) ======================= -->
                <div id="marks-view" class="view">
     <div class="view-header">
         <button class="back-button action-btn"><i class='bx bx-arrow-back'></i></button>
@@ -346,7 +549,6 @@ text-align: right; / Align percentage to the right */
                                     <button class="exam-filter-btn" data-exam-target="see">Final (SEE)</button>
                                 </div>
 
-                                <!-- CIE-1 Content -->
                                 <div class="exam-content is-visible" data-exam-type="cie1">
                                 <div class="table-scroll-wrapper">
                                     <table class="marks-table">
@@ -365,7 +567,6 @@ text-align: right; / Align percentage to the right */
                                   </div>
                                 </div>
 
-                                <!-- CIE-2 Content -->
                                 <div class="exam-content" data-exam-type="cie2">
                                 <div class="table-scroll-wrapper">
                                     <table class="marks-table">
@@ -384,7 +585,6 @@ text-align: right; / Align percentage to the right */
                                     </div>
                                 </div>
 
-                                <!-- SEE (Final) Content -->
                                 <div class="exam-content" data-exam-type="see">
                                 <div class="table-scroll-wrapper">
                                     <table class="marks-table">
@@ -414,23 +614,52 @@ text-align: right; / Align percentage to the right */
             <div id="schedule-view" class="view">
                 <div class="view-header"><button class="back-button action-btn"><i class='bx bx-arrow-back'></i></button><h2>Today's Schedule</h2></div>
                 <div class="widget">
-                    <div class="widget-header"><i class='bx bxs-calendar'></i><span>Classes for Jul 29, 2025</span></div>
-                    <ul class="data-list">
-                        <li class="data-list-item">
-                            <div class="icon" style="background: var(--accent-blue);"><i class='bx bx-code-alt'></i></div>
-                            <div class="content"><h4>Web Tech Lab</h4><p class="meta">Block A, Room 301</p></div>
-                            <span class="trailing">10-11 AM</span></li>
-                         <li class="data-list-item">
-                            <div class="icon" style="background: var(--accent-green);"><i class='bx bxs-brain'></i></div>
-                            <div class="content"><h4>AI & ML</h4><p class="meta">Block C, Room 205</p></div>
-                            <span class="trailing">12-1 PM</span></li>
+                    <div class="widget-header"><i class='bx bxs-calendar'></i><span id="schedule-header-date">Classes for <fmt:formatDate value="<%= new java.util.Date() %>" pattern="MMM d, yyyy"/></span></div>
+                    <ul class="data-list" id="todays-schedule-list">
+                         <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                             <p>Loading schedule...</p>
+                         </div>
                     </ul>
                 </div>
             </div>
         </div>
     </main>
 </div>
-
+<div class="modal-overlay" id="event-modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-event-title">Event Title</h3>
+            <button class="action-btn modal-close-btn"><i class='bx bx-x'></i></button>
+        </div>
+        <div class="modal-body">
+            <p id="modal-event-description">Event description will go here...</p>
+            <div class="event-meta-grid">
+                <div class="meta-item" id="modal-event-date-item">
+                    <span class="meta-label">Event Date</span>
+                    <span class="meta-value" id="modal-event-date"></span>
+                </div>
+                <div class="meta-item" id="modal-event-time-item">
+                    <span class="meta-label">Time</span>
+                    <span class="meta-value" id="modal-event-time"></span>
+                </div>
+                <div class="meta-item" id="modal-event-reg-date-item">
+                    <span class="meta-label">Registration</span>
+                    <span class="meta-value" id="modal-event-reg-date"></span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#" target="_blank" class="btn btn-register" id="modal-event-link">
+                <i class='bx bx-link-external'></i> Register 
+            </a>
+        </div>
+    </div>
+</div>
+<script>
+    window.studentProgramId = '<c:out value="${dashboard.programId}"/>';
+    window.studentSemester = '<c:out value="${dashboard.currentSemester}"/>';
+    window.serverDate = '<fmt:formatDate value="<%= new java.util.Date() %>" pattern="yyyy-MM-dd"/>';
+</script>
 <script src="${pageContext.request.contextPath}/js/student.js"></script>
 
 </body>

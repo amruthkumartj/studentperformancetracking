@@ -12,6 +12,8 @@ public class StudentDashboardDTO {
     private String studentName;
     private int currentSemester;
     
+    private int programId;
+    
     // Key: Semester number (e.g., 1, 2). Value: List of course performance data for that semester.
     private Map<Integer, List<CoursePerformance>> performanceBySemester;
     
@@ -27,6 +29,9 @@ public class StudentDashboardDTO {
 
     public int getCurrentSemester() { return currentSemester; }
     public void setCurrentSemester(int currentSemester) { this.currentSemester = currentSemester; }
+
+    public int getProgramId() { return programId; }
+    public void setProgramId(int programId) { this.programId = programId; }
 
     public Map<Integer, List<CoursePerformance>> getPerformanceBySemester() { return performanceBySemester; }
     public void setPerformanceBySemester(Map<Integer, List<CoursePerformance>> performanceBySemester) { this.performanceBySemester = performanceBySemester; }
