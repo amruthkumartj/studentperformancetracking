@@ -146,14 +146,11 @@
         width: 100%;
         max-width: 100%;
         box-sizing: border-box;
-        /* Ensure content-area can grow vertically */
-        flex-grow: 1; 
-        /* Remove any fixed height that might be cutting off content */
-        height: auto; 
+        flex-grow: 1;
+        height: auto;
     }
     .content-scroll-wrapper {
         padding: 16px;
-        /* ADD THIS: Extra padding at the bottom to push content above device nav bar */
         padding-bottom: 80px; /* Adjust this value as needed to clear the device's nav bar */
         scrollbar-width: none;
         width: 100%;
@@ -189,6 +186,26 @@
         box-sizing: border-box;
         margin: 0;
     }
+
+    /* --- NEW FIX FOR EVENT TEXT OVERFLOW --- */
+    .data-list-item .content {
+        /* Allow text to wrap within the content area */
+        white-space: normal; /* Override nowrap if it's set elsewhere */
+        word-wrap: break-word; /* Break long words */
+        overflow-wrap: break-word; /* Modern property for word breaking */
+        flex-shrink: 1; /* Allow this item to shrink if needed */
+        min-width: 0; /* Important for flex items to allow shrinking */
+    }
+
+    .data-list-item h4 {
+        /* Ensure the heading text also wraps */
+        white-space: normal; /* Override nowrap if it's set elsewhere */
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        text-overflow: clip; /* Prevent ellipsis if text wraps */
+    }
+    /* --- END NEW FIX --- */
+
 
     .nav-grid { grid-template-columns: 1fr; }
     .view.is-exiting { padding: 16px; }
