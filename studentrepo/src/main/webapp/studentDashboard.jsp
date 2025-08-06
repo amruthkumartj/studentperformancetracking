@@ -461,7 +461,7 @@
             </button>
             <div class="profile-menu-wrapper">
                 <button class="action-btn profile-avatar-btn">
-                    <img src="https://i.pravatar.cc/44?u=${fn:replace(dashboard.studentName, ' ', '')}" alt="Avatar" class="profile-avatar">
+                    <img src="Graduation-icon.png" alt="Graduation Icon" class="profile-avatar">
                 </button>
                 <div class="profile-dropdown">
                     <div class="profile-dropdown-item nav-link" data-target="profile-view">
@@ -535,7 +535,7 @@
                 <div class="view-header"><button class="back-button action-btn"><i class='bx bx-arrow-back'></i></button><h2>My Profile</h2></div>
                 <div class="widget">
                     <div class="profile-avatar-large-wrapper">
-                        <img src="https://i.pravatar.cc/110?u=${fn:replace(dashboard.studentName, ' ', '')}" alt="Student Avatar" class="profile-avatar-large">
+                        <img src="Graduation-icon.png" alt="Student Avatar" class="profile-avatar-large">
                     </div>
                     <div class="form-group">
                         <label for="studentName">Full Name</label>
