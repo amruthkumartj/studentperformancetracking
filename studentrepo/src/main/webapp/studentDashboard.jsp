@@ -143,44 +143,51 @@
     .header-logo img { height: 32px; }
     .content-area {
         margin-top: -40px;
-        width: 100%; /* Ensure content-area itself takes full width */
-        max-width: 100%; /* Prevent overflow */
+        width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        /* Ensure content-area can grow vertically */
+        flex-grow: 1; 
+        /* Remove any fixed height that might be cutting off content */
+        height: auto; 
     }
     .content-scroll-wrapper {
         padding: 16px;
+        /* ADD THIS: Extra padding at the bottom to push content above device nav bar */
+        padding-bottom: 80px; /* Adjust this value as needed to clear the device's nav bar */
         scrollbar-width: none;
-        width: 100%; /* Ensure it takes full width */
-        max-width: 100%; /* Prevent overflow */
+        width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
-        overflow-x: hidden; /* Crucial: Hide any horizontal overflow within this wrapper */
+        overflow-x: hidden; /* Hide any horizontal overflow */
+        overflow-y: auto; /* Ensure vertical scrolling is enabled */
     }
     .content-scroll-wrapper::-webkit-scrollbar { display: none; }
 
     /* Ensure the main layout grid collapses and its columns take full width */
     .home-layout-grid {
-        grid-template-columns: 1fr; /* Ensures single column layout */
-        width: 100%; /* Make sure the grid itself takes full width */
-        max-width: 100%; /* Prevent it from exceeding its container */
+        grid-template-columns: 1fr;
+        width: 100%;
+        max-width: 100%;
         margin: 0 auto; /* Center the grid horizontally */
-        box-sizing: border-box; /* Include padding/border in its width */
-        padding: 0; /* Remove any internal padding that might cause issues here */
+        box-sizing: border-box;
+        padding: 0;
     }
     .home-col-left,
     .home-col-right {
-        width: 100%; /* Make sure both columns take full width on mobile */
-        max-width: 100%; /* Prevent overflow */
-        box-sizing: border-box; /* Include padding/border in width */
-        padding: 0; /* Reset padding to ensure content aligns to the edge of the column */
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        padding: 0;
     }
 
     /* Ensure widgets and nav cards take full width within their containers */
     .widget,
     .nav-card {
-        width: 100%; /* Explicitly set to 100% to fit parent */
-        max-width: 100%; /* Prevent it from exceeding its container */
-        box-sizing: border-box; /* Crucial for padding to be internal */
-        margin: 0; /* Remove any default margins that might push it right */
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        margin: 0;
     }
 
     .nav-grid { grid-template-columns: 1fr; }
