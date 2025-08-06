@@ -138,39 +138,72 @@
     .attendance-bar { background: linear-gradient(90deg, #23C35F, #34c759); height: 100%; width: 0; transition: width 1s var(--transition-smooth); }
     .attendance-meta { display: flex; justify-content: space-between; margin-top: 8px; font-size: 13px; color: var(--text-secondary); }
     @media (max-width: 1024px) { .home-layout-grid { grid-template-columns: 1fr; } }
-    @media (max-width: 600px) {
-        .widget, .nav-card {
-        width: 95%;
-        max-width: 100%;
-        }
-        .app-header { padding: 16px 16px 70px 16px; }
-        .header-logo img { height: 32px; }
-        .content-area { margin-top: -40px; }
-        .content-scroll-wrapper { padding: 16px; scrollbar-width: none; }
-        .content-scroll-wrapper::-webkit-scrollbar { display: none; }
-        .nav-grid { grid-template-columns: 1fr; }
-        .view.is-exiting { padding: 16px; }
-            .marks-table { font-size: 14px; }
-        .marks-table th, .marks-table td { padding: 10px; }
-        .marks-table {
-font-size: 12px; 
-}
-.marks-table th, .marks-table td {
-padding: 8px 6px; / Reduced padding /
-}
-.marks-table thead th:last-child,
-.marks-table tbody td:last-child {
-white-space: nowrap; / Prevent wrapping of percentage /
-text-align: right; / Align percentage to the right */
-}
-         /* ✨ NEW STYLES FOR SCROLLABLE TABLE ✨ */
+@media (max-width: 600px) {
+    .app-header { padding: 16px 16px 70px 16px; }
+    .header-logo img { height: 32px; }
+    .content-area {
+        margin-top: -40px;
+        width: 100%; /* Ensure content-area itself takes full width */
+        max-width: 100%; /* Prevent overflow */
+        box-sizing: border-box;
+    }
+    .content-scroll-wrapper {
+        padding: 16px;
+        scrollbar-width: none;
+        width: 100%; /* Ensure it takes full width */
+        max-width: 100%; /* Prevent overflow */
+        box-sizing: border-box;
+        overflow-x: hidden; /* Crucial: Hide any horizontal overflow within this wrapper */
+    }
+    .content-scroll-wrapper::-webkit-scrollbar { display: none; }
+
+    /* Ensure the main layout grid collapses and its columns take full width */
+    .home-layout-grid {
+        grid-template-columns: 1fr; /* Ensures single column layout */
+        width: 100%; /* Make sure the grid itself takes full width */
+        max-width: 100%; /* Prevent it from exceeding its container */
+        margin: 0 auto; /* Center the grid horizontally */
+        box-sizing: border-box; /* Include padding/border in its width */
+        padding: 0; /* Remove any internal padding that might cause issues here */
+    }
+    .home-col-left,
+    .home-col-right {
+        width: 100%; /* Make sure both columns take full width on mobile */
+        max-width: 100%; /* Prevent overflow */
+        box-sizing: border-box; /* Include padding/border in width */
+        padding: 0; /* Reset padding to ensure content aligns to the edge of the column */
+    }
+
+    /* Ensure widgets and nav cards take full width within their containers */
+    .widget,
+    .nav-card {
+        width: 100%; /* Explicitly set to 100% to fit parent */
+        max-width: 100%; /* Prevent it from exceeding its container */
+        box-sizing: border-box; /* Crucial for padding to be internal */
+        margin: 0; /* Remove any default margins that might push it right */
+    }
+
+    .nav-grid { grid-template-columns: 1fr; }
+    .view.is-exiting { padding: 16px; }
+    .marks-table { font-size: 14px; }
+    .marks-table th, .marks-table td { padding: 10px; }
+    .marks-table {
+        font-size: 12px;
+    }
+    .marks-table th, .marks-table td {
+        padding: 8px 6px; /* Reduced padding */
+    }
+    .marks-table thead th:last-child,
+    .marks-table tbody td:last-child {
+        white-space: nowrap; /* Prevent wrapping of percentage */
+        text-align: right; /* Align percentage to the right */
+    }
+    /* ✨ NEW STYLES FOR SCROLLABLE TABLE ✨ */
     .table-scroll-wrapper {
         overflow-x: auto; /* This is the key property! */
         -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
-    
- 
-    } 
+}
     /* --- FIX for UI BUG --- */
     .widget .exam-content { display: none; }
     .widget .exam-content.is-visible { display: block; }
