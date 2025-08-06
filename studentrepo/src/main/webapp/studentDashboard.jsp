@@ -139,6 +139,10 @@
     .attendance-meta { display: flex; justify-content: space-between; margin-top: 8px; font-size: 13px; color: var(--text-secondary); }
     @media (max-width: 1024px) { .home-layout-grid { grid-template-columns: 1fr; } }
     @media (max-width: 600px) {
+        .widget, .nav-card {
+        width: 95%;
+        max-width: 100%;
+        }
         .app-header { padding: 16px 16px 70px 16px; }
         .header-logo img { height: 32px; }
         .content-area { margin-top: -40px; }
