@@ -545,6 +545,19 @@
                         <label for="studentId">Student ID</label>
                         <input type="text" id="studentId" class="form-control" value="<c:out value="${dashboard.studentId}"/>" readonly>
                     </div>
+                    <div class="form-group">
+                        <label for="ProgramName">Program</label>
+                        <input type="text" id="Program" class="form-control" value="<c:out value="${dashboard.programName}"/>" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentProgram">Current Semester</label>
+                        <input type="text" id="CrrSem" class="form-control" value="<c:out value="${dashboard.currentSemester}"/>" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentEmail">Email</label>
+                        <input type="text" id="Email" class="form-control" value="<c:out value="${dashboard.email}"/>" readonly>
+                    </div>
+                    
                 </div>
             </div>
 

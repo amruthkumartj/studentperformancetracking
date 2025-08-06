@@ -967,48 +967,49 @@ public class UserDAO {
         
         // This query has been corrected to join the 'marks' table to the correct enrollment table.
         String sql = """
-            SELECT
-                sd.student_id, sd.student_name, sd.current_semester, sd.program_id,
-                c.course_id, c.course_name, c.semester,
-                -- Subquery for present days (this logic is correct)
-                (SELECT COUNT(ar.attendance_id)
-                 FROM attendancerecords ar
-                 JOIN enrollments e ON ar.enrollment_id = e.enrollment_id
-                 WHERE e.student_id = sd.student_id AND ar.status = 'PRESENT'
-                   AND ar.session_id IN (SELECT ats.session_id FROM attendancesessions ats WHERE ats.course_id = c.course_id)
-                ) AS present_days,
-                -- Subquery for total completed classes (this logic is correct)
-                (SELECT COUNT(ats.session_id)
-                 FROM attendancesessions ats
-                 WHERE ats.course_id = c.course_id AND ats.status = 'Completed'
-                ) AS total_days,
-                -- CORRECTED: Marks subqueries now join to 'student_courses' which is the correct table
-                (SELECT m.marks_obtained
-                 FROM marks m
-                 JOIN student_courses sc_m ON m.enrollment_id = sc_m.enrollment_id
-                 WHERE sc_m.student_id = sd.student_id AND m.course_id = c.course_id AND m.exam_type = 'Internal Assessment 1'
-                ) AS cie1,
-                (SELECT m.marks_obtained
-                 FROM marks m
-                 JOIN student_courses sc_m ON m.enrollment_id = sc_m.enrollment_id
-                 WHERE sc_m.student_id = sd.student_id AND m.course_id = c.course_id AND m.exam_type = 'Internal Assessment 2'
-                ) AS cie2,
-                (SELECT m.marks_obtained
-                 FROM marks m
-                 JOIN student_courses sc_m ON m.enrollment_id = sc_m.enrollment_id
-                 WHERE sc_m.student_id = sd.student_id AND m.course_id = c.course_id AND m.exam_type = 'SEE (Semester End Examination)'
-                ) AS see
-            FROM
-                (
-                    SELECT s.student_id, s.student_name, s.program_id, s.sem AS current_semester
-                    FROM students s
-                    JOIN users u ON s.email = u.email
-                    WHERE u.user_id = ?
-                ) sd
-            JOIN student_courses sc ON sd.student_id = sc.student_id
-            JOIN courses c ON sc.course_id = c.course_id
-            ORDER BY c.semester, c.course_name;
-        """;
+                SELECT
+                    sd.student_id, sd.student_name, sd.current_semester, sd.program_id, sd.email, sd.program_name,
+                    c.course_id, c.course_name, c.semester,
+                    -- Subquery for present days (this logic is correct)
+                    (SELECT COUNT(ar.attendance_id)
+                     FROM attendancerecords ar
+                     JOIN enrollments e ON ar.enrollment_id = e.enrollment_id
+                     WHERE e.student_id = sd.student_id AND ar.status = 'PRESENT'
+                       AND ar.session_id IN (SELECT ats.session_id FROM attendancesessions ats WHERE ats.course_id = c.course_id)
+                    ) AS present_days,
+                    -- Subquery for total completed classes (this logic is correct)
+                    (SELECT COUNT(ats.session_id)
+                     FROM attendancesessions ats
+                     WHERE ats.course_id = c.course_id AND ats.status = 'Completed'
+                    ) AS total_days,
+                    -- CORRECTED: Marks subqueries now join to 'student_courses' which is the correct table
+                    (SELECT m.marks_obtained
+                     FROM marks m
+                     JOIN student_courses sc_m ON m.enrollment_id = sc_m.enrollment_id
+                     WHERE sc_m.student_id = sd.student_id AND m.course_id = c.course_id AND m.exam_type = 'Internal Assessment 1'
+                    ) AS cie1,
+                    (SELECT m.marks_obtained
+                     FROM marks m
+                     JOIN student_courses sc_m ON m.enrollment_id = sc_m.enrollment_id
+                     WHERE sc_m.student_id = sd.student_id AND m.course_id = c.course_id AND m.exam_type = 'Internal Assessment 2'
+                    ) AS cie2,
+                    (SELECT m.marks_obtained
+                     FROM marks m
+                     JOIN student_courses sc_m ON m.enrollment_id = sc_m.enrollment_id
+                     WHERE sc_m.student_id = sd.student_id AND m.course_id = c.course_id AND m.exam_type = 'SEE (Semester End Examination)'
+                    ) AS see
+                FROM
+                    (
+                        SELECT s.student_id, s.student_name, s.program_id, s.sem AS current_semester, u.email, p.program_name
+                        FROM students s
+                        JOIN users u ON s.email = u.email
+                        JOIN programs p ON s.program_id = p.program_id -- JOIN to get program_name
+                        WHERE u.user_id = ?
+                    ) sd
+                JOIN student_courses sc ON sd.student_id = sc.student_id
+                JOIN courses c ON sc.course_id = c.course_id
+                ORDER BY c.semester, c.course_name;
+            """;
 
         Map<Integer, List<CoursePerformance>> performanceMap = new HashMap<>();
         long totalPresentAllCourses = 0;
@@ -1024,7 +1025,9 @@ public class UserDAO {
                         dashboardDTO.setStudentId(rs.getInt("student_id"));
                         dashboardDTO.setStudentName(rs.getString("student_name"));
                         dashboardDTO.setCurrentSemester(rs.getInt("current_semester"));
-                        dashboardDTO.setProgramId(rs.getInt("program_id")); // <-- ADDED THIS LINE
+                        dashboardDTO.setProgramId(rs.getInt("program_id")); 
+                        dashboardDTO.setProgramName(rs.getString("program_name"));
+                        dashboardDTO.setEmail(rs.getString("email"));
                         firstRow = false;
                     }
                     int semester = rs.getInt("semester");

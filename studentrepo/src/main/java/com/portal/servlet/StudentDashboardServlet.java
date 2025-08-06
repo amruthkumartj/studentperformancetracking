@@ -51,7 +51,9 @@ public class StudentDashboardServlet extends HttpServlet {
             
             LOGGER.info("DTO prepared: studentId=" + dashboardDTO.getStudentId() + 
                         ", programId=" + dashboardDTO.getProgramId() + 
-                        ", currentSemester=" + dashboardDTO.getCurrentSemester());
+                        ", currentSemester=" + dashboardDTO.getCurrentSemester() +
+                        ", programName=" + dashboardDTO.getProgramName() +
+                        ", Email=" + dashboardDTO.getEmail());
 
             req.setAttribute("dashboard", dashboardDTO);
             req.getRequestDispatcher("/studentDashboard.jsp").forward(req, resp);

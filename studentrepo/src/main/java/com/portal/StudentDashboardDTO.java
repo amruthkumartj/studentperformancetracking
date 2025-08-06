@@ -11,7 +11,8 @@ public class StudentDashboardDTO {
     private int studentId;
     private String studentName;
     private int currentSemester;
-    
+    private String programName;
+    private String Email;
     private int programId;
     
     // Key: Semester number (e.g., 1, 2). Value: List of course performance data for that semester.
@@ -26,6 +27,12 @@ public class StudentDashboardDTO {
 
     public String getStudentName() { return studentName; }
     public void setStudentName(String studentName) { this.studentName = studentName; }
+    
+    public String getProgramName() { return programName; }
+    public void setProgramName(String programName) { this.programName = programName; }
+    
+    public String getEmail() { return Email; }
+    public void setEmail(String Email) { this.Email = Email; }
 
     public int getCurrentSemester() { return currentSemester; }
     public void setCurrentSemester(int currentSemester) { this.currentSemester = currentSemester; }
