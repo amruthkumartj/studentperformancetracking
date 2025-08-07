@@ -17,6 +17,7 @@
   </properties>
 
   <dependencies>
+    <!-- Your dependencies remain the same -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -24,46 +25,40 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-    <groupId>javax.mail</groupId>
-    <artifactId>javax.mail-api</artifactId>
-    <version>1.6.2</version>
-</dependency>
-<dependency>
-    <groupId>com.sun.mail</groupId>
-    <artifactId>javax.mail</artifactId>
-    <version>1.6.2</version>
-</dependency>
-
+        <groupId>javax.mail</groupId>
+        <artifactId>javax.mail-api</artifactId>
+        <version>1.6.2</version>
+    </dependency>
+    <dependency>
+        <groupId>com.sun.mail</groupId>
+        <artifactId>javax.mail</artifactId>
+        <version>1.6.2</version>
+    </dependency>
     <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>jstl</artifactId>
         <version>1.2</version>
     </dependency>
-    
     <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
         <version>2.10.1</version>
     </dependency>
-
     <dependency>
         <groupId>com.fatboyindustrial.gson-javatime-serialisers</groupId>
         <artifactId>gson-javatime-serialisers</artifactId>
         <version>1.1.1</version>
     </dependency>
-
     <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
         <version>8.0.33</version>
     </dependency>
-
     <dependency>
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
         <version>5.1.0</version>
     </dependency>
-
     <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
@@ -75,23 +70,15 @@
         <version>2.0.13</version>
         <scope>runtime</scope>
     </dependency>
-
     <dependency>
         <groupId>org.mindrot</groupId>
         <artifactId>jbcrypt</artifactId>
         <version>0.4</version>
     </dependency>
-
   </dependencies>
 
   <build>
     <finalName>studentrepo</finalName>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
-
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -101,9 +88,70 @@
         </configuration>
       </plugin>
 
+      <!-- samaxes minify-maven-plugin -->
+      <plugin>
+        <groupId>com.samaxes.maven</groupId>
+        <artifactId>minify-maven-plugin</artifactId>
+        <version>1.7.6</version>
+        <executions>
+          <execution>
+            <id>default-minify</id>
+            <!-- ** FIX 1: Run early in the build cycle ** -->
+            <phase>process-resources</phase>
+            <goals>
+              <goal>minify</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-utils</artifactId>
+                <version>3.3.0</version>
+            </dependency>
+        </dependencies>
+        <configuration>
+          <!-- ** FIX 2: Point to the source directory to modify files in-place ** -->
+          <webappSourceDir>${project.basedir}/src/main/webapp</webappSourceDir>
+          
+          <!-- Process files individually instead of merging them -->
+          <skipMerge>true</skipMerge>
+          
+          <!-- This is important: it keeps the original filenames -->
+          <nosuffix>true</nosuffix>
+
+          <!-- CSS settings -->
+          <cssSourceDir>css</cssSourceDir>
+          <cssSourceIncludes>
+            <cssSourceInclude>**/*.css</cssSourceInclude>
+          </cssSourceIncludes>
+          <cssTargetDir>css</cssTargetDir>
+          
+          <!-- JS settings -->
+          <jsSourceDir>js</jsSourceDir>
+          <jsSourceIncludes>
+            <jsSourceInclude>**/*.js</jsSourceInclude>
+          </jsSourceIncludes>
+          <jsTargetDir>js</jsTargetDir>
+          
+          <!-- Use the Google Closure Compiler engine -->
+          <jsEngine>CLOSURE</jsEngine>
+
+          <!-- Correctly nested configuration for the Closure engine -->
+          <closure>
+              <!-- Tell the engine to understand modern JavaScript -->
+              <language>ECMASCRIPT_2020</language>
+              <!-- Disable the creation of source maps to hide original code -->
+              <createSourceMap>false</createSourceMap>
+          </closure>
+          
+        </configuration>
+      </plugin>
+
+      <!-- maven-war-plugin: No special configuration needed -->
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
-        <version>3.2.3</version>
+        <version>3.4.0</version>
         <configuration>
           <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
