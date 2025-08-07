@@ -96,7 +96,6 @@
         <executions>
           <execution>
             <id>default-minify</id>
-            <!-- ** FIX 1: Run early in the build cycle ** -->
             <phase>process-resources</phase>
             <goals>
               <goal>minify</goal>
@@ -111,13 +110,13 @@
             </dependency>
         </dependencies>
         <configuration>
-          <!-- ** FIX 2: Point to the source directory to modify files in-place ** -->
+          <!-- Point to the source directory to modify files in-place -->
           <webappSourceDir>${project.basedir}/src/main/webapp</webappSourceDir>
           
-          <!-- Process files individually instead of merging them -->
+          <!-- Process files individually -->
           <skipMerge>true</skipMerge>
           
-          <!-- This is important: it keeps the original filenames -->
+          <!-- Keep original filenames -->
           <nosuffix>true</nosuffix>
 
           <!-- CSS settings -->
@@ -141,14 +140,16 @@
           <closure>
               <!-- Tell the engine to understand modern JavaScript -->
               <language>ECMASCRIPT_2020</language>
-              <!-- Disable the creation of source maps to hide original code -->
+              <!-- Disable source maps to hide original code -->
               <createSourceMap>false</createSourceMap>
+              <!-- ** THE FIX IS HERE: Enable advanced optimizations ** -->
+              <compilationLevel>ADVANCED_OPTIMIZATIONS</compilationLevel>
           </closure>
           
         </configuration>
       </plugin>
 
-      <!-- maven-war-plugin: No special configuration needed -->
+      <!-- maven-war-plugin -->
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <version>3.4.0</version>
