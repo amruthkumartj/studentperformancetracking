@@ -1,5 +1,5 @@
 // src/main/java/com/portal/AttendanceDAO.java
-package com.portal;
+package com.portal.datatransfer_access;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,6 +13,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.portal.AttendanceRecord;
+import com.portal.AttendanceSession;
+import com.portal.DBUtil;
+import com.portal.Student;
 
 public class AttendanceDAO {
     // Removed the Connection field and constructor, as DBUtil will provide connections dynamically.

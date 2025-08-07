@@ -1,4 +1,4 @@
-package com.portal.servlet;
+package com.portal.studservlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -7,7 +7,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import com.google.gson.Gson; // Import Gson for JSON responses
 import com.google.gson.JsonObject; // Import JsonObject for structured JSON error responses
-import com.portal.UserDAO; // Import UserDAO from com.portal
+import com.portal.datatransfer_access.UserDAO;
 
 @WebServlet("/AddStudServlet")
 public class AddStudServlet extends HttpServlet {

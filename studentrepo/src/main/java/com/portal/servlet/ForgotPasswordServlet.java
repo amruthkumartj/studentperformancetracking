@@ -3,7 +3,7 @@ package com.portal.servlet;
 import com.google.gson.JsonObject;
 import com.portal.EmailUtil;
 import com.portal.User;
-import com.portal.UserDAO;
+import com.portal.datatransfer_access.UserDAO;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

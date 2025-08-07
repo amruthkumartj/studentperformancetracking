@@ -6,9 +6,9 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import com.portal.Event;
-import com.portal.EventsDAO;
-import com.portal.FacultyDAO; // <-- IMPORT FACULTY DAO
 import com.portal.User;
+import com.portal.datatransfer_access.EventsDAO;
+import com.portal.datatransfer_access.FacultyDAO;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

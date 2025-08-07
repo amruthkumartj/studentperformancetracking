@@ -1,5 +1,5 @@
 // src/main/java/com/portal/PerformanceDAO.java
-package com.portal;
+package com.portal.datatransfer_access;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap; // Added for getPrograms/getProgramSemesters
 import java.util.List;
 import java.util.Map;   // Added for getPrograms/getProgramSemesters
+
+import com.portal.DBUtil;
+import com.portal.Student;
 
 public class PerformanceDAO {
 

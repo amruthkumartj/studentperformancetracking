@@ -5,7 +5,7 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
-import com.portal.UserDAO; // Ensure this is the correct package for your UserDAO
+import com.portal.datatransfer_access.UserDAO;
 
 @WebServlet("/RegisterServlet")
 public class RegisterServlet extends HttpServlet {

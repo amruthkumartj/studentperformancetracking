@@ -1,9 +1,9 @@
 package com.portal.servlet;
 
 import com.portal.User;
-import com.portal.FacultyDAO;
-import com.portal.ProgramCourseDAO;
-import com.portal.ProgramDAO;
+import com.portal.datatransfer_access.FacultyDAO;
+import com.portal.datatransfer_access.ProgramCourseDAO;
+import com.portal.datatransfer_access.ProgramDAO;
 import com.portal.Program;
 
 import javax.servlet.ServletException;

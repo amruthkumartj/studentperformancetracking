@@ -1,8 +1,8 @@
 package com.portal.servlet;
 
 import com.google.gson.*;
-import com.portal.EventsDAO;
 import com.portal.Event;
+import com.portal.datatransfer_access.EventsDAO;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

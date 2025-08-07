@@ -1,6 +1,7 @@
 // src/main/java/com/portal/FetchProgramsServlet.java
-package com.portal.servlet; // Changed package to com.portal
+package com.portal.studservlet; // Changed package to com.portal
 import com.portal.*;
+import com.portal.datatransfer_access.ProgramDAO;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

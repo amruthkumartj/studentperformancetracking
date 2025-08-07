@@ -1,5 +1,5 @@
 // src/main/java/com/portal/servlet/GetAttendanceRecordsServlet.java
-package com.portal.servlet;
+package com.portal.studservlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -24,10 +24,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.portal.AttendanceDAO;
 import com.portal.AttendanceRecord;
 import com.portal.DBUtil; // Keep this import as DAOs use it
 import com.portal.User;
+import com.portal.datatransfer_access.AttendanceDAO;
 
 @WebServlet("/GetAttendanceRecordsServlet")
 public class GetAttendanceRecordsServlet extends HttpServlet {

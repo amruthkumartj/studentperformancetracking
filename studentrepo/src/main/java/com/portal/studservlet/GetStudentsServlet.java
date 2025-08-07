@@ -1,14 +1,14 @@
 // src/main/java/com/portal/servlet/GetStudentsServlet.java
-package com.portal.servlet;
+package com.portal.studservlet;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException; // Import for JsonSyntaxException
-import com.portal.AttendanceDAO;
 import com.portal.DBUtil; // Keep this import as DAOs use it
 import com.portal.Student;
 import com.portal.User;
-import com.portal.UserDAO; // Import UserDAO
+import com.portal.datatransfer_access.AttendanceDAO;
+import com.portal.datatransfer_access.UserDAO;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

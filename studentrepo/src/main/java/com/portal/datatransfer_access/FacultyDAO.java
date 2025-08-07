@@ -1,5 +1,5 @@
 // src/main/java/com/portal/dao/FacultyDAO.java
-package com.portal; // <--- Corrected package name as discussed
+package com.portal.datatransfer_access; // <--- Corrected package name as discussed
 
 import com.portal.DBUtil; // Your database utility for connections
 import com.portal.User; // Potentially used for User objects if any method returns one

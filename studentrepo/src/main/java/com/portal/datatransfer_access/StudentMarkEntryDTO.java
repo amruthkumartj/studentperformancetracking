@@ -1,4 +1,4 @@
-package com.portal; // Assuming this is the correct package
+package com.portal.datatransfer_access; // Assuming this is the correct package
 
 public class StudentMarkEntryDTO {
     private int studentId;

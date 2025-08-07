@@ -1,7 +1,9 @@
-package com.portal;
+package com.portal.datatransfer_access;
 
 import java.util.List;
 import java.util.Map;
+
+import com.portal.CoursePerformance;
 
 /**
  * Main DTO to transfer all necessary data for the student dashboard to the JSP.

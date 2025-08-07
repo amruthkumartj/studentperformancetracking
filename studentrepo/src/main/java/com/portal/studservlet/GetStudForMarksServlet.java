@@ -1,10 +1,10 @@
-package com.portal.servlet;
+package com.portal.studservlet;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder; // Import GsonBuilder
 import com.google.gson.JsonObject;
-import com.portal.MarksDAO; // Assuming MarksDAO is in com.portal
-import com.portal.StudentMarkEntryDTO; // CORRECTED: Import from com.portal package
+import com.portal.datatransfer_access.MarksDAO;
+import com.portal.datatransfer_access.StudentMarkEntryDTO;
 
 import java.io.BufferedReader;
 import java.io.IOException;

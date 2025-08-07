@@ -1,12 +1,12 @@
-package com.portal.servlet;
+package com.portal.studservlet;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.portal.AttendanceDAO;
 import com.portal.AttendanceRecord;
 import com.portal.AttendanceSession;
 import com.portal.DBUtil;
+import com.portal.datatransfer_access.AttendanceDAO;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

@@ -11,9 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.portal.User;
-import com.portal.UserDAO;
-import com.portal.FacultyDAO;
-import com.portal.ProgramCourseDAO;
+import com.portal.datatransfer_access.FacultyDAO;
+import com.portal.datatransfer_access.ProgramCourseDAO;
+import com.portal.datatransfer_access.UserDAO;
 
 @WebServlet("/admin/approveFaculty")
 public class AdminFacultyApprovalServlet extends HttpServlet {

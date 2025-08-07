@@ -1,7 +1,8 @@
-package com.portal.servlet;
+package com.portal.studservlet;
 
 import com.google.gson.Gson; // Import Gson for JSON conversion
-import com.portal.ProgramCourseDAO; // Assuming your DAO is in com.portal
+import com.portal.datatransfer_access.ProgramCourseDAO;
+
 import java.io.IOException;
 import java.util.List;
 import javax.servlet.ServletException;

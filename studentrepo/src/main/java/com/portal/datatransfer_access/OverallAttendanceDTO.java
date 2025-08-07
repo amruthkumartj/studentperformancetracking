@@ -1,4 +1,4 @@
-package com.portal;
+package com.portal.datatransfer_access;
 
 /**
  * A simple DTO to hold the aggregated attendance data for calculating

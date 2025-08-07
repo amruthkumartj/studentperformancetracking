@@ -5,10 +5,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import com.portal.EventsDAO;
-import com.portal.FacultyDAO; // Make sure your FacultyDAO is imported
 import com.portal.Event;
 import com.portal.User;
+import com.portal.datatransfer_access.EventsDAO;
+import com.portal.datatransfer_access.FacultyDAO;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

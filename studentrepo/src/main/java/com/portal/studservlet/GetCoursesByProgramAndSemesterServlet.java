@@ -1,8 +1,9 @@
-package com.portal.servlet;
+package com.portal.studservlet;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject; // Import JsonObject
-import com.portal.ProgramCourseDAO;
+import com.portal.datatransfer_access.ProgramCourseDAO;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList; // Import ArrayList, though not strictly needed here

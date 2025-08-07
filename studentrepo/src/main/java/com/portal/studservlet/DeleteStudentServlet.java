@@ -1,4 +1,4 @@
-package com.portal.servlet; // Replace with your actual package name
+package com.portal.studservlet; // Replace with your actual package name
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -7,8 +7,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import com.portal.UserDAO; // Assuming your DAO is here
+
 import com.portal.Student; // Assuming your Student model is here
+import com.portal.datatransfer_access.UserDAO;
 
 @WebServlet("/DeleteStudentServlet")
 public class DeleteStudentServlet extends HttpServlet {

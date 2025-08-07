@@ -1,5 +1,5 @@
 // src/main/java/com/portal/ProgramCourseDAO.java
-package com.portal;
+package com.portal.datatransfer_access;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,6 +7,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.portal.Course;
+import com.portal.DBUtil;
+import com.portal.Program;
 
 public class ProgramCourseDAO {
 

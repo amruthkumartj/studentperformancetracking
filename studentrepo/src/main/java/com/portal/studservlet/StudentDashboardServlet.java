@@ -1,4 +1,4 @@
-package com.portal.servlet;
+package com.portal.studservlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -11,9 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.portal.StudentDashboardDTO;
 import com.portal.User;
-import com.portal.UserDAO;
+import com.portal.datatransfer_access.StudentDashboardDTO;
+import com.portal.datatransfer_access.UserDAO;
 
 @WebServlet("/studentdashboard")
 public class StudentDashboardServlet extends HttpServlet {

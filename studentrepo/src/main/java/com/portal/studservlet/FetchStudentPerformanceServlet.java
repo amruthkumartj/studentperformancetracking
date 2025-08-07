@@ -1,4 +1,4 @@
-package com.portal.servlet;
+package com.portal.studservlet;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.portal.PerformanceDAO; // For student lists and program/semester info
-import com.portal.UserDAO;      // For specific student detailed performance
+import com.portal.datatransfer_access.PerformanceDAO;
+import com.portal.datatransfer_access.UserDAO;
 import com.portal.StudentPerformance; // DTO for detailed performance
 import com.portal.Student; // DTO for student list
 

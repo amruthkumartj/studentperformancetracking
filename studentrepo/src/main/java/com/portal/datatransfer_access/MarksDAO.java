@@ -1,8 +1,8 @@
 // src/main/java/com/portal/MarksDAO.java
-package com.portal;
+package com.portal.datatransfer_access;
 
 import com.portal.DBUtil;
-import com.portal.StudentMarkEntryDTO;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

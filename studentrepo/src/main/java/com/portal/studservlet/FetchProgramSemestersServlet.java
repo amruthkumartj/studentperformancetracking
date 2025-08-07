@@ -1,7 +1,7 @@
 // src/main/java/com/portal/FetchProgramSemestersServlet.java
-package com.portal.servlet;
+package com.portal.studservlet;
 import com.portal.*;
-
+import com.portal.datatransfer_access.ProgramDAO;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

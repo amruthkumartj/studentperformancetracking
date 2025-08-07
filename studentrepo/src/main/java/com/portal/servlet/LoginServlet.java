@@ -6,7 +6,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
 import com.portal.User;    // Ensure your User DTO is correctly imported
-import com.portal.UserDAO; // Ensure your UserDAO is correctly imported
+import com.portal.datatransfer_access.UserDAO;
 
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {

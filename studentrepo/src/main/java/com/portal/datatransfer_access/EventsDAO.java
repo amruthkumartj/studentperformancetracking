@@ -1,11 +1,12 @@
-package com.portal;
+package com.portal.datatransfer_access;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 // NEW: Assuming you create and use the DatabaseUtil class
-import com.portal.DBUtil; 
+import com.portal.DBUtil;
+import com.portal.Event; 
 
 public class EventsDAO {
 

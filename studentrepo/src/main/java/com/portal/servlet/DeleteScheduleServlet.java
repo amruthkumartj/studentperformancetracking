@@ -3,8 +3,8 @@ package com.portal.servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.portal.ScheduleDAO;
 import com.portal.User;
+import com.portal.datatransfer_access.ScheduleDAO;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
