@@ -2,6 +2,18 @@
        UTILITY & UI FUNCTIONS (SHOW MESSAGE, CARD HEIGHT, LOADER)
     ====================================================================
     */
+   
+	function clearLoginForm() {
+	    const loginForm = document.getElementById('loginForm');
+	    const usernameInput = document.getElementById('username');
+	    const passwordInput = document.getElementById('password');
+
+	    if (loginForm && usernameInput && passwordInput) {
+	        usernameInput.value = '';
+	        passwordInput.value = '';
+	        loginForm.reset();
+	    }
+	}
 
     function showMessage(type, text) {
         const iconMap = { success: 'check_circle', error: 'error', info: 'info' };
@@ -228,6 +240,23 @@
     */
 
     document.addEventListener('DOMContentLoaded', () => {
+		
+
+		window.addEventListener('pageshow', function(event) {
+		    // Find the loading overlay
+		    const loadingOverlay = document.getElementById('loadingOverlay');
+		    if (loadingOverlay) {
+		        // Always hide the loader when the login page is shown
+		        loadingOverlay.style.display = 'none';
+		    }
+		});
+	
+		
+
+		
+
+	
+
         const loginCard = document.querySelector('.login-card');
         const pwField = document.getElementById('password');
         const toggle = document.getElementById('togglePw');
@@ -243,6 +272,7 @@
         const newPasswordField = document.getElementById('newPassword');
         const confirmNewPasswordField = document.getElementById('confirmNewPassword');
         const otpInputs = document.querySelectorAll('.otp-input');
+		
 
         // --- Event Listeners ---
         if (toggle && pwField) {
@@ -306,6 +336,10 @@
         const loginStatus = p.get("login");
         const regStatus = p.get("reg");
         const forgotStatus = p.get("forgot");
+		if (document.referrer.includes('logout')) {
+		       clearLoginForm();
+		   }
+	
 
         if (loginStatus === "fail" || regStatus === "fail" || forgotStatus === "fail") {
             let reason = p.get("reason");

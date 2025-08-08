@@ -1,3 +1,5 @@
+
+<%@ page isELIgnored="false" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
@@ -513,13 +515,24 @@ body.dark .table-striped tbody tr:hover {
     justify-content: flex-start; /* Align buttons to the start of the container */
     align-items: center; /* Vertically align items in the middle if they have different heights */
 }
+/* Style for disabled options to be more user-friendly */
+option:disabled {
+    color: #aaa;
+    background-color: #f5f5f5;
+}
+body.dark option:disabled {
+    color: #666;
+    background-color: #2a2a4a;
+}
 
     </style>
 </head>
 <body>
     <script>
-        // Make facultyId available globally for faculty.js
-       window.currentFacultyId = "<c:out value='${sessionScope.user.id}'/>";
+ 		window.currentFacultyId = "<c:out value='${sessionScope.user.id}'/>";
+    
+   
+    	window.assignedProgramIds = JSON.parse('<c:out value="${requestScope.assignedProgramIdsJson}" escapeXml="false" default="[]" />');
 
         // Theme management
         function applyTheme() {
@@ -885,21 +898,51 @@ function qs(selector) { return document.querySelector(selector); }
             { value: 'SEE (Semester End Examination)', text: 'SEE (Semester End Examination)' }
         ];
 
-        function loadProgramsForMarksEntry() {
-            fetch('<%= request.getContextPath() %>/GetProgramsServlet')
-                .then(r => {
-                    if (!r.ok) throw new Error('HTTP ' + r.status);
-                    return r.json();
-                })
-                .then(data => {
-                    const formattedPrograms = data.map(p => ({ value: p[0], text: p[1] }));
-                    fillSelect(marksProgramSelect, formattedPrograms, 'Select Program');
-                })
-                .catch(error => {
-                    console.error("Error loading programs for Marks Entry:", error);
-                    showMessage(marksEntryMessage, `<i class="bx bx-error-circle"></i> Failed to load programs for marks entry.`, false);
-                });
-        }
+     // --- REPLACE THIS ENTIRE FUNCTION ---
+        // In enterCourseMarks.jsp
+
+function loadProgramsForMarksEntry() {
+    // This fetch call stays the same
+    fetch('<%= request.getContextPath() %>/GetProgramsServlet', {
+        credentials: 'include' // <-- ADD THIS LINE
+    })
+        .then(r => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        })
+        .then(data => {
+            // "data" is now an object like: 
+            // { allPrograms: [["1", "MCA"], ...], assignedProgramIds: [1, 3] }
+
+            const allPrograms = data.allPrograms;
+            const assignedIds = new Set(data.assignedProgramIds.map(String)); // A set for fast lookups
+
+            const marksProgramSelect = qs('#marksProgramFilterDropdown');
+            marksProgramSelect.innerHTML = `<option value="" disabled selected>Select Program</option>`;
+
+            // Loop through ALL programs to create the options
+            allPrograms.forEach(program => {
+                const programId = program[0];
+                const programName = program[1];
+
+                const opt = document.createElement('option');
+                opt.value = programId;
+                opt.textContent = programName;
+
+                // Use the assignedIds list to check if the option should be disabled
+                if (!assignedIds.has(programId)) {
+                    opt.disabled = true;
+                    opt.textContent += ' (Not Assigned)';
+                }
+
+                marksProgramSelect.appendChild(opt);
+            });
+        })
+        .catch(error => {
+            console.error("Error loading programs for Marks Entry:", error);
+            showMessage(qs('#marksEntryMessage'), `Failed to load programs.`, false);
+        });
+}
 
         function fetchSubjectsForMarksEntry(programId, semester) {
             fetch('<%= request.getContextPath() %>/GetCoursesByProgramAndSemesterServlet', {
