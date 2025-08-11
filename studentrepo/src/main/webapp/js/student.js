@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- Selectors ---
-    const themeToggle = document.querySelector('.theme-toggle');
+    
     const profileDropdown = document.querySelector('.profile-dropdown');
     const eventModalOverlay = document.getElementById('event-modal-overlay');
     let isTransitioning = false;
@@ -49,9 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Close profile dropdown if clicking outside
     document.addEventListener('click', () => profileDropdown.classList.remove('is-open'));
 
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => document.body.classList.toggle('light-mode'));
-    }
+   
     // UPDATED FUNCTION: Uses transitionend for smoother view transitions
 	function switchView(targetId) {
 	    if (isTransitioning) return;

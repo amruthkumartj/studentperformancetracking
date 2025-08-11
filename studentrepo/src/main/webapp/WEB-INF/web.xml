@@ -8,6 +8,26 @@
     <welcome-file-list>
         <welcome-file>login.html</welcome-file>
     </welcome-file-list>
- 
 
-    </web-app>
+    <filter>
+        <filter-name>AuthenticationFilter</filter-name>
+        <filter-class>com.portal.servlet.AuthenticationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthenticationFilter</filter-name>
+        <url-pattern>/facultydashboard</url-pattern>
+        <url-pattern>/studentdashboard</url-pattern>
+        <url-pattern>/facultyDashboard.jsp</url-pattern>
+        <url-pattern>/studentDashboard.jsp</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>LoginAccessFilter</filter-name>
+        <filter-class>com.portal.servlet.LoginAccessFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>LoginAccessFilter</filter-name>
+        <url-pattern>/login.html</url-pattern>
+    </filter-mapping>
+
+</web-app>

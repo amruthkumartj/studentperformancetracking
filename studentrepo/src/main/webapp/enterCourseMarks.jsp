@@ -12,6 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <script src="<%= request.getContextPath() %>/js/theme.js"></script>
     
     <style>
         /* CSS Variables - Ensure these are defined in sidebar.css or similar global stylesheet */
@@ -523,6 +524,103 @@ option:disabled {
 body.dark option:disabled {
     color: #666;
     background-color: #2a2a4a;
+}
+/* ===================================================================== */
+/* UNIFIED BLUE DARK MODE THEME - For Enter Course Marks Page            */
+/* REPLACE your old body.dark block with this one.                       */
+/* ===================================================================== */
+body.dark {
+    /* 1. Redefine variables to match the dashboard's blue theme */
+    --body-color: #18191a;
+    --panel-color: #242526;
+    --primary-color: #81a4ff;
+    --primary-color-light: rgba(129, 164, 255, 0.1);
+    --primary-color-rgb: 129, 164, 255;
+    --toggle-color: #3a3b3c;
+    --text-color: #ccc;
+    --text-color-light: #a0a0b0;
+    --border-color: #3a3b3c;
+    --input-background: #242526;
+    --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    --dropdown-highlight-bg: rgba(129, 164, 255, 0.2);
+    --dropdown-highlight-text: #fff;
+}
+
+/* 2. Specific overrides for elements on this page */
+
+/* Buttons */
+body.dark .btn-secondary {
+    background-color: var(--toggle-color);
+    border-color: var(--toggle-color);
+}
+body.dark .btn-secondary:hover {
+    filter: brightness(1.2);
+}
+
+/* Form Controls & Filters */
+body.dark .table-filters {
+    background-color: var(--panel-color);
+}
+body.dark .form-label {
+    color: var(--text-color);
+}
+body.dark .form-select option:disabled {
+    color: #666;
+    background-color: #2a2a4a;
+}
+body.dark .form-select option {
+    background-color: #2a2a4a;
+    color: var(--text-color);
+}
+
+/* Message Box */
+body.dark .message-box.success {
+    background: rgba(40, 167, 69, 0.2);
+    border-color: var(--success-color);
+    color: #81c784;
+}
+body.dark .message-box.error {
+    background: rgba(220, 53, 69, 0.2);
+    border-color: var(--danger-color);
+    color: #e57373;
+}
+body.dark .spinner {
+    border-color: rgba(255, 255, 255, 0.1);
+    border-left-color: var(--primary-color);
+}
+
+/* Table Styling */
+body.dark .table-responsive {
+    border-color: var(--border-color);
+    background-color: var(--panel-color);
+}
+body.dark .table th, 
+body.dark .table td {
+    border-color: var(--border-color);
+}
+body.dark .table thead th {
+    background-color: rgba(129, 164, 255, 0.05);
+    color: var(--primary-color);
+}
+body.dark .table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--panel-color);
+}
+body.dark .table-striped tbody tr:nth-of-type(even) {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+body.dark .table-striped tbody tr:hover {
+    background-color: var(--primary-color-light);
+}
+
+/* Submission Dialog */
+body.dark .submission-dialog-content {
+    background: #2a2a3a;
+}
+body.dark .submission-dialog-content h3 {
+    color: var(--text-color);
+}
+body.dark .submission-dialog-content p {
+    color: var(--text-color-light);
 }
 
     </style>

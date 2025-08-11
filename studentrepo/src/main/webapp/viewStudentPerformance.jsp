@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
 
     <style>
         :root {
@@ -185,9 +186,86 @@
 .reset-button:hover:not(:disabled) {
     background: var(--dark-color);
 }
+  body.dark {
+        /* 1. Redefine variables to match the dashboard's blue theme */
+        --primary-color: #81a4ff;
+        --primary-color-light: rgba(129, 164, 255, 0.1);
+        --primary-color-dark: #6B90FF;
+        --text-color: #ccc;
+        --dark-color: #f0f0f0; /* This becomes the light text color for labels */
+        --bg-color: #18191a;
+        --card-bg-color: rgba(36, 37, 38, 0.75); /* Matches sidebar color */
+        --box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    }
+
+    /* 2. Specific overrides for elements and components on this page */
+
+    /* Cards & Containers */
+    body.dark .card {
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    body.dark .chart-container {
+        background-color: #242526;
+        border-color: #3a3b3c;
+    }
+
+    /* Forms & Inputs */
+    body.dark .styled-select,
+    body.dark .styled-input {
+        background-color: #242526;
+        border-color: #3a3b3c;
+        color: var(--text-color);
+    }
+    body.dark .styled-select:focus,
+    body.dark .styled-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-color-light);
+    }
+    body.dark .styled-button:disabled {
+        background: #3a3b3c;
+    }
+    body.dark .back-button,
+    body.dark .reset-button {
+        background: #3a3b3c;
+    }
+    body.dark .back-button:hover:not(:disabled),
+    body.dark .reset-button:hover:not(:disabled) {
+        background: #4a4b4c;
+    }
+    body.dark #clearStudentIdBtn {
+        color: var(--text-color);
+    }
+
+    /* View Mode Toggle */
+    body.dark .view-mode-toggle {
+        background-color: #18191a;
+    }
+    body.dark .view-mode-toggle label {
+        color: var(--text-color);
+    }
+
+    /* Tables */
+    body.dark .styled-table th,
+    body.dark .styled-table td {
+        border-bottom-color: #3a3b3c;
+    }
+    body.dark .styled-table th {
+        background-color: rgba(129, 164, 255, 0.05);
+        color: var(--primary-color);
+    }
+    body.dark .styled-table tbody tr:hover {
+        background-color: rgba(129, 164, 255, 0.08);
+    }
+
+    /* Faculty Analysis Box */
+    body.dark .analysis-box.success { background-color: rgba(40, 167, 69, 0.2); }
+    body.dark .analysis-box.info { background-color: rgba(129, 164, 255, 0.15); }
+    body.dark .analysis-box.warning { background-color: rgba(255, 193, 7, 0.2); }
+    body.dark .analysis-box.danger { background-color: rgba(220, 53, 69, 0.2); }
     </style>
 </head>
-<body>
+
+<body class="${sessionScope.theme}">
 
     <div class="container">
        <!-- REPLACE THIS: -->
@@ -507,70 +585,75 @@ const renderStudentSummary = (student, examType) => {
     // ==================================================================
     //  REPLACE THIS ENTIRE FUNCTION
     // ==================================================================
-    const renderStudentChart = (student, examType) => {
-        const chartWrapper = document.createElement('div');
-        chartWrapper.className = 'chart-container';
-        const canvas = document.createElement('canvas');
-        chartWrapper.appendChild(canvas);
-        performanceDisplay.innerHTML = '';
-        performanceDisplay.appendChild(chartWrapper);
+   const renderStudentChart = (student, examType) => {
+    const chartWrapper = document.createElement('div');
+    chartWrapper.className = 'chart-container';
+    const canvas = document.createElement('canvas');
+    chartWrapper.appendChild(canvas);
+    performanceDisplay.innerHTML = '';
+    performanceDisplay.appendChild(chartWrapper);
 
-        const CHART_COLORS = {
-            ia1: 'rgba(88, 86, 214, 0.8)',
-            ia2: 'rgba(255, 69, 58, 0.8)',
-            cie: 'rgba(48, 209, 88, 0.8)',
-            see: 'rgba(0, 122, 255, 0.8)',
-            attendanceLine: 'rgba(255, 159, 10, 1)',
-            attendanceBg: 'rgba(255, 159, 10, 0.2)',
-            grid: 'rgba(142, 142, 147, 0.2)'
-        };
-
-        const labels = student.coursePerformances.map(c => `${c.courseCode} (${c.subjectName})`);
-        const attendance = student.coursePerformances.map(c => (c.totalClassesHeld > 0) ? (c.classesAttended / c.totalClassesHeld) * 100 : 0);
-        let datasets = [];
-        let yAxisMax = 100;
-        let yAxisTitle = 'Marks';
-
-        if (examType === "Internal Assessment 1") {
-            yAxisMax = 50;
-            yAxisTitle = 'IA 1 Marks (out of 50)';
-            datasets.push({ label: 'IA 1 Marks', data: student.coursePerformances.map(c => c.ia1Marks), backgroundColor: CHART_COLORS.ia1, borderRadius: 6 });
-        } else if (examType === "Internal Assessment 2") {
-            yAxisMax = 50;
-            yAxisTitle = 'IA 2 Marks (out of 50)';
-            datasets.push({ label: 'IA 2 Marks', data: student.coursePerformances.map(c => c.ia2Marks), backgroundColor: CHART_COLORS.ia2, borderRadius: 6 });
-        } else if (examType === "SEE") { // CORRECTED CHECK
-            yAxisMax = 100;
-            yAxisTitle = 'Marks';
-            datasets.push({ label: 'CIE Marks (Avg)', data: student.coursePerformances.map(c => (c.ia1Marks != null && c.ia2Marks != null) ? (c.ia1Marks + c.ia2Marks) / 2 : null), backgroundColor: CHART_COLORS.cie, borderRadius: 4 });
-            datasets.push({ label: 'SEE Marks (out of 80)', data: student.coursePerformances.map(c => c.seeMarks), backgroundColor: CHART_COLORS.see, borderRadius: 4 });
-        }
-
-        datasets.push({ 
-            type: 'line', label: 'Attendance %', data: attendance,
-            borderColor: CHART_COLORS.attendanceLine, backgroundColor: CHART_COLORS.attendanceBg,
-            yAxisID: 'y1', tension: 0.4, pointBackgroundColor: CHART_COLORS.attendanceLine, fill: true
-        });
-
-        if(studentCharts['main']) studentCharts['main'].destroy();
-
-        studentCharts['main'] = new Chart(canvas.getContext('2d'), {
-            type: 'bar', 
-            data: { labels, datasets },
-            options: {
-                responsive: true, maintainAspectRatio: true,
-                plugins: {
-                    legend: { position: 'top', align: 'end' },
-                    title: { display: true, text: `Performance Analytics for ${student.studentName} - ${examType}`, align: 'start', font: { size: 18, weight: '600' } }
-                },
-                scales: {
-                    y: { beginAtZero: true, max: yAxisMax, title: { display: true, text: yAxisTitle }, grid: { color: CHART_COLORS.grid } },
-                    y1: { type: 'linear', display: true, position: 'right', beginAtZero: true, max: 100, title: { display: true, text: 'Attendance (%)' }, grid: { drawOnChartArea: false } },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
+    // --- THEME-AWARE CHART COLORS ---
+    const isDarkMode = document.body.classList.contains('dark');
+    const CHART_COLORS = {
+        ia1: 'rgba(88, 86, 214, 0.8)',
+        ia2: 'rgba(255, 69, 58, 0.8)',
+        cie: 'rgba(48, 209, 88, 0.8)',
+        see: 'rgba(0, 122, 255, 0.8)',
+        attendanceLine: 'rgba(255, 159, 10, 1)',
+        attendanceBg: 'rgba(255, 159, 10, 0.2)',
+        // Use different grid and text colors for light vs. dark mode
+        grid: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(142, 142, 147, 0.2)',
+        text: isDarkMode ? '#E0E0E0' : '#495057'
     };
+    // ------------------------------------
+
+    const labels = student.coursePerformances.map(c => `${c.courseCode} (${c.subjectName})`);
+    const attendance = student.coursePerformances.map(c => (c.totalClassesHeld > 0) ? (c.classesAttended / c.totalClassesHeld) * 100 : 0);
+    let datasets = [];
+    let yAxisMax = 100;
+    let yAxisTitle = 'Marks';
+
+    if (examType === "Internal Assessment 1") {
+        yAxisMax = 50;
+        yAxisTitle = 'IA 1 Marks (out of 50)';
+        datasets.push({ label: 'IA 1 Marks', data: student.coursePerformances.map(c => c.ia1Marks), backgroundColor: CHART_COLORS.ia1, borderRadius: 6 });
+    } else if (examType === "Internal Assessment 2") {
+        yAxisMax = 50;
+        yAxisTitle = 'IA 2 Marks (out of 50)';
+        datasets.push({ label: 'IA 2 Marks', data: student.coursePerformances.map(c => c.ia2Marks), backgroundColor: CHART_COLORS.ia2, borderRadius: 6 });
+    } else if (examType === "SEE") {
+        yAxisMax = 100;
+        yAxisTitle = 'Marks';
+        datasets.push({ label: 'CIE Marks (Avg)', data: student.coursePerformances.map(c => (c.ia1Marks != null && c.ia2Marks != null) ? (c.ia1Marks + c.ia2Marks) / 2 : null), backgroundColor: CHART_COLORS.cie, borderRadius: 4 });
+        datasets.push({ label: 'SEE Marks (out of 80)', data: student.coursePerformances.map(c => c.seeMarks), backgroundColor: CHART_COLORS.see, borderRadius: 4 });
+    }
+
+    datasets.push({ 
+        type: 'line', label: 'Attendance %', data: attendance,
+        borderColor: CHART_COLORS.attendanceLine, backgroundColor: CHART_COLORS.attendanceBg,
+        yAxisID: 'y1', tension: 0.4, pointBackgroundColor: CHART_COLORS.attendanceLine, fill: true
+    });
+
+    if(studentCharts['main']) studentCharts['main'].destroy();
+
+    studentCharts['main'] = new Chart(canvas.getContext('2d'), {
+        type: 'bar', 
+        data: { labels, datasets },
+        options: {
+            responsive: true, maintainAspectRatio: true,
+            plugins: {
+                legend: { position: 'top', align: 'end', labels: { color: CHART_COLORS.text } },
+                title: { display: true, text: `Performance Analytics for ${student.studentName} - ${examType}`, align: 'start', font: { size: 18, weight: '600' }, color: CHART_COLORS.text }
+            },
+            scales: {
+                y: { beginAtZero: true, max: yAxisMax, title: { display: true, text: yAxisTitle, color: CHART_COLORS.text }, grid: { color: CHART_COLORS.grid }, ticks: { color: CHART_COLORS.text } },
+                y1: { type: 'linear', display: true, position: 'right', beginAtZero: true, max: 100, title: { display: true, text: 'Attendance (%)', color: CHART_COLORS.text }, grid: { drawOnChartArea: false }, ticks: { color: CHART_COLORS.text } },
+                x: { grid: { display: false }, ticks: { color: CHART_COLORS.text } }
+            }
+        }
+    });
+};
     
     // ==================================================================
     //  REPLACE THIS ENTIRE FUNCTION
@@ -867,5 +950,6 @@ if (analyticsBackButton) {
     updateControlStates();
 });
 </script>
+<script src="<%= request.getContextPath() %>/js/theme.js"></script>
 </body>
 </html>

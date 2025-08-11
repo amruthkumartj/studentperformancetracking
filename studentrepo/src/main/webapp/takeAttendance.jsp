@@ -49,6 +49,7 @@
     <title>Take Attendance - <%= currentSession.getSubjectName() %></title>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/> 
+    <script src="<%= request.getContextPath() %>/js/theme.js"></script>
     <style>
        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
@@ -470,10 +471,87 @@ input:checked + .slider:before { transform: translateX(22px); }
 #customMessageContent.success #customMessageOkBtn:hover {
     background-color: #218838;
 }
+body.dark {
+        /* 1. Redefine the root variables for the dark theme */
+        --primary-color: #8A7AFF; /* A slightly brighter purple for better contrast */
+        --text-color: #E0E0E0; /* Light gray for text */
+        --bg-color: #121212; /* A very dark, near-black background */
+        --card-bg-color: rgba(30, 30, 50, 0.75); /* A dark, semi-transparent card background */
+        --box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* A more subtle shadow for dark backgrounds */
+    }
+
+    /* 2. Specific overrides for elements not using variables or needing adjustments */
+
+    /* Invert colors for buttons that have light backgrounds by default */
+    body.dark .btn-absent {
+        background-color: #494A42; /* Darker yellow/brown */
+        color: #ffc107; /* Bright yellow text */
+    }
+    body.dark .btn-absent:hover {
+        background-color: #5A5B52;
+    }
+    body.dark #customMessageCancelBtn {
+        background-color: #4a4a4a;
+        color: #f1f1f1;
+    }
+    body.dark #customMessageCancelBtn:hover {
+        background-color: #5a5a5a;
+    }
+
+    /* Update filter input styles */
+    body.dark .filter-section input {
+        background-color: #2a2a3a;
+        border-color: #4a4a5a;
+        color: var(--text-color);
+    }
+
+    /* Update table styles */
+    body.dark .attendance-table th, 
+    body.dark .attendance-table td {
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+    }
+    body.dark .attendance-table tbody tr:hover {
+        background-color: rgba(138, 122, 255, 0.15); /* Use the new primary color for hover */
+    }
+
+    /* Update iOS switch "off" state */
+    body.dark .ios-switch .slider {
+        background-color: #4a4a5a;
+    }
+
+    /* Update custom message pop-up background */
+    body.dark #customMessageContent {
+        background-color: #252535;
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    body.dark #customMessageContent p {
+        color: var(--text-color);
+    }
+
+    /* Update scrollbar for dark mode */
+    body.dark .table-container {
+        scrollbar-color: var(--primary-color) #2a2a3a;
+    }
+    body.dark .table-container::-webkit-scrollbar-track {
+        background: #2a2a3a;
+    }
+    body.dark .table-container::-webkit-scrollbar-thumb {
+        border-color: #2a2a3a;
+    }
+    body.dark .ios-switch .slider {
+    background-color: var(--dark-color); /* A dark grey that matches the theme */
+}
+
+/* This styles the background of the switch when it is ON in dark mode. */
+/* It uses the theme's primary color for a consistent look. */
+body.dark .ios-switch input:checked + .slider {
+    background-color: var(--primary-color);
+}
 
     </style>
 </head>
-<body>
+
+<body class="${sessionScope.theme}">
 
     <div class="container">
 

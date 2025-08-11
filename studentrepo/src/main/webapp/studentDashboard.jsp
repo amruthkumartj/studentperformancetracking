@@ -14,9 +14,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<%= request.getContextPath() %>/css/stud.css" />
+<script src="<%= request.getContextPath() %>/js/theme.js"></script>
+
 
 </head>
-<body class="dark-mode">
+
+<body class="${sessionScope.theme}">
 
 <div class="app-container">
     <header class="app-header">
@@ -301,7 +304,9 @@
     window.studentSemester = '<c:out value="${dashboard.currentSemester}"/>';
     window.serverDate = '<fmt:formatDate value="<%= new java.util.Date() %>" pattern="yyyy-MM-dd"/>';
 </script>
+
 <script src="${pageContext.request.contextPath}/js/student.js"></script>
+
 
 </body>
 </html>

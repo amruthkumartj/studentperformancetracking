@@ -1,25 +1,41 @@
-    :root {
-        --font-family: 'Inter', -apple-system, sans-serif;
-        --radius-small: 8px;
-        --radius-medium: 16px;
-        --radius-large: 24px;
-        --radius-curve: 32px;
-        --transition-fast: 0.2s ease;
-        --transition-smooth: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        --bg-color: #121212;
-        --content-bg: rgba(28, 28, 30, 0.7);
-        --card-bg: #1c1c1e;
-        --text-primary: #f5f5f7;
-        --text-secondary: #a1a1a6;
-        --border-color: rgba(255, 255, 255, 0.12);
-        --hover-bg: rgba(255, 255, 255, 0.05);
-        --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.1);
-        --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.2);
-        --accent-green: #34c759;
-        --accent-blue: #007aff;
-        --accent-orange: #ff9500;
-        --accent-red: #ff3b30;
-    }
+ :root {
+    --font-family: 'Inter', -apple-system, sans-serif;
+    --radius-small: 8px;
+    --radius-medium: 16px;
+    --radius-large: 24px;
+    --radius-curve: 32px;
+    --transition-fast: 0.2s ease;
+    --transition-smooth: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    
+    /* Light Mode (Default) */
+    --bg-color: #f0f2f5;
+    --content-bg: rgba(255, 255, 255, 0.75);
+    --card-bg: #ffffff;
+    --text-primary: #1a1b1f;
+    --text-secondary: #5a5b60;
+    --border-color: rgba(0, 0, 0, 0.08);
+    --hover-bg: rgba(0, 0, 0, 0.03);
+    
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.1);
+    
+    --accent-green: #28a745;
+    --accent-blue: #007aff;
+    --accent-orange: #ff9500;
+    --accent-red: #ff3b30;
+}
+
+body.dark {
+    /* Dark Mode Overrides */
+    --bg-color: #121212;
+    --content-bg: rgba(28, 28, 30, 0.7);
+    --card-bg: #1c1c1e;
+    --text-primary: #f5f5f7;
+    --text-secondary: #a1a1a6;
+    --border-color: rgba(255, 255, 255, 0.12);
+    --hover-bg: rgba(255, 255, 255, 0.05);
+    --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
     body.light-mode {
         --bg-color: #f0f2f5;
         --content-bg: rgba(255, 255, 255, 0.75);
@@ -29,6 +45,7 @@
         --border-color: rgba(0, 0, 0, 0.08);
         --hover-bg: rgba(0, 0, 0, 0.03);
     }
+    
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-family); transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, fill 0.3s ease, opacity 0.3s ease, transform 0.3s ease; }
     .welcome-header h1, .view-header h2, .nav-card h3, .data-list-item h4, .widget-header, .attendance-details .percentage, .semester-filter-wrapper label, .marks-table th, .profile-dropdown-item { font-family: 'Poppins', sans-serif; }
     body { background-color: var(--bg-color); color: var(--text-primary); height: 100vh; overflow: hidden; }
@@ -429,4 +446,8 @@
 #modal-event-description {
     white-space: pre-wrap; /* This is the magic property */
     word-wrap: break-word; /* Ensures long words don't overflow */
+}
+/* FIX: Make theme toggle button icons un-clickable */
+.theme-toggle > i {
+    pointer-events: none;
 }

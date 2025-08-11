@@ -243,18 +243,28 @@
 		
 
 		window.addEventListener('pageshow', function(event) {
-		    // Find the loading overlay
-		    const loadingOverlay = document.getElementById('loadingOverlay');
-		    if (loadingOverlay) {
-		        // Always hide the loader when the login page is shown
-		        loadingOverlay.style.display = 'none';
-		    }
-		});
-	
-		
+		       // This event fires every single time the login page is displayed.
+		       const loginForm = document.getElementById('loginForm');
+		       if (loginForm) {
+		           // Reset the form, clearing the username and password fields.
+		           loginForm.reset();
+		       }
 
-		
-
+		       // Hide any loading overlays that might have gotten stuck.
+		       const loadingOverlay = document.getElementById('loadingOverlay');
+		       if (loadingOverlay) {
+		           loadingOverlay.style.display = 'none';
+		       }
+		   });
+		   
+		   const urlParams = new URLSearchParams(window.location.search);
+		      if (urlParams.get('status') === 'logged_out') {
+		          // This removes the "?status=logged_out" from the URL bar
+		          // and, more importantly, it replaces the current history entry.
+		          // This effectively deletes the "forward" path to the dashboard.
+		          history.replaceState(null, document.title, window.location.pathname);
+		          console.log("Forward history cleared after logout.");
+		      }
 	
 
         const loginCard = document.querySelector('.login-card');

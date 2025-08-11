@@ -17,14 +17,16 @@ public class LogoutServlet extends HttpServlet {
             throws ServletException, IOException {
         
         // Get the current session, but don't create a new one if it doesn't exist
-        HttpSession session = request.getSession(false);
-        
-        if (session != null) {
-            // Invalidate the session, removing all attributes (like the 'user' object)
-            session.invalidate();
-        }
-        
-        // Redirect the user to the login page
-        response.sendRedirect(request.getContextPath() + "/login.html");
-        System.out.print("Logged out successfully for:");   }
+    	  HttpSession session = request.getSession(false);
+          
+          // 1. Invalidate the current user's session
+          if (session != null) {
+              session.invalidate();
+          }
+          
+          // 2. Redirect back to the login page with a status parameter
+          // This parameter tells our login page JavaScript that the user just logged out.
+          String loginPage = request.getContextPath() + "/login.html?status=logged_out";
+          response.sendRedirect(loginPage);
+      }
 }

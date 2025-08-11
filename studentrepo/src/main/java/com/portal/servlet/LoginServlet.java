@@ -15,7 +15,26 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        /* Just bounce to the login page (GET is not allowed for direct login processing) */
+        
+        // ⚠️ START OF MODIFIED LOGIC FOR SESSION VALIDATION ⚠️
+        String action = req.getParameter("action");
+        if ("validate".equals(action)) {
+            HttpSession session = req.getSession(false);
+            if (session == null || session.getAttribute("user") == null) {
+                // If session is invalid, immediately redirect to logout page
+                resp.sendRedirect(req.getContextPath() + "/logout");
+                return; // Stop further execution
+            } else {
+                // Session is valid, do nothing and let the request complete.
+                // This is a simple validation endpoint.
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.getWriter().println("Session valid");
+                return;
+            }
+        }
+        // ⚠️ END OF MODIFIED LOGIC ⚠️
+
+        /* Original logic: Just bounce to the login page */
         resp.sendRedirect(req.getContextPath() + "/login.html");
     }
 
@@ -79,6 +98,10 @@ public class LoginServlet extends HttpServlet {
                     System.err.println("LoginServlet: Unexpected user role after successful login: " + user.getRole());
                     redirectUrl = ctx + "/login.html?login=fail&reason=invalidrole";
                 }
+                
+                long timestamp = System.currentTimeMillis();
+                redirectUrl += "?t=" + timestamp;
+
                 System.out.println("DEBUG: Login successful for " + user.getUsername() + ", redirecting to: " + redirectUrl);
                 resp.sendRedirect(redirectUrl);
 

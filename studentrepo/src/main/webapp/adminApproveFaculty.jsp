@@ -6,13 +6,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Approve Faculty</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+<script src="<%= request.getContextPath() %>/js/theme.js"></script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
+      body {
+            font-family: 'Poppins', sans-serif;
+            padding: 20px;
         }
+       
         .container {
             max-width: 900px;
         }
@@ -62,11 +68,89 @@
             width: 100%;
             margin-top: 0.75rem;
         }
+          body.dark {
+        background-color: #18191a;
+        color: #ccc;
+    }
+
+    /* Main container and text */
+    body.dark .container {
+        background-color: #242526;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+    body.dark h1 { /* Main Page Title */
+        color: #81a4ff; /* Unified blue accent color */
+    }
+    body.dark h2 { /* Subtitle like "Pending Faculty" */
+        color: #f0f0f0; /* Set to white/light-gray */
+    }
+    body.dark p,
+    body.dark a,
+    body.dark .text-gray-600 {
+        color: #a0a0b0;
+    }
+    body.dark a:hover {
+        color: #81a4ff;
+    }
+    
+    /* Table styles */
+    body.dark .min-w-full { /* Targets the table */
+        background-color: #242526;
+        border-color: #3a3b3c;
+    }
+    body.dark thead { /* Table header */
+        background-color: rgba(129, 164, 255, 0.05);
+    }
+    body.dark th { /* Table header cells */
+        color: #f0f0f0; /* Set to white/light-gray */
+        border-bottom-color: #3a3b3c;
+    }
+    body.dark td { /* Table data cells */
+        border-color: #3a3b3c;
+        color: #ccc;
+    }
+    body.dark tbody tr:hover { /* Table row hover */
+        background-color: rgba(129, 164, 255, 0.08);
+    }
+
+    /* Form elements inside the table */
+    body.dark .form-group label {
+        color: #ccc;
+    }
+    body.dark .form-group input,
+    body.dark .form-group select {
+        background-color: #18191a;
+        border-color: #3a3b3c;
+        color: #ccc;
+    }
+    body.dark .form-group select option {
+        background-color: #18191a; /* Ensure options are readable */
+        color: #ccc;
+    }
+    body.dark .form-group input:focus,
+    body.dark .form-group select:focus {
+        border-color: #81a4ff;
+        box-shadow: 0 0 0 2px rgba(129, 164, 255, 0.3);
+    }
+
+    /* Message Boxes */
+    body.dark .message-success {
+        background-color: rgba(40, 167, 69, 0.2);
+        border-color: #28a745;
+        color: #81c784;
+    }
+    body.dark .message-error {
+        background-color: rgba(220, 53, 69, 0.2);
+        border-color: #dc3545;
+        color: #e57373;
+    }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center py-8">
+<body class="bg-gray-100 min-h-screen flex flex-col items-center py-8 ${sessionScope.theme}">
     <div class="container bg-white p-8 rounded-lg shadow-xl w-full">
         <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Approve Faculty Accounts</h1>
+        <br>
+        <br>
 
         <c:if test="${not empty sessionScope.message}">
             <div class="message-box message-success">
@@ -81,7 +165,7 @@
             <c:remove var="error" scope="session"/>
         </c:if>
 
-        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Pending Faculty</h2>
+        
 
         <c:choose>
             <c:when test="${empty pendingFaculty}">

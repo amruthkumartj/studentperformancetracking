@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
 
+
+
     // --- UTILITY FUNCTIONS ---
     function qs(selector) { return document.querySelector(selector); }
     function qsa(selector) { return document.querySelectorAll(selector); }
@@ -23,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }, delay);
         };
     }
+	
     
     // --- GENERAL UI LISTENERS ---
     document.addEventListener('click', function(e) {
@@ -35,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 activeDropdown.classList.remove('active');
             }
         }
+		
     });
 
     /* ───────── UI ELEMENT REFERENCES ───────── */
@@ -51,12 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    if (modeSwitch) {
-        modeSwitch.addEventListener('click', function() {
-            document.body.classList.toggle('dark');
-            if (modeText) modeText.textContent = document.body.classList.contains('dark') ? 'Light mode' : 'Dark mode';
-        });
-    }
+  
 
     Array.prototype.forEach.call(qsa('.has-dropdown > a'), function(a) {
         a.addEventListener('click', function(e) {
@@ -264,23 +263,27 @@ document.addEventListener('DOMContentLoaded', function () {
 	    { name: 'View Profile', hint: 'View your faculty profile', icon: 'bx-user', action: function() { qs('#profileNavLink').click(); } }
 	];
 
+	// Function to open the search modal
 	function openSearchModal() {
-	    if (!searchModal) return;
-	    searchModal.style.display = 'flex';
-	    setTimeout(function() {
-	        searchModal.classList.add('visible');
-	        modalInput.focus();
-	    }, 10);
+	    const searchModal = document.getElementById('searchModal');
+	    if (searchModal) {
+	        searchModal.style.display = 'flex';
+	        setTimeout(() => {
+	            searchModal.classList.add('visible');
+	            document.getElementById('modalSearchInput').focus();
+	        }, 10);
+	    }
 	}
 
+	// Function to close the search modal
 	function closeSearchModal() {
-	    if (!searchModal) return;
-	    searchModal.classList.remove('visible');
-	    setTimeout(function() {
-	        searchModal.style.display = 'none';
-	        modalInput.value = '';
-	        if (modalResults) modalResults.innerHTML = '';
-	    }, 300);
+	    const searchModal = document.getElementById('searchModal');
+	    if (searchModal) {
+	        searchModal.classList.remove('visible');
+	        setTimeout(() => {
+	            searchModal.style.display = 'none';
+	        }, 300);
+	    }
 	}
 
 	if (qs('#openSearchModalBtn')) {

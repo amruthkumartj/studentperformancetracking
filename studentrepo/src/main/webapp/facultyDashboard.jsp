@@ -1,3 +1,8 @@
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setHeader("Expires", "0");
+%>
 <%@ page isELIgnored="false" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -8,13 +13,42 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Faculty Dashboard</title>
+    
+     <script>
+        // --- AGGRESSIVE BACK BUTTON & FORWARD BUTTON CONTROL ---
 
+        // 1. On load, explicitly go "forward" in history. This helps create a state
+        // that makes the back button's target the page itself.
+        window.onload = function () {
+            history.pushState(null, "", location.href);
+            history.forward(); 
+        };
+        
+        // 2. Add the listener for back-clicks.
+        window.addEventListener('popstate', function (event) {
+            // The user clicked "back". Instead of just pushing a new state,
+            // we forcefully tell the browser to go forward again.
+            history.forward();
+            
+            // Show the alert after canceling the action.
+            alert("You cannot go back from the dashboard. Please use the Logout button to exit.");
+        });
+
+        // 3. This listener for the bfcache remains essential.
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+    </script>
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 	<link rel="stylesheet" href="<%= request.getContextPath() %>/css/sidebar.css" />
 
 <script>
+
+
     // Pass data from JSP to JavaScript
     window.currentFacultyId = "<c:out value='${sessionScope.userId}'/>";
     window.currentUserRole = "<c:out value='${sessionScope.userRole}'/>";
@@ -22,8 +56,10 @@
     // These are for other features and are fine
     window.allProgramsData = JSON.parse('<c:out value="${requestScope.allProgramsJson}" escapeXml="false" default="[]" />');
     window.assignedProgramIdsData = JSON.parse('<c:out value="${requestScope.assignedProgramIdsJson}" escapeXml="false" default="[]" />');
-   </script>
-   <style>
+    
+</script>
+
+<style>
 .schedule-layout-container {
     display: flex;
     flex-wrap: wrap;
@@ -250,7 +286,7 @@
 </style>
 
 </head>
-<body>
+<body class="${sessionScope.theme}">
 
 <nav class="sidebar close">
     <header>
@@ -272,11 +308,11 @@
         <div class="menu">
             <ul class="menu-links">
                 <li class="nav-link">
-                    <a href="#" id="openSearchModalBtn">
-                        <i class='bx bx-search icon'></i>
-                        <span class="text nav-text">Search</span>
-                    </a>
-                </li>
+    <a href="javascript:void(0);" id="openSearchModalBtn">
+        <i class='bx bx-search icon'></i>
+        <span class="text nav-text">Search</span>
+    </a>
+</li>
                 <li class="nav-link">
                     <a href="javascript:void(0);" id="dashboardNavLink" >
                         <i class='bx bx-home-alt icon'></i>
@@ -355,12 +391,11 @@
         <div class="bottom-content">
             <ul class="menu-links">
                 <li class="">
-                    <a href="login.html">
-                        <i class='bx bx-log-out icon'></i>
-                        
-                        <span class="text nav-text">Logout</span>
-                    </a>
-                </li>
+    <a href="<c:url value='/logout' />">
+        <i class='bx bx-log-out icon'></i>
+        <span class="text nav-text">Logout</span>
+    </a>
+</li>
                 <li class="mode">
                     <div class="sun-moon">
                         <i class='bx bx-moon icon moon'></i>
@@ -968,6 +1003,8 @@
 
 <script src="<%= request.getContextPath() %>/js/facultymain.js"></script>
 <script src="<%= request.getContextPath() %>/js/facultystud.js"></script>
+<script src="<%= request.getContextPath() %>/js/theme.js"></script>
+
 
 
     </div>

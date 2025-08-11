@@ -8,6 +8,7 @@
     <title>Host a New Event</title>
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <script src="<%= request.getContextPath() %>/js/theme.js"></script>
     <style>
         /* Sea Blue Color Schema */
         :root {
@@ -195,9 +196,65 @@
             #pageTitle { font-size: 1.6rem; }
             .event-category-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
         }
+        body.dark {
+        /* 1. Redefine variables to match the dashboard's theme */
+        --body-color: #18191a;
+        --panel-color: #242526;
+        --primary-color: #81a4ff; /* The vibrant blue from your dashboard numbers */
+        --primary-color-rgb: 129, 164, 255;
+        --primary-color-light: rgba(129, 164, 255, 0.1);
+        --text-color: #ccc;
+        --text-color-light: #a0a0b0;
+        --border-color: #3a3b3c;
+        --input-background: #242526;
+        --toggle-color: #3a3b3c;
+        --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    /* 2. Specific overrides for elements on this page */
+
+    /* Make secondary button hover darker */
+    body.dark .btn-secondary:hover {
+        background-color: #4a4b4c;
+    }
+
+    /* Adjust the input group prefix for better contrast */
+    body.dark .input-group-text {
+        background-color: var(--toggle-color);
+        border-color: var(--border-color);
+        color: var(--text-color-light);
+    }
+    
+    /* Style the category cards to stand out from the body background */
+    body.dark .category-card {
+        background: var(--panel-color);
+        border-color: #3a3b3c;
+    }
+    body.dark .category-card:hover {
+        box-shadow: none;
+        border-color: var(--primary-color);
+    }
+    body.dark .category-card.selected {
+        border-color: var(--primary-color);
+        background: var(--primary-color-light);
+    }
+    body.dark .category-card i,
+    body.dark .category-card p {
+        color: var(--text-color);
+    }
+    body.dark .category-card.selected i {
+        color: var(--primary-color);
+    }
+
+    /* Style the pop-up submission dialog */
+    body.dark .submission-dialog-content {
+        background: #242526;
+        border: 1px solid #3a3b3c;
+    }
     </style>
 </head>
-<body>
+
+<body class="${sessionScope.theme}">
     <script>
         window.currentFacultyId = "<c:out value='${sessionScope.user.id}'/>";
     </script>
