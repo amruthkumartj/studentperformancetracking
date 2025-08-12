@@ -60,158 +60,11 @@
 </script>
 
 <style>
-.schedule-layout-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-    align-items: flex-start;
-}
+/* =================================================================== */
+/* ========== 1. GENERAL & REUSABLE COMPONENT STYLES ========== */
+/* =================================================================== */
 
-.schedule-form-container {
-    flex: 1;
-    min-width: 320px;
-    background: var(--sidebar-color);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.schedule-table-container {
-    flex: 2;
-    min-width: 400px;
-}
-.styled-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9em;
-    background-color: var(--sidebar-color);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.07);
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.styled-table thead tr {
-    background-color: var(--primary-color);
-    color: #ffffff;
-    text-align: left;
-}
-
-.styled-table th,
-.styled-table td {
-    padding: 12px 15px;
-}
-
-.styled-table tbody tr {
-    border-bottom: 1px solid var(--border-color);
-}
-
-.styled-table tbody tr:last-of-type {
-    border-bottom: 2px solid var(--primary-color);
-}
-
-.styled-table tbody tr:hover {
-    background-color: var(--primary-color-light);
-}
-.confirm-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-.confirm-dialog {
-    background: var(--sidebar-color);
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    width: 90%;
-    max-width: 450px;
-    text-align: center;
-}
-.confirm-dialog p {
-    margin: 0 0 20px;
-    color: var(--text-color);
-    font-size: 1.1em;
-    line-height: 1.5;
-}
-.confirm-dialog .buttons {
-    display: flex;
-    justify-content: space-around;
-}
-#scheduleRecurrenceCheckbox {
-    width: 16px;
-    height: 16px;
-    margin: 0;
-    padding: 0;
-    flex-shrink: 0;
-    accent-color: var(--primary-color);
-}
-.form-group input[type="checkbox"]#scheduleRecurrenceCheckbox {
-    appearance: checkbox;
-    -webkit-appearance: checkbox;
-    width: 16px;
-    height: 16px;
-    padding: 0;
-    margin: 0;
-    flex-shrink: 0;
-    accent-color: var(--primary-color);
-    border: 1px solid #ccc;
-}
-.timetable-filters {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-
-.timetable-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.day-column {
-    background-color: var(--sidebar-color);
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.day-column h3 {
-    margin: 0 0 15px 0;
-    padding-bottom: 10px;
-    border-bottom: 2px solid var(--primary-color);
-    color: var(--primary-color);
-    text-align: center;
-}
-
-.schedule-card {
-    background-color: var(--body-color);
-    border-left: 4px solid var(--primary-color-light);
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 10px;
-}
-.schedule-card .time {
-    font-weight: 600;
-    color: var(--text-color);
-}
-.schedule-card .subject {
-    font-weight: 500;
-    margin: 5px 0;
-}
-.schedule-card .location {
-    font-size: 0.85em;
-    color: #888;
-}
-/* In facultyDashboard.jsp, inside the <style> tag */
-
-/* General Button Style (Rectangular Shape) */
+/* General Button Styles */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -219,7 +72,7 @@
     font-weight: 500;
     padding: 0.6rem 1.2rem;
     font-size: 0.95rem;
-    border-radius: 6px; /* Rectangular with slightly rounded corners */
+    border-radius: 6px;
     transition: all 0.2s ease;
     text-decoration: none;
     justify-content: center;
@@ -244,8 +97,7 @@
     background-color: #dcdfe2;
 }
 
-
-/* Design for Edit/Delete Action Buttons in Table */
+/* Action Buttons in Tables (Edit/Delete) */
 .btn-action {
     padding: 5px 10px;
     font-size: 14px;
@@ -259,30 +111,11 @@
 .btn-action i {
     vertical-align: middle;
 }
-.btn-action.edit {
-    background-color: #ffc107; /* Amber */
-}
-.btn-action.edit:hover {
-    background-color: #e0a800;
-}
-.btn-action.delete {
-    background-color: #dc3545; /* Red */
-}
-.btn-action.delete:hover {
-    background-color: #c82333;
-}
-  #changePasswordFormContainer {
-        max-height: 0;
-        opacity: 0;
-        overflow: hidden;
-        transition: max-height 0.5s ease-out, opacity 0.3s ease-in, margin-top 0.5s ease-out;
-        margin-top: 0;
-    }
-    #changePasswordFormContainer.is-visible {
-        max-height: 300px;
-        opacity: 1;
-        margin-top: 20px;
-    }
+.btn-action.edit { background-color: #ffc107; }
+.btn-action.edit:hover { background-color: #e0a800; }
+.btn-action.delete { background-color: #dc3545; }
+.btn-action.delete:hover { background-color: #c82333; }
+
 </style>
 
 </head>
@@ -374,11 +207,11 @@
                     </ul>
                 </li>
                 <li class="nav-link">
-                    <a href="javascript:void(0);">
-                        <i class='bx bx-envelope icon'></i>
-                        <span class="text nav-text">Messages</span>
-                    </a>
-                </li>
+    <a href="javascript:void(0);" id="aiAssistantNavLink">
+        <i class='bx bxs-brain icon'></i>
+        <span class="text nav-text">AI Assistant</span>
+    </a>
+</li>
                 <li class="nav-link">
     				<a href="javascript:void(0);" id="profileNavLink">
         				<i class='bx bx-user icon'></i>
@@ -439,11 +272,32 @@
                     </p>
                 </div>
 
-                <div class="card">
-                    <i class='bx bx-envelope' style="font-size:36px;color:var(--primary);margin-bottom:10px"></i>
-                    <h3>Messages</h3>
-                    <p class="counter" data-target="0">0</p>
-                </div>
+               <!-- FINAL VERSION: Compact AI Assistant Card -->
+<div class="card" id="ai-assistant-card">
+    <button class="ai-settings-btn"><i class='bx bx-cog'></i></button>
+    <div class="ai-card-main-content">
+        <i class='bx bxs-brain icon'></i>
+        <h3>Faculty Assistant</h3>
+        <p class="ai-card-desc">AI Powered Service</p>
+        <button class="ai-launch-btn-circle">
+            <i class='bx bx-right-arrow-alt'></i>
+        </button>
+    </div>
+    <div class="ai-card-settings-panel">
+        <!-- The settings panel code remains the same -->
+        <div class="settings-panel-header">
+            <button class="ai-settings-close-btn"><i class='bx bx-arrow-back'></i></button>
+            <h4>Settings</h4>
+        </div>
+        <div class="setting-row">
+            <span>Show Floating Icon</span>
+            <label class="switch-toggle">
+               <input type="checkbox" id="enable-global-ai-toggle">
+               <span class="slider-toggle"></span>
+            </label>
+        </div>
+    </div>
+</div>
 
                 <c:if test="${sessionScope.user.role == 'ADMIN'}">
                     <div class="card admin-approval-widget-card">
@@ -482,6 +336,25 @@
                 </div>
             </div>
             </div>
+           <section id="aiAssistantSection" style="display: none;">
+    <div class="ai-section-header">
+        <h2 class="text page-title">Faculty Assistant</h2>
+        <button class="ai-section-settings-btn"><i class='bx bx-cog'></i> Settings</button>
+    </div>
+    
+    <div class="ai-chat-container">
+        <div class="ai-chat-history" id="ai-chat-history">
+            <div class="message assistant">
+                <i class='bx bxs-brain'></i>
+                <p>Welcome! How can I help you? You can ask me to summarize student performance, draft emails, or analyze course data.</p>
+            </div>
+        </div>
+        <div class="ai-chat-input-area">
+            <input type="text" id="ai-chat-input" placeholder="Ask a question or give a command... (e.g., 'Summarize performance for student 123')">
+            <button id="ai-chat-send-btn"><i class='bx bxs-send'></i></button>
+        </div>
+    </div>
+</section>
 
         <section id="studentFeatures" style="display:none;">
         <h2 class="text page-title">Manage Students</h2>
@@ -1008,7 +881,38 @@
 
 
     </div>
+<button id="global-ai-fab">
+        <i class='bx bxs-brain'></i>
+    </button>
+    
+   
+<div id="ai-search-modal" class="ai-search-modal">
+    <div class="ai-search-panel">
+       
+<div class="ai-modal-header">
+    <h4 class="text">AI Assistant</h4>
+    <!-- Add this new wrapper div -->
+    <div class="ai-modal-header-actions">
+        <!-- The dustbin icon will be added here by JavaScript -->
+        <button id="ai-modal-close-btn" title="Close"><i class='bx bx-x'></i></button>
+    </div>
 </div>
 
+        <!-- Results Area -->
+        <div class="ai-search-results" id="ai-modal-results">
+            <p class="ai-placeholder">Ask a question to get started.</p>
+        </div>
+
+        <!-- Input Area at the bottom with Send Button -->
+        <div class="ai-search-input-wrapper">
+            <input type="text" id="ai-modal-input" placeholder="Type your question...">
+            <button id="ai-modal-send-btn" title="Send">
+                <i class='bx bxs-send'></i>
+            </button>
+        </div>
+    </div>
+</div>
+    
+</div>
 </body>
 </html>

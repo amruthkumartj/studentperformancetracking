@@ -17,13 +17,40 @@
   </properties>
 
   <dependencies>
-    <!-- Your dependencies remain the same -->
+    <!-- Your existing dependencies -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <version>4.0.1</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.10.1</version>
+    </dependency>
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>8.0.33</version>
+    </dependency>
+    <dependency>
+        <groupId>com.google.cloud</groupId>
+        <artifactId>google-cloud-vertexai</artifactId>
+        <version>1.5.0</version>
+    </dependency>
+
+    <!-- 
+      THE FIX: Add this dependency to resolve the conflict.
+      This forces Maven to use a compatible version of Protocol Buffers.
+    -->
+    <dependency>
+        <groupId>com.google.protobuf</groupId>
+        <artifactId>protobuf-java</artifactId>
+        <version>3.25.3</version> <!-- Use a recent, compatible version -->
+    </dependency>
+    
+    <!-- Other dependencies... -->
     <dependency>
         <groupId>javax.mail</groupId>
         <artifactId>javax.mail-api</artifactId>
@@ -40,19 +67,9 @@
         <version>1.2</version>
     </dependency>
     <dependency>
-        <groupId>com.google.code.gson</groupId>
-        <artifactId>gson</artifactId>
-        <version>2.10.1</version>
-    </dependency>
-    <dependency>
         <groupId>com.fatboyindustrial.gson-javatime-serialisers</groupId>
         <artifactId>gson-javatime-serialisers</artifactId>
         <version>1.1.1</version>
-    </dependency>
-    <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>8.0.33</version>
     </dependency>
     <dependency>
         <groupId>com.zaxxer</groupId>

@@ -87,7 +87,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	        scheduleLanding: qs('#scheduleLandingSection'),
 	        addSchedule: qs('#dailyClassScheduleSection'),
 	        viewSchedule: qs('#viewTimetableSection'),
-	        eventManagement: qs('#eventManagementSection')
+	        eventManagement: qs('#eventManagementSection'),
+			aiAssistant: qs('#aiAssistantSection')
+			
 	    };
 
 	    var navMapping = {
@@ -97,7 +99,18 @@ document.addEventListener('DOMContentLoaded', function () {
 	        'enterMarksNavLink': { section: mainSections.marks, init: window.initMarksFeature },
 	        'profileNavLink': { section: mainSections.profile, init: window.initProfileFeature },
 	        'manageScheduleLink': { section: mainSections.scheduleLanding, init: window.initScheduleLanding },
-	        'hostEventsLink': { section: mainSections.eventManagement, init: window.initEventManagement }
+	        'hostEventsLink': { section: mainSections.eventManagement, init: window.initEventManagement },
+			'aiAssistantNavLink': { 
+			    section: mainSections.aiAssistant, 
+			    init: function() {
+			        // This function runs when the AI Assistant link is clicked.
+			        // It finds the settings button on the main dashboard card and makes it visible.
+			        const settingsBtn = document.querySelector('#ai-assistant-card .ai-settings-btn');
+			        if (settingsBtn) {
+			            settingsBtn.style.display = 'block'; // Or 'inline-block' if needed
+			        }
+			    } 
+			}
 	    };
 
 	    function hideAllSections() {
@@ -810,4 +823,342 @@ document.addEventListener('DOMContentLoaded', function () {
 	        qs('#dashboardNavLink').classList.add('active-nav');
 	    }
 	    showOnly(mainSections.dashboard);
-	});
+		// ====================================================================
+		// FINAL JAVASCRIPT FOR AI ASSISTANT & GLOBAL SETTINGS (ES5 COMPATIBLE)
+		// ====================================================================
+
+		// --- Element References ---
+		var aiAssistantCard = document.getElementById('ai-assistant-card');
+		var aiLaunchBtn = document.querySelector('.ai-launch-btn-circle');
+		var aiSettingsBtn = document.querySelector('.ai-settings-btn');
+		var aiSettingsCloseBtn = document.querySelector('.ai-settings-close-btn');
+		var globalAiFab = document.getElementById('global-ai-fab');
+		var aiSearchModal = document.getElementById('ai-search-modal');
+		var aiModalInput = document.getElementById('ai-modal-input');
+		var aiModalCloseBtn = document.getElementById('ai-modal-close-btn');
+		var aiModalSendBtn = document.getElementById('ai-modal-send-btn');
+		var aiModalResults = document.getElementById('ai-modal-results');
+		var enableGlobalAiToggle = document.getElementById('enable-global-ai-toggle');
+		var GLOBAL_AI_ENABLED_KEY = 'globalAiAssistantEnabled';
+
+		// --- References for Main AI Section ---
+		var aiChatInput = document.getElementById('ai-chat-input');
+		var aiChatSendBtn = document.getElementById('ai-chat-send-btn');
+		var aiChatHistory = document.getElementById('ai-chat-history');
+		var aiSectionSettingsBtn = document.querySelector('.ai-section-settings-btn');
+
+
+		// --- Chat History Storage ---
+		var chatHistory = [];
+
+
+		// --- AI Card Logic (Dashboard Widget) ---
+		if (aiLaunchBtn) {
+		    aiLaunchBtn.addEventListener('click', function() {
+		        showOnly(mainSections.aiAssistant, null);
+		        displayMessages();
+		    });
+		}
+		if (aiSettingsBtn) {
+		    aiSettingsBtn.addEventListener('click', function() {
+		        if (aiAssistantCard) {
+		            aiAssistantCard.classList.add('is-settings-open');
+		        }
+		    });
+		}
+		if (aiSettingsCloseBtn) {
+		    aiSettingsCloseBtn.addEventListener('click', function() {
+		        if (aiAssistantCard) {
+		            aiAssistantCard.classList.remove('is-settings-open');
+		        }
+		    });
+		}
+
+		// --- Floating Action Button (FAB) Logic ---
+		function applyFabPreference() {
+		    if (localStorage.getItem(GLOBAL_AI_ENABLED_KEY) === 'true') {
+		        document.body.classList.add('global-ai-fab-enabled');
+		        if (enableGlobalAiToggle) {
+		            enableGlobalAiToggle.checked = true;
+		        }
+		    } else {
+		        document.body.classList.remove('global-ai-fab-enabled');
+		        if (enableGlobalAiToggle) {
+		            enableGlobalAiToggle.checked = false;
+		        }
+		    }
+		}
+
+		if (enableGlobalAiToggle) {
+		    enableGlobalAiToggle.addEventListener('change', function() {
+		        localStorage.setItem(GLOBAL_AI_ENABLED_KEY, this.checked);
+		        applyFabPreference();
+		    });
+		}
+
+		// --- Global AI Modal Logic ---
+		function openAiModal() {
+		    if (aiSearchModal) {
+		        aiSearchModal.style.display = 'flex';
+		        setTimeout(function() {
+		            aiSearchModal.classList.add('is-visible');
+		            if (aiModalInput) {
+		                aiModalInput.focus();
+		            }
+		            displayMessages();
+		        }, 10);
+		    }
+		}
+
+		function closeAiModal() {
+		    if (aiSearchModal) {
+		        aiSearchModal.classList.remove('is-visible');
+		        setTimeout(function() {
+		            aiSearchModal.style.display = 'none';
+		            if (aiModalInput) {
+		                aiModalInput.value = '';
+		            }
+		        }, 300);
+		    }
+		}
+
+		if (globalAiFab) {
+		    globalAiFab.addEventListener('click', openAiModal);
+		}
+		if (aiModalCloseBtn) {
+		    aiModalCloseBtn.addEventListener('click', closeAiModal);
+		}
+		if (aiSearchModal) {
+		    aiSearchModal.addEventListener('click', function(e) {
+		        if (e.target === aiSearchModal) {
+		            closeAiModal();
+		        }
+		    });
+		}
+		document.addEventListener('keydown', function(e) {
+		    if ((e.key === "Escape" || e.keyCode === 27) && aiSearchModal && aiSearchModal.classList.contains('is-visible')) {
+		        closeAiModal();
+		    }
+		});
+
+
+		// --- Central AI Query Handler ---
+		function handleAiQuery(userQuery) {
+		    chatHistory.push({ role: 'user', text: userQuery });
+		    displayMessages();
+
+		    if (aiChatHistory) {
+		        var thinkingDivMain = document.createElement('div');
+		        thinkingDivMain.className = 'message assistant';
+		        thinkingDivMain.innerHTML = '<i class="bx bxs-brain"></i><p>Thinking...</p>';
+		        aiChatHistory.appendChild(thinkingDivMain);
+		        aiChatHistory.scrollTop = aiChatHistory.scrollHeight;
+		    }
+		    if (aiModalResults) {
+		        var thinkingDivModal = document.createElement('div');
+		        thinkingDivModal.className = 'ai-response-block-wrapper';
+		        thinkingDivModal.innerHTML = '<i class="bx bxs-brain"></i><div class="ai-response-block assistant">Thinking...</div>';
+		        aiModalResults.appendChild(thinkingDivModal);
+		        aiModalResults.scrollTop = aiModalResults.scrollHeight;
+		    }
+
+		    fetch('AssistantServlet', {
+		            method: 'POST',
+		            headers: { 'Content-Type': 'application/json' },
+		            body: JSON.stringify({
+		                history: chatHistory,
+		                question: userQuery
+		            })
+		        })
+		        .then(function(response) {
+		            if (!response.ok) {
+		                return response.text().then(function(text) {
+		                    throw new Error('Network error: ' + text);
+		                });
+		            }
+		            return response.text();
+		        })
+		        .then(function(aiResponseText) {
+		            chatHistory.push({ role: 'assistant', text: aiResponseText });
+		            displayMessages();
+		        })
+		        .catch(function(error) {
+		            var errorMessage = 'Sorry, an error occurred. ' + error.message;
+		            chatHistory.push({ role: 'assistant', text: errorMessage, isError: true });
+		            displayMessages();
+		        });
+		}
+
+		// --- NEW HELPER: Sanitize and format text for display ---
+		function formatMessageText(text) {
+		    var sanitizedText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+		    var formattedText = sanitizedText.replace(/```([\s\S]*?)```/g, function(match, code) {
+		        var trimmedCode = code.trim();
+		        return '<pre><code>' + trimmedCode + '</code></pre>';
+		    });
+		    return formattedText;
+		}
+
+
+		// --- Central Display Function ---
+		function displayMessages() {
+		    if (chatHistory.length === 0) {
+		        var welcomeMessage = '<div class="placeholder"><i class="bx bxs-brain"></i><p>How can I help you today?</p></div>';
+		        if (aiChatHistory) aiChatHistory.innerHTML = welcomeMessage;
+		        if (aiModalResults) aiModalResults.innerHTML = welcomeMessage;
+		        return;
+		    }
+
+		    if (aiChatHistory) {
+		        aiChatHistory.innerHTML = '';
+		        chatHistory.forEach(function(message) {
+		            var messageDiv = document.createElement('div');
+		            messageDiv.className = 'message ' + message.role;
+		            var iconClass = message.role === 'assistant' ? 'bxs-brain' : 'bxs-user';
+		            var messageContent = '<i class="bx ' + iconClass + '"></i><p>' + formatMessageText(message.text) + '</p>';
+		            if (message.isError) {
+		                messageContent = '<i class="bx bxs-error-circle"></i><p class="error">' + formatMessageText(message.text) + '</p>';
+		            }
+		            messageDiv.innerHTML = messageContent;
+		            aiChatHistory.appendChild(messageDiv);
+		        });
+		        aiChatHistory.scrollTop = aiChatHistory.scrollHeight;
+		    }
+
+		    if (aiModalResults) {
+		        aiModalResults.innerHTML = '';
+		        chatHistory.forEach(function(message) {
+		            var messageDiv = document.createElement('div');
+		            messageDiv.className = 'ai-response-block-wrapper ' + message.role;
+		            var iconClass = message.role === 'assistant' ? 'bxs-brain' : 'bxs-user';
+		            var messageContent = '<i class="bx ' + iconClass + '"></i><div class="ai-response-block">' + formatMessageText(message.text) + '</div>';
+		            if (message.isError) {
+		                iconClass = 'bxs-error-circle';
+		                messageContent = '<i class="bx ' + iconClass + '"></i><div class="ai-response-block error">' + formatMessageText(message.text) + '</div>';
+		            }
+		            messageDiv.innerHTML = messageContent;
+		            aiModalResults.appendChild(messageDiv);
+		        });
+		        aiModalResults.scrollTop = aiModalResults.scrollHeight;
+		    }
+		}
+
+		// --- NEW FUNCTION: Clear Chat History ---
+		function clearChatHistory() {
+		    chatHistory = [];
+		    displayMessages();
+		    // Hide the floating clear button if it's visible
+		    var floatingClearBtn = document.getElementById('ai-section-clear-btn');
+		    if (floatingClearBtn) {
+		        floatingClearBtn.classList.remove('visible');
+		    }
+		}
+
+
+		// --- Event Listeners for BOTH UIs ---
+		if (aiModalSendBtn) {
+		    aiModalSendBtn.addEventListener('click', function() {
+		        var userQuery = aiModalInput.value.trim();
+		        if (userQuery) {
+		            aiModalInput.value = '';
+		            handleAiQuery(userQuery);
+		        }
+		    });
+		}
+		if (aiModalInput) {
+		    aiModalInput.addEventListener('keydown', function(e) {
+		        if (e.key === 'Enter' || e.keyCode === 13) {
+		            e.preventDefault();
+		            var userQuery = aiModalInput.value.trim();
+		            if (userQuery) {
+		                aiModalInput.value = '';
+		                handleAiQuery(userQuery);
+		            }
+		        }
+		    });
+		}
+
+		if (aiChatSendBtn) {
+		    aiChatSendBtn.addEventListener('click', function() {
+		        var userQuery = aiChatInput.value.trim();
+		        if (userQuery) {
+		            aiChatInput.value = '';
+		            handleAiQuery(userQuery);
+		        }
+		    });
+		}
+		if (aiChatInput) {
+		    aiChatInput.addEventListener('keydown', function(e) {
+		        if (e.key === 'Enter' || e.keyCode === 13) {
+		            e.preventDefault();
+		            var userQuery = aiChatInput.value.trim();
+		            if (userQuery) {
+		                aiChatInput.value = '';
+		                handleAiQuery(userQuery);
+		            }
+		        }
+		    });
+		}
+
+
+		// --- Initial Setup on Page Load ---
+		if (document.querySelector('#dashboardNavLink')) {
+		    document.querySelector('#dashboardNavLink').classList.add('active-nav');
+		}
+		showOnly(mainSections.dashboard);
+		applyFabPreference();
+		displayMessages();
+
+		// --- THE FIX: Dynamically add UI elements and their listeners ---
+		(function setupAiExtras() {
+		    // Add Dustbin icon to Modal
+		    var modalHeaderActions = document.querySelector('.ai-modal-header-actions');
+		    if (modalHeaderActions && !modalHeaderActions.querySelector('.ai-modal-clear-btn')) {
+		        var clearBtn = document.createElement('button');
+		        clearBtn.className = 'ai-modal-clear-btn';
+		        clearBtn.title = 'Clear Chat';
+		        clearBtn.innerHTML = '<i class="bx bx-trash"></i>';
+		        clearBtn.addEventListener('click', clearChatHistory);
+		        // Add it before the close button
+		        modalHeaderActions.insertBefore(clearBtn, modalHeaderActions.firstChild);
+		    }
+
+		    // Add Floating Clear Chat button for Main Section
+		    var aiSection = document.getElementById('aiAssistantSection');
+		    if (aiSection && !document.getElementById('ai-section-clear-btn')) {
+		        var floatingClearBtn = document.createElement('button');
+		        floatingClearBtn.id = 'ai-section-clear-btn';
+		        floatingClearBtn.className = 'ai-section-clear-chat-btn';
+		        floatingClearBtn.innerHTML = '<i class="bx bx-trash"></i> Clear Chat';
+		        floatingClearBtn.addEventListener('click', clearChatHistory);
+		        aiSection.appendChild(floatingClearBtn);
+
+		        // Add listener to the settings button to toggle it
+		        if (aiSectionSettingsBtn) {
+		            aiSectionSettingsBtn.addEventListener('click', function() {
+		                floatingClearBtn.classList.toggle('visible');
+		            });
+		        }
+		    }
+
+		    // Add disclaimers
+		    var disclaimerText = 'Powered by Gemini 2.5 Flash. Responses may be inaccurate.';
+		    var mainDisclaimer = document.createElement('p');
+		    mainDisclaimer.className = 'ai-disclaimer';
+		    mainDisclaimer.textContent = disclaimerText;
+		    
+		    var modalDisclaimer = document.createElement('p');
+		    modalDisclaimer.className = 'ai-disclaimer';
+		    modalDisclaimer.textContent = disclaimerText;
+
+		    var mainChatArea = document.querySelector('.ai-chat-input-area');
+		    if (mainChatArea && !mainChatArea.nextElementSibling) {
+		        mainChatArea.parentNode.insertBefore(mainDisclaimer, mainChatArea.nextSibling);
+		    }
+		    
+		    var modalPanel = document.querySelector('.ai-search-panel');
+		    if (modalPanel && !modalPanel.querySelector('.ai-disclaimer')) {
+		        modalPanel.appendChild(modalDisclaimer);
+		    }
+		})();
+});
