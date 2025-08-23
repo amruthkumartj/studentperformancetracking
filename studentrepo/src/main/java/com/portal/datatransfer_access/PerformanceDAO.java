@@ -10,8 +10,10 @@ import java.util.HashMap; // Added for getPrograms/getProgramSemesters
 import java.util.List;
 import java.util.Map;   // Added for getPrograms/getProgramSemesters
 
+import com.portal.CoursePerformance;
 import com.portal.DBUtil;
 import com.portal.Student;
+import com.portal.StudentPerformance;
 
 public class PerformanceDAO {
 
@@ -25,6 +27,80 @@ public class PerformanceDAO {
         // Otherwise, these are not needed if UserDAO handles detailed performance.
         // this.marksDAO = new MarksDAO();
         // this.attendanceDAO = new AttendanceDAO();
+    }
+    /**
+     * Retrieves a complete performance profile for a student using only their ID.
+     * This is the primary method for the AI Assistant.
+     * @param studentId The ID of the student.
+     * @return A StudentPerformance object populated with all course data, or null if not found.
+     * @throws SQLException If a database access error occurs.
+     */
+    public StudentPerformance getStudentPerformanceById(int studentId) throws SQLException {
+        StudentPerformance studentPerf = null;
+        // This query uses LEFT JOINs and aggregation to get student details,
+        // sum up attendance, and pivot marks into columns for each course.
+        String sql = "SELECT " +
+                     "s.student_id, s.student_name, p.program_name, s.sem, c.course_id, c.course_name, " +
+                     "SUM(CASE WHEN ar.attendance_status = 'PRESENT' THEN 1 ELSE 0 END) as classes_attended, " +
+                     "COUNT(DISTINCT ass.session_id) as total_classes_held, " +
+                     "MAX(CASE WHEN m.exam_type = 'Internal Assessment 1' THEN m.marks_obtained END) as ia1_marks, " +
+                     "MAX(CASE WHEN m.exam_type = 'Internal Assessment 2' THEN m.marks_obtained END) as ia2_marks, " +
+                     "MAX(CASE WHEN m.exam_type = 'SEE (Semester End Examination)' THEN m.marks_obtained END) as see_marks " +
+                     "FROM students s " +
+                     "JOIN enrollments e ON s.student_id = e.student_id " +
+                     "JOIN programs p ON e.program_id = p.program_id " +
+                     "LEFT JOIN student_courses sc ON s.student_id = sc.student_id " +
+                     "LEFT JOIN courses c ON sc.course_id = c.course_id " +
+                     "LEFT JOIN attendancesessions ass ON c.course_id = ass.course_id AND ass.semester = s.sem AND ass.status = 'COMPLETED' " +
+                     "LEFT JOIN attendancerecords ar ON ass.session_id = ar.session_id AND ar.student_id = s.student_id " +
+                     "LEFT JOIN marks m ON sc.enrollment_id = m.enrollment_id AND c.course_id = m.course_id " +
+                     "WHERE s.student_id = ? " +
+                     "GROUP BY s.student_id, s.student_name, p.program_name, s.sem, c.course_id, c.course_name " +
+                     "ORDER BY c.course_name;";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, studentId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                List<CoursePerformance> courses = new ArrayList<>();
+                boolean studentFound = false;
+
+                while (rs.next()) {
+                    if (!studentFound) {
+                        // This part runs only once to set up the main student object
+                        studentPerf = new StudentPerformance();
+                        studentPerf.setStudentId(studentId);
+                        studentPerf.setStudentName(rs.getString("student_name"));
+                        studentPerf.setProgramName(rs.getString("program_name"));
+                        studentPerf.setSemester(rs.getInt("sem"));
+                        studentFound = true;
+                    }
+
+                    // Use the constructor from your CoursePerformance DTO
+                    CoursePerformance coursePerf = new CoursePerformance(
+                        rs.getString("course_id"),
+                        rs.getString("course_name"),
+                        rs.getObject("ia1_marks") != null ? rs.getDouble("ia1_marks") : null,
+                        rs.getObject("ia2_marks") != null ? rs.getDouble("ia2_marks") : null,
+                        rs.getObject("see_marks") != null ? rs.getDouble("see_marks") : null,
+                        rs.getInt("total_classes_held"),
+                        rs.getInt("classes_attended")
+                    );
+                    
+                    courses.add(coursePerf);
+                }
+
+                if (!studentFound) {
+                    return null; // Return null if the student ID doesn't exist at all
+                }
+
+                studentPerf.setCoursePerformances(courses);
+                // The overall analysis can be calculated here or in the DTO if needed
+            }
+        }
+        return studentPerf;
     }
 
     /**

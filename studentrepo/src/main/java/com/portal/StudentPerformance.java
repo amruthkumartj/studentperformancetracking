@@ -11,6 +11,7 @@ public class StudentPerformance {
     private int semester;       // <--- ADD THIS FIELD (if not already present for semester-specific performance)
     private List<CoursePerformance> coursePerformances;
     private String overallAnalysis; // e.g., "Excellent", "Needs Improvement"
+    private double overallAttendancePercentage;
 
     // Default constructor
     public StudentPerformance() {
@@ -77,6 +78,13 @@ public class StudentPerformance {
     public void setOverallAnalysis(String overallAnalysis) {
         this.overallAnalysis = overallAnalysis;
     }
+    public double getOverallAttendancePercentage() {
+        return overallAttendancePercentage;
+    }
+
+    public void setOverallAttendancePercentage(double overallAttendancePercentage) {
+        this.overallAttendancePercentage = overallAttendancePercentage;
+    }
 
     // You might also want to add a toString() method for easier debugging
     @Override
@@ -86,6 +94,7 @@ public class StudentPerformance {
                ", studentName='" + studentName + '\'' +
                ", programName='" + programName + '\'' +
                ", semester=" + semester +
+               ", overallAttendancePercentage=" + overallAttendancePercentage + 
                ", coursePerformances=" + coursePerformances +
                ", overallAnalysis='" + overallAnalysis + '\'' +
                '}';
