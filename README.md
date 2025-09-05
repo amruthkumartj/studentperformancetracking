@@ -1,6 +1,21 @@
 
 # Aegis Academic Suite: AI-Powered Academic Management & Tracking
 
+
+![Java](https://img.shields.io/badge/Java-Servlets%20%7C%20JSP-red?logo=java&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-Database-blue?logo=mysql&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-Build%20Tool-orange?logo=apachemaven&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Containerized-blue?logo=docker&logoColor=white)
+![Frontend](https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JS-yellow?logo=javascript&logoColor=white)
+
+![GitHub Repo stars](https://img.shields.io/github/stars/amruthkumartj/studentperformancetracking?style=social)
+![GitHub forks](https://img.shields.io/github/forks/amruthkumartj/studentperformancetracking?style=social)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/amruthkumartj/studentperformancetracking)
+![GitHub last commit](https://img.shields.io/github/last-commit/amruthkumartj/studentperformancetracking)
+![GitHub License](https://img.shields.io/github/license/amruthkumartj/studentperformancetracking)
+
+[![Live Demo](https://img.shields.io/badge/🚀%20Launch-Live%20Demo-brightgreen?style=for-the-badge)](https://studentperformancetracking.onrender.com)
+
 An intelligent, self-hosted web application engineered with a pure Java backend (Servlets & JSP). **Aegis Academic Suite** provides a secure, robust, and multi-user environment for educational institutions to manage student performance, departmental data, and academic schedules with unparalleled efficiency.
 
 This project integrates a **Gemini-powered AI assistant** to empower faculty, offers a modern and responsive user interface built with Material Design 3, and is fully containerized with **Docker** for seamless deployment on any cloud platform.
