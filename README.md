@@ -1,18 +1,40 @@
 
-# AI-Powered Student Performance Tracking System
+# Aegis Academic Suite: AI-Powered Academic Management
 
-An intelligent, self-hosted web application engineered with a pure Java backend (Servlets & JSP) to manage and track student academic performance. This project integrates a Gemini-powered AI assistant and provides a secure, multi-user environment for administrators, faculty, and students, streamlining academic monitoring, communication, and data analysis with a modern, responsive interface.
+An intelligent, self-hosted web application engineered with a pure Java backend (Servlets & JSP). **Aegis Academic Suite** provides a secure, robust, and multi-user environment for educational institutions to manage student performance, departmental data, and academic schedules with unparalleled efficiency.
 
-The application is fully containerized with Docker for seamless deployment on any cloud platform.
+This project integrates a **Gemini-powered AI assistant** to empower faculty, offers a modern and responsive user interface built with Material Design 3, and is fully containerized with **Docker** for seamless deployment on any cloud platform.
 
-### ✨ Key Features
+### ✨ Key Features Overview
 
-This platform is divided into three distinct user roles with tailored functionalities:
+#### 🌐 Multi-Platform & Personalized Dashboards
+
+  * **👑 Admin Portal:** A central command center to manage the entire user lifecycle, approve faculty, assign departmental roles, and broadcast secure messages.
+  * **🧑‍🏫 Faculty Workspace:** An intuitive interface for faculty to manage assigned students, handle attendance and marks, schedule classes, and leverage the AI assistant.
+  * **🎓 Student Gateway:** A personal dashboard for students to track their academic progress, view attendance, and stay updated on events.
+  * **📱 Responsive by Design:** The UI offers a seamless and consistent experience on any device, from desktops to mobile phones.
+
+#### 🤖 Intelligent & Automated Tools
+
+  * **🧠 AI-Powered Assistant:** A built-in Gemini assistant helps faculty generate performance summaries, draft emails, and gain insights from academic data.
+  * **⏰ Timed Attendance System:** Automates attendance taking with 15-minute timed sessions, quick-marking tools, and intelligent defaults.
+  * **📊 Performance Analytics:** In-depth visualization tools and automated analysis to track both individual and class-wide academic trends.
+  * **📅 Advanced Scheduling:** A comprehensive module for managing weekly timetables and scheduling extra classes with built-in conflict detection.
+
+#### 🔒 Enterprise-Grade Security
+
+  * **🛡️ Robust Authentication:** Features strong **BCrypt password hashing** and a secure, OTP-based password reset flow to protect user accounts.
+  * **🔐 Role-Based Access Control (RBAC):** A strict permissions system ensures that users can only access the data and functionalities relevant to their specific role.
+  * **🚦 Filter-Based Session Management:** Secure servlet filters protect all sensitive routes, preventing unauthorized access to critical data and actions.
+
+-----
+
+### Detailed Role-Based Functionalities
 
 #### 👑 Admin
 
   * **Centralized User Management:** Securely manage the entire user lifecycle. Add, view, edit, and delete student and faculty records with ease.
-  * **Faculty Onboarding & Approval:** Review and approve or deny new faculty registration requests, ensuring only authorized personnel can access the system.
+  * **Faculty Onboarding & Approval:** Review and approve or deny new faculty registration requests, ensuring only authorized personnel access the system.
   * **Role & Program Allocation:** Assign specific programs (e.g., BCA, MCA) to faculty members, enforcing strict access control so they can only manage relevant students.
   * **Data Integrity Controls:** The system actively prevents duplicate student entries by validating unique IDs, email addresses, and phone numbers upon creation.
   * **Secure Broadcast System:** Send important announcements, messages, and updates to all or specific groups of faculty members.
