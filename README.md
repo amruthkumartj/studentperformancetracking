@@ -1,92 +1,82 @@
 
-## Student Performance Tracking System
+# AI-Powered Student Performance Tracking System
 
-A comprehensive, self-hosted web application built with a pure Java backend for managing and tracking student academic performance. This project provides a secure, multi-user environment for administrators, faculty, and students to streamline academic monitoring, communication, and data analysis.
+An intelligent, self-hosted web application engineered with a pure Java backend (Servlets & JSP) to manage and track student academic performance. This project integrates a Gemini-powered AI assistant and provides a secure, multi-user environment for administrators, faculty, and students, streamlining academic monitoring, communication, and data analysis with a modern, responsive interface.
+
+The application is fully containerized with Docker for seamless deployment on any cloud platform.
 
 ### ✨ Key Features
 
 This platform is divided into three distinct user roles with tailored functionalities:
 
-
 #### 👑 Admin
 
-  * **Faculty Management:**  Approve or deny faculty registration requests, ensuring only authorized personnel access the system.
-  * **Student Lifecycle Management:**  Add, view, edit, and delete student records. Assign students to specific programs and semesters.
-  * **Data Integrity:**  Prevents duplicate student entries by validating unique IDs, email addresses, and phone numbers.
-  * **Course Allocation:**  Assign specific programs (e.g., BCA, MCA) to faculty members, restricting their access to relevant students only.
-  * **Secure Communication:**  Broadcast messages and important updates to all or specific faculty members.
-
+  * **Centralized User Management:** Securely manage the entire user lifecycle. Add, view, edit, and delete student and faculty records with ease.
+  * **Faculty Onboarding & Approval:** Review and approve or deny new faculty registration requests, ensuring only authorized personnel can access the system.
+  * **Role & Program Allocation:** Assign specific programs (e.g., BCA, MCA) to faculty members, enforcing strict access control so they can only manage relevant students.
+  * **Data Integrity Controls:** The system actively prevents duplicate student entries by validating unique IDs, email addresses, and phone numbers upon creation.
+  * **Secure Broadcast System:** Send important announcements, messages, and updates to all or specific groups of faculty members.
 
 #### 🧑‍🏫 Faculty
 
-  * **Role-Based Access Control:** Faculty can only view and manage students within the programs they are assigned to by the admin.
- 
-  * **Timed Attendance System:**
-      * Initiate attendance sessions for a specific class (program & semester).
-      * A 15-minute timer ensures sessions are completed promptly.
-      * Quickly mark students using filters, "Mark All as Present," and "Mark All as Absent" buttons.
-      * If the timer expires, all un-marked students are defaulted to 'Present'.
-      * Attendance sessions are locked upon starting and cannot be canceled.
-
-  * **Efficient Marks Management:**
-      * Enter and update marks for various exam types (e.g., Internal Assessment 1, SEE).
-      * The system prevents duplicate mark entries for the same student and exam type.
-      * Easily edit previously entered marks to correct errors.
-
-  * **📊 Performance Analytics:**
-      * Visualize overall class performance with charts and tables to identify academic trends.
-      * Drill down to an individual student's performance, viewing detailed reports on marks and attendance.
-      * Receive an automated analysis summary (e.g., "Excellent," "Good," "Needs Improvement").
- 
-  * **Utilities:**
-      * **Event Scheduler:** Schedule seminars, guest lectures, and other events.
-      * **Messaging:** Communicate directly with other faculty members.
-      * **Profile Management:** Update personal details, profile picture, and password.
-
+  * **🤖 AI-Powered Faculty Assistant:** A built-in assistant powered by the **Google Gemini API** to enhance productivity. Faculty can:
+      * Generate summaries of student performance.
+      * Draft emails to students or parents.
+      * Get insights and analyze course data.
+  * **Advanced Scheduling & Timetabling:**
+      * **Weekly Timetable:** A clear, organized visual interface to view the entire weekly schedule for any program and semester.
+      * **Extra Class Management:** Schedule single or recurring daily classes with built-in conflict detection against the main timetable.
+  * **Robust Attendance System:**
+      * **Timed Sessions:** Initiate attendance sessions that automatically lock and expire after 15 minutes to ensure timely data entry.
+      * **Efficient Marking:** Utilize quick-marking features like "Mark All as Present/Absent" for large classes.
+      * **Default Status:** Unmarked students automatically default to 'Present' upon session expiry to prevent incomplete records.
+  * **Comprehensive Marks Management:**
+      * Enter, update, and manage marks for various exam types (e.g., Internal Assessment, SEE).
+      * The system prevents duplicate mark entries for the same student/exam and allows for easy correction of errors.
+  * **📊 In-Depth Performance Analytics:**
+      * Visualize class-wide performance with dynamic charts and detailed data tables to identify academic trends.
+      * Drill down into individual student reports, viewing detailed breakdowns of marks and attendance percentages.
+      * Receive an automated performance analysis summary (e.g., "Excellent," "Good," "Needs Improvement").
+  * **Event Coordination:** Schedule, view, and manage departmental or college-wide events like seminars and guest lectures.
 
 #### 🎓 Student
 
-  * **Secure Registration:** Students can only register and log in if their Student ID has been added to the system by a faculty or admin.
-  * **Performance Dashboard:** Track personal marks across all subjects and semesters.
-  * **Attendance Monitoring:** View personal attendance percentages for each course to stay on track.
-  * **Profile Management:** Manage personal profile and update login credentials.
+  * **Secure Onboarding:** Students can only register and log in if their unique Student ID has been pre-loaded into the system by an administrator, preventing unauthorized access.
+  * **Personalized Performance Dashboard:** A dedicated dashboard to track personal marks across all subjects and semesters.
+  * **Real-time Attendance Monitoring:** View personal attendance percentages for each course to stay on track with academic requirements.
+  * **Event Calendar:** View a list of upcoming college and departmental events.
+  * **Self-Service Profile Management:** Easily manage personal profile information and update login credentials.
 
+### 🔒 Security & Architecture
 
-### 🔒 Security & UI
-
-  * **Strong Password Hashing:** All user passwords are secured using Bcrypt (12-factor), ensuring they are unreadable even by database administrators.
-  * **OTP Password Reset:** A secure "Forgot Password" flow using One-Time Passwords.
-  * **Modern & Responsive UI:** Built with Material Design 3, the interface is clean, intuitive, and fully responsive, providing a seamless experience on both desktop and mobile devices.
-  * **Dark/Light Mode:** A user-friendly toggle for visual comfort.
-
+  * **Strong Password Hashing:** All user passwords are secured using **BCrypt (12-factor hashing)**, making them computationally expensive to crack and unreadable even by database administrators.
+  * **Secure Authentication & Session Management:** Implemented with robust servlet filters to protect all sensitive routes and ensure only authenticated and authorized users can access specific resources.
+  * **OTP-Based Password Reset:** A secure "Forgot Password" flow using One-Time Passwords sent via email to verify user identity.
+  * **Modern & Responsive UI:** Built with **Material Design 3**, the interface is clean, intuitive, and fully responsive for a seamless experience on both desktop and mobile devices.
+  * **User Experience:** Features a user-friendly Dark/Light mode toggle and intuitive navigation.
 
 ### 🛠️ Tech Stack
 
   * **Backend:** Java (Servlets, JSP)
-  * **Build Tool:** Apache Maven
   * **Database:** MySQL
-  * **Deployment:** Docker
-  * **Frontend:** HTML, Material Design 3 CSS, JavaScript
+  * **AI Integration:** Google Cloud Vertex AI (Gemini API)
+  * **Build Tool:** Apache Maven
   * **Password Hashing:** BCrypt
+  * **Deployment:** Docker, Apache Tomcat
+  * **Frontend:** HTML, Material Design 3 CSS, JavaScript
 
 -----
 
-
 ### 🚀 Getting Started
 
-Follow these instructions to get a local copy up and running for development and testing purposes.
-
+Follow these instructions to get a local copy up and running for development and testing.
 
 #### Prerequisites
 
-Make sure you have the following software installed on your machine:
-
-  * Java Development Kit (JDK) 11 or newer
+  * Java Development Kit (JDK) 17 or newer
   * Apache Maven
   * MySQL Server
-  * Git
-  * Apache Tomcat 9.x (for local deployment without Docker)
-
+  * Docker
 
 #### Installation & Setup
 
@@ -94,109 +84,63 @@ Make sure you have the following software installed on your machine:
 
     ```bash
     git clone https://github.com/amruthkumartj/studentperformancetracking.git
-    cd studentperformancetracking
+    cd studentperformancetracking/studentrepo
     ```
-
 
 2.  **Database Configuration:**
 
-      * Create a new MySQL database for the project (e.g., `student_performance_db`).
-      * You'll need to import the initial schema. Look for an `.sql` file in the repository (e.g., `schema/database.sql` or similar) and import it into your newly created database.
-      * Update the database connection details (URL, username, password) in the project's configuration file. This is typically located in `src/main/resources/db.properties` or similar.
-
+      * Create a new MySQL database (e.g., `stud`).
+      * Import the database schema from the `.sql` file provided in the repository.
+      * For local development, update the database credentials directly in the `DBUtil.java` file.
 
 3.  **Build the project with Maven:**
-    This command will compile the source code, run any tests, and package the application into a `.war` file in the `target/` directory.
+    This command compiles the source code and packages the application into a `.war` file in the `target/` directory.
 
     ```bash
     mvn clean install
     ```
 
-
-4.  **Run the application (Local Tomcat Deployment):**
-    If you're deploying locally without Docker, deploy the generated `.war` file (`target/studentrepo.war`) to your Apache Tomcat 9.x servlet container.
-
-      * **Manual Deployment:** Copy `target/studentrepo.war` to the `webapps` directory of your Tomcat installation.
-      * **Maven Tomcat Plugin (if configured):** Some projects use the Tomcat Maven plugin for direct deployment. Check `pom.xml` for `tomcat7-maven-plugin` or similar configurations.
-
-    Once deployed, start your Tomcat server, and the application should be accessible at `http://localhost:8080/studentrepo` (or `http://localhost:8080/` if you renamed the `war` file to `ROOT.war` as done in the Dockerfile).
-
 -----
-
 
 ### 🐳 Docker Deployment
 
-Containerizing the application with Docker is the recommended way to deploy it to cloud platforms like Render, Heroku, or AWS. This packages the application and its entire environment, resolving any library or runtime inconsistencies.
-
-**Note on Render & JSTL/Servlets:** Platforms like Render typically expect a self-contained service and do not have a "Java Servlet" environment out-of-box. By using Docker, you package a servlet container (like Tomcat) with your application, which Render can then run. Our `Dockerfile` uses **Tomcat 9.0** as the base image for deployment.
+Containerizing the application with Docker is the recommended way to deploy it to any cloud platform.
 
 #### Understanding the `Dockerfile`
 
-```dockerfile
-# --- Stage 1: Build the Application ---
-FROM openjdk:17-jdk-slim AS build
+The `Dockerfile` uses a multi-stage build to create a lean and efficient final image:
 
-# Install Maven in the build stage
-RUN apt-get update && \
-    apt-get install -y maven && \
-    rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
-
-# Copy the project files
-COPY pom.xml .
-COPY src ./src
-
-# Build the WAR file. The output will be 'target/studentrepo.war'
-RUN mvn clean package -DskipTests
-
-# --- Stage 2: Run the Application ---
-# Use a Tomcat 9.0 image with JDK 17
-FROM tomcat:9.0-jdk17-openjdk-slim
-
-WORKDIR /usr/local/tomcat/webapps/
-
-# Copy the WAR file from the 'build' stage and RENAME it to ROOT.war
-# Tomcat automatically serves ROOT.war at the root context (e.g., http://your-app-url.com/).
-COPY --from=build /app/target/studentrepo.war ROOT.war
-
-# Expose the default Tomcat port
-EXPOSE 8080
-
-# Command to run Tomcat when the container starts
-CMD ["catalina.sh", "run"]
-```
-
+1.  **Build Stage:** An `openjdk:17-jdk-slim` image and Maven are used to build the `.war` file from the source.
+2.  **Run Stage:** A `tomcat:9.0-jdk17-openjdk-slim` image is used for the final container. The `.war` file is copied into Tomcat's `webapps` directory as `ROOT.war`, making the app accessible at the root URL (`/`).
 
 #### Steps to Deploy with Docker:
 
-1.  **Ensure your Java code reads database credentials from environment variables.**
-    For Docker deployments, you **must** configure your Java application to read database connection details (host, user, password) from environment variables (e.g., `System.getenv("DB_HOST")`, `System.getenv("DB_USER")`, `System.getenv("DB_PASSWORD")`) instead of directly from `db.properties` or similar files. This is a standard and secure practice for containerized applications.
-
+1.  **Code Configuration for Cloud Deployment:**
+    Ensure your `DBUtil.java` is configured to read database credentials from **environment variables**. This is a critical security practice for containerized applications.
 
 2.  **Build the Docker image:**
-    Make sure you are in the root directory of your project (where the `Dockerfile` is located).
+    From the root directory of the `studentrepo` project, run:
 
     ```bash
     docker build -t student-performance-tracker .
     ```
 
-    (You can replace `student-performance-tracker` with any name you prefer for your image.)
-
-
-3.  **Run the container locally (for testing):**
-    This command runs your container and maps the container's port 8080 to your local machine's port 8080. You'll need to pass your database credentials as environment variables.
+3.  **Run the container locally for testing:**
+    This command runs the container and maps the container's port 8080 to your local machine's port 8080. You must pass your database and AI API credentials as environment variables.
 
     ```bash
     docker run -p 8080:8080 \
-      -e DB_HOST='your_mysql_host' \
-      -e DB_USER='your_mysql_user' \
-      -e DB_PASSWORD='your_mysql_password' \
+      -e AIVEN_MYSQL_HOST='your_mysql_host' \
+      -e AIVEN_MYSQL_PORT='your_mysql_port' \
+      -e AIVEN_MYSQL_DATABASE='your_database_name' \
+      -e AIVEN_MYSQL_USERNAME='your_mysql_user' \
+      -e AIVEN_MYSQL_PASSWORD='your_mysql_password' \
+      -e GEMINI_API_KEY='your_gemini_api_key' \
       student-performance-tracker
     ```
 
-    Replace `your_mysql_host`, `your_mysql_user`, and `your_mysql_password` with your actual local MySQL credentials. After running, access your application at `http://localhost:8080/`.
-
+    You can now access your application at `http://localhost:8080/`.
 
 ## 📄 License
-   This project is licensed under the MIT License - see the [LICENSE.md] file for details.
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
