@@ -1,5 +1,5 @@
 
-# Aegis Academic Suite: AI-Powered Academic Management
+# Aegis Academic Suite: AI-Powered Academic Management & Tracking
 
 An intelligent, self-hosted web application engineered with a pure Java backend (Servlets & JSP). **Aegis Academic Suite** provides a secure, robust, and multi-user environment for educational institutions to manage student performance, departmental data, and academic schedules with unparalleled efficiency.
 
