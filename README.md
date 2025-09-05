@@ -14,7 +14,7 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/amruthkumartj/studentperformancetracking)
 ![GitHub License](https://img.shields.io/github/license/amruthkumartj/studentperformancetracking)
 
-[![Live Demo](https://img.shields.io/badge/🚀%20Launch-Live%20Demo-brightgreen?style=for-the-badge)](https://studentperformancetracking.onrender.com)
+[![Live Demo](https://img.shields.io/badge/🚀%20Launch-Live%20Demo-brightgreen?style=for-the-badge)](https://studentperformancetracking.onrender.com)   **[🔑 Demo Login Credentials ](#-demo-credentials)**
 
 An intelligent, self-hosted web application engineered with a pure Java backend (Servlets & JSP). **Aegis Academic Suite** provides a secure, robust, and multi-user environment for educational institutions to manage student performance, departmental data, and academic schedules with unparalleled efficiency.
 
@@ -47,8 +47,11 @@ This project integrates a **Gemini-powered AI assistant** to empower faculty, of
 #### ScreenShots:  
 
 <img width="1918" height="907" alt="image" src="https://github.com/user-attachments/assets/fed85142-9e1b-41ea-8384-f13fd6caf599" />
+
 <img width="1895" height="897" alt="image" src="https://github.com/user-attachments/assets/3ba46048-447e-4b58-a2e6-7d8044ed2fd3" />
+
 <img width="1890" height="901" alt="image" src="https://github.com/user-attachments/assets/f39515a9-e3f2-4c87-890d-12eef2ebf471" />
+
 <img width="1913" height="903" alt="image" src="https://github.com/user-attachments/assets/907d2613-a23a-4284-b04d-ff16c26fa128" />
 
 
@@ -68,23 +71,33 @@ This project integrates a **Gemini-powered AI assistant** to empower faculty, of
 #### 🧑‍🏫 Faculty
 
   * **🤖 AI-Powered Faculty Assistant:** A built-in assistant powered by the **Google Gemini API** to enhance productivity. Faculty can:
+    
       * Generate summaries of student performance.
       * Draft emails to students or parents.
       * Get insights and analyze course data.
+        
   * **Advanced Scheduling & Timetabling:**
+    
       * **Weekly Timetable:** A clear, organized visual interface to view the entire weekly schedule for any program and semester.
       * **Extra Class Management:** Schedule single or recurring daily classes with built-in conflict detection against the main timetable.
+        
   * **Robust Attendance System:**
+    
       * **Timed Sessions:** Initiate attendance sessions that automatically lock and expire after 15 minutes to ensure timely data entry.
       * **Efficient Marking:** Utilize quick-marking features like "Mark All as Present/Absent" for large classes.
       * **Default Status:** Unmarked students automatically default to 'Present' upon session expiry to prevent incomplete records.
+        
   * **Comprehensive Marks Management:**
+    
       * Enter, update, and manage marks for various exam types (e.g., Internal Assessment, SEE).
       * The system prevents duplicate mark entries for the same student/exam and allows for easy correction of errors.
+       
   * **📊 In-Depth Performance Analytics:**
+    
       * Visualize class-wide performance with dynamic charts and detailed data tables to identify academic trends.
       * Drill down into individual student reports, viewing detailed breakdowns of marks and attendance percentages.
       * Receive an automated performance analysis summary (e.g., "Excellent," "Good," "Needs Improvement").
+        
   * **Event Coordination:** Schedule, view, and manage departmental or college-wide events like seminars and guest lectures.
 
 #### 🎓 Student
@@ -125,6 +138,18 @@ Follow these instructions to get a local copy up and running for development and
   * Apache Maven
   * MySQL Server
   * Docker
+
+### 🔑 Demo Credentials
+
+You can log in using the following demo accounts:
+
+- **Faculty Login**  
+  📧 Email: `hero@gmail.com`  
+  🔑 Password: `demo`
+
+- **Student Login**  
+  📧 Email: `demo@gmail.com`  
+  🔑 Password: `demo`
 
 #### Installation & Setup
 
@@ -192,3 +217,7 @@ The `Dockerfile` uses a multi-stage build to create a lean and efficient final i
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+
+
+
