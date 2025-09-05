@@ -29,6 +29,17 @@ This project integrates a **Gemini-powered AI assistant** to empower faculty, of
 
 -----
 
+#### ScreenShots:  
+
+<img width="1918" height="907" alt="image" src="https://github.com/user-attachments/assets/fed85142-9e1b-41ea-8384-f13fd6caf599" />
+<img width="1895" height="897" alt="image" src="https://github.com/user-attachments/assets/3ba46048-447e-4b58-a2e6-7d8044ed2fd3" />
+<img width="1890" height="901" alt="image" src="https://github.com/user-attachments/assets/f39515a9-e3f2-4c87-890d-12eef2ebf471" />
+<img width="1913" height="903" alt="image" src="https://github.com/user-attachments/assets/907d2613-a23a-4284-b04d-ff16c26fa128" />
+
+
+
+
+
 ### Detailed Role-Based Functionalities
 
 #### 👑 Admin
